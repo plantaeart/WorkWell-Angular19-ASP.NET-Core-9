@@ -141,4 +141,3 @@ _ReSharper*/
 # JetBrains Rider
 .idea/
 *.sln.iml
-/backend/WorkWell-backend/bin
