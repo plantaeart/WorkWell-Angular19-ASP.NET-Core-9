@@ -23,5 +23,5 @@ I will use ASP.NET Core 9 web API with the unkown Firestore (never use it before
 * In the terminal run : dotnet run
 * Go to the URL : __http://localhost:5213/swagger__ to get the API specifications
 
- ## Note from me 💭
+ ## Notes from me 💭
  * 21/04/2025 : It's been a while since i used some C# (that i love ! Except the fact that you always need to connect with your microsof account to use the APS.NET universe...). And also will be the first time i will use Firestore. Will tell you if it's easy to use and put in place.
