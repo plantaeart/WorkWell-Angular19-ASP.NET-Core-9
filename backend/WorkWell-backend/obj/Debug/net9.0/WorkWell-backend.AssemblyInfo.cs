@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WorkWell-backend")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1774009c2b53157edd70fb889ec00aa649322a10")]
 [assembly: System.Reflection.AssemblyProductAttribute("WorkWell-backend")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WorkWell-backend")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
