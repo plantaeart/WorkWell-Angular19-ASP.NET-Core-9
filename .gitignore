@@ -1,0 +1,143 @@
+# Build Folders
+bin/
+obj/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Rider
+.idea/
+*.sln.iml
+
+# VS Code
+.vscode/
+
+# Visual Studio Code Workspace
+*.code-workspace
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# DotCover
+*.dotCover
+
+# NCrunch
+*.ncrunch*
+_NCrunch_*
+.*crunch*.local.xml
+
+# MSTest
+TestResults/
+
+# Build Results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+dlldata.c
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# StyleCop
+StyleCopReport.xml
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.log
+*.vspscc
+*.vssscc
+*.cache
+*.scc
+
+# Others
+*.dbmdl
+*.bak
+*.backup
+*.BLOB
+*.cache
+*.db
+*.db-shm
+*.db-wal
+*.diff
+*.orig
+*.rej
+*.sdf
+*.sqlite
+*.sqlite3
+*.swp
+*.v12.suo
+*.vsscc
+*.vspscc
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Local history for Visual Studio
+.localhistory/
+
+# IIS Express
+.vs/
+.vsconfig
+*.vspscc
+*.vssscc
+
+# Dotnet tool manifest
+.dotnet-tools.json
+
+# App secrets
+secrets.json
+
+# Azure Functions local settings file
+local.settings.json
+
+# Docker
+**/Dockerfile.*
+**/docker-compose*.yml
+
+# Logs
+*.log
+
+# npm packages
+node_modules/
+
+# Yarn
+.yarn/
+
+# Environment files
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Resharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# JetBrains Rider
+.idea/
+*.sln.iml
