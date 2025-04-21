@@ -45,17 +45,16 @@ public class WorkWellController : ControllerBase
 
     // POST: api/WorkWell/CreateWorkWell
     [HttpPost("CreateWorkWell")]
-    public async Task<IActionResult> CreateWorkWell([FromBody] WorkWellSchedule workWell)
+    public async Task<IActionResult> CreateWorkWell([FromBody] WorkWell workWell)
     {
         var document = _firestoreDb.Collection(CollectionName).Document();
-        workWell.IdDay = (WorkWellDayType)Enum.Parse(typeof(WorkWellDayType), document.Id); // Example of setting IdDay
         await document.SetAsync(workWell);
         return CreatedAtAction(nameof(GetWorkWellById), new { id = document.Id }, workWell);
     }
 
     // PUT: api/WorkWell/UpdateWorkWell/{id}
     [HttpPut("UpdateWorkWell/{id}")]
-    public async Task<IActionResult> UpdateWorkWell(string id, [FromBody] WorkWellSchedule workWell)
+    public async Task<IActionResult> UpdateWorkWell(string id, [FromBody] WorkWell workWell)
     {
         var document = _firestoreDb.Collection(CollectionName).Document(id);
         var snapshot = await document.GetSnapshotAsync();
