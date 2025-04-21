@@ -25,3 +25,10 @@ I will use ASP.NET Core 9 web API with the unkown Firestore (never use it before
 
  ## Notes from me 💭
  * 21/04/2025 : It's been a while since i used some C# (that i love ! Except the fact that you always need to connect with your microsof account to use the APS.NET universe...). And also will be the first time i will use Firestore. Will tell you if it's easy to use and put in place.
+ * 21/04/2025 : Firestore is really easy to use ! Collections are table, Documents are line, so really easy to understand, and the Firebase package makes everything so easy to manipulate 😎
+So to use Firestore for a ASP.Net core 9 webapi project you will need to :
+  * Install the nuget package for Firebase : __https://cloud.google.com/dotnet/docs/reference/Google.Cloud.Firestore/latest__
+  * Create a Firestore project on Google Firebase : __https://console.firebase.google.com__
+  * Install google cloud cli and add dev auth (follow this document) : __https://cloud.google.com/docs/authentication/set-up-adc-local-dev-environment#local-user-cred__
+After that, you are good to go !
+And also Swagger is really helful to manipulate easily the API's endpoint 🙂
