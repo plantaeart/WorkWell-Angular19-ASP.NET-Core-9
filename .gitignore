@@ -1,143 +1,152 @@
-# Build Folders
-bin/
-obj/
+# === Angular 19 Frontend Ignore Rules ===
+# See https://angular.io/guide/build#gitignore
+# compiled output
+/frontend/WorkWell-frontend/dist
+/frontend/WorkWell-frontend/tmp
+/frontend/WorkWell-frontend/out-tsc
 
-# User-specific files
-*.user
-*.userosscache
-*.suo
-*.sln.docstates
+# dependencies
+/frontend/WorkWell-frontend/node_modules
 
-# Rider
-.idea/
-*.sln.iml
+# IDEs and editors
+/frontend/WorkWell-frontend/.idea
+/frontend/WorkWell-frontend/.vscode
 
-# VS Code
-.vscode/
+# misc
+/frontend/WorkWell-frontend/.DS_Store
 
-# Visual Studio Code Workspace
-*.code-workspace
+# environment files
+/frontend/WorkWell-frontend/src/environments/*.ts
 
-# ASP.NET Scaffolding
-ScaffoldingReadMe.txt
-
-# DotCover
-*.dotCover
-
-# NCrunch
-*.ncrunch*
-_NCrunch_*
-.*crunch*.local.xml
-
-# MSTest
-TestResults/
-
-# Build Results of an ATL Project
-[Dd]ebugPS/
-[Rr]eleasePS/
-dlldata.c
-
-# .NET Core
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
-# StyleCop
-StyleCopReport.xml
-
-# Files built by Visual Studio
-*_i.c
-*_p.c
-*_h.h
-*.ilk
-*.meta
-*.obj
-*.iobj
-*.pch
-*.pdb
-*.ipdb
-*.pgc
-*.pgd
-*.rsp
-*.sbr
-*.tlb
-*.tli
-*.tlh
-*.tmp
-*.log
-*.vspscc
-*.vssscc
-*.cache
-*.scc
-
-# Others
-*.dbmdl
-*.bak
-*.backup
-*.BLOB
-*.cache
-*.db
-*.db-shm
-*.db-wal
-*.diff
-*.orig
-*.rej
-*.sdf
-*.sqlite
-*.sqlite3
-*.swp
-*.v12.suo
-*.vsscc
-*.vspscc
-*.user
-*.userosscache
-*.suo
-*.sln.docstates
-
-# Local history for Visual Studio
-.localhistory/
-
-# IIS Express
-.vs/
-.vsconfig
-*.vspscc
-*.vssscc
-
-# Dotnet tool manifest
-.dotnet-tools.json
-
-# App secrets
-secrets.json
-
-# Azure Functions local settings file
-local.settings.json
-
-# Docker
-**/Dockerfile.*
-**/docker-compose*.yml
+# Angular specific
+/frontend/WorkWell-frontend/.angular/cache
 
 # Logs
-*.log
+/frontend/WorkWell-frontend/npm-debug.log*
+/frontend/WorkWell-frontend/yarn-debug.log*
+/frontend/WorkWell-frontend/yarn-error.log*
 
-# npm packages
-node_modules/
+# System Files
+/frontend/WorkWell-frontend/Thumbs.db
 
-# Yarn
-.yarn/
+# === ASP.NET Core 9 Backend Ignore Rules ===
+# Build Folders
+/backend/WorkWell-backend/bin/
+/backend/WorkWell-backend/obj/
 
-# Environment files
-.env
-.env.*
+# User-specific files
+/backend/WorkWell-backend/*.user
+/backend/WorkWell-backend/*.userosscache
+/backend/WorkWell-backend/*.suo
+/backend/WorkWell-backend/*.sln.docstates
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Rider
+/backend/WorkWell-backend/.idea/
+/backend/WorkWell-backend/*.sln.iml
 
-# Resharper
-_ReSharper*/
-*.[Rr]e[Ss]harper
-*.DotSettings.user
+# VS Code
+/backend/WorkWell-backend/.vscode/
 
-# JetBrains Rider
-.idea/
-*.sln.iml
+/backend/WorkWell-backend/*.code-workspace
+
+# ASP.NET Scaffolding
+/backend/WorkWell-backend/ScaffoldingReadMe.txt
+
+# DotCover
+/backend/WorkWell-backend/*.dotCover
+
+# NCrunch
+/backend/WorkWell-backend/*.ncrunch*
+/backend/WorkWell-backend/_NCrunch_*
+/backend/WorkWell-backend/.*crunch*.local.xml
+
+# MSTest
+/backend/WorkWell-backend/TestResults/
+
+/backend/WorkWell-backend/project.lock.json
+/backend/WorkWell-backend/project.fragment.lock.json
+/backend/WorkWell-backend/artifacts/
+
+/backend/WorkWell-backend/StyleCopReport.xml
+
+/backend/WorkWell-backend/*_i.c
+/backend/WorkWell-backend/*_p.c
+/backend/WorkWell-backend/*_h.h
+/backend/WorkWell-backend/*.ilk
+/backend/WorkWell-backend/*.meta
+/backend/WorkWell-backend/*.obj
+/backend/WorkWell-backend/*.iobj
+/backend/WorkWell-backend/*.pch
+/backend/WorkWell-backend/*.pdb
+/backend/WorkWell-backend/*.ipdb
+/backend/WorkWell-backend/*.pgc
+/backend/WorkWell-backend/*.pgd
+/backend/WorkWell-backend/*.rsp
+/backend/WorkWell-backend/*.sbr
+/backend/WorkWell-backend/*.tlb
+/backend/WorkWell-backend/*.tli
+/backend/WorkWell-backend/*.tlh
+/backend/WorkWell-backend/*.tmp
+/backend/WorkWell-backend/*.log
+/backend/WorkWell-backend/*.vspscc
+/backend/WorkWell-backend/*.vssscc
+/backend/WorkWell-backend/*.cache
+/backend/WorkWell-backend/*.scc
+
+/backend/WorkWell-backend/*.dbmdl
+/backend/WorkWell-backend/*.bak
+/backend/WorkWell-backend/*.backup
+/backend/WorkWell-backend/*.BLOB
+/backend/WorkWell-backend/*.cache
+/backend/WorkWell-backend/*.db
+/backend/WorkWell-backend/*.db-shm
+/backend/WorkWell-backend/*.db-wal
+/backend/WorkWell-backend/*.diff
+/backend/WorkWell-backend/*.orig
+/backend/WorkWell-backend/*.rej
+/backend/WorkWell-backend/*.sdf
+/backend/WorkWell-backend/*.sqlite
+/backend/WorkWell-backend/*.sqlite3
+/backend/WorkWell-backend/*.swp
+/backend/WorkWell-backend/*.v12.suo
+/backend/WorkWell-backend/*.vsscc
+/backend/WorkWell-backend/*.vspscc
+/backend/WorkWell-backend/*.user
+/backend/WorkWell-backend/*.userosscache
+/backend/WorkWell-backend/*.suo
+/backend/WorkWell-backend/*.sln.docstates
+
+/backend/WorkWell-backend/.localhistory/
+
+/backend/WorkWell-backend/.vs/
+/backend/WorkWell-backend/.vsconfig
+/backend/WorkWell-backend/*.vspscc
+/backend/WorkWell-backend/*.vssscc
+
+/backend/WorkWell-backend/.dotnet-tools.json
+
+/backend/WorkWell-backend/secrets.json
+
+/backend/WorkWell-backend/local.settings.json
+
+/backend/WorkWell-backend/**/Dockerfile.*
+/backend/WorkWell-backend/**/docker-compose*.yml
+
+/backend/WorkWell-backend/*.log
+
+/backend/WorkWell-backend/node_modules/
+
+/backend/WorkWell-backend/.yarn/
+
+/backend/WorkWell-backend/.env
+/backend/WorkWell-backend/.env.*
+
+/backend/WorkWell-backend/.DS_Store
+/backend/WorkWell-backend/Thumbs.db
+
+/backend/WorkWell-backend/_ReSharper*/
+/backend/WorkWell-backend/*.[Rr]e[Ss]harper
+/backend/WorkWell-backend/*.DotSettings.user
+
+/backend/WorkWell-backend/.idea/
+/backend/WorkWell-backend/*.sln.iml
