@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { WwHeaderComponent } from '../ww-header/ww-header.component';
 import { SeparatorComponent } from '../separator/separator.component';
 import { WwDisplayTemplatesComponent } from '../ww-display-templates/ww-display-templates.component';
+import { WorkWellStore } from '../../store/workWell.store';
 
 @Component({
   selector: 'root',
@@ -17,4 +18,11 @@ import { WwDisplayTemplatesComponent } from '../ww-display-templates/ww-display-
 })
 export class AppComponent {
   title = 'WorkWell-frontend';
+
+  private workWellStore = inject(WorkWellStore);
+
+  // Load work wells on initialization
+  ngOnInit() {
+    this.workWellStore.getAllWorkWell();
+  }
 }

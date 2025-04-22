@@ -7,11 +7,13 @@ import {
   withEventReplay,
 } from '@angular/platform-browser';
 import { WwThemeColor } from './ww-themeColor';
+import { provideHttpClient, withFetch } from '@angular/common/http';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    provideHttpClient(withFetch()),
     provideClientHydration(withEventReplay()),
     providePrimeNG({ theme: { preset: WwThemeColor } }),
   ],

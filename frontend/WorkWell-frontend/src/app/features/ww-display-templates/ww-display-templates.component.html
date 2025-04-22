@@ -1,3 +1,8 @@
 <div>
   <h2 class="text-lg">Your templates</h2>
+  <div *ngIf="isLoading()">Loading...</div>
+
+  <div *ngFor="let workWell of workWellList()">
+    {{ workWell.idWWS }} - {{ workWell.name }} - {{ workWell.description }}
+  </div>
 </div>
