@@ -16,4 +16,23 @@ export class WorkWellApiService {
       `${this.baseUrl}/api/WorkWell/GetAllWorkWell`
     );
   }
+
+  getWorkWellByIdFromApi(idWWS: number): Observable<WorkWell> {
+    return this.http.get<WorkWell>(
+      `${this.baseUrl}/api/WorkWell/GetWorkWellById/${idWWS}`
+    );
+  }
+
+  createWorkWellFromApi(workWell: WorkWell): Observable<WorkWell> {
+    return this.http.post<WorkWell>(
+      `${this.baseUrl}/api/WorkWell/CreateWorkWell`,
+      workWell
+    );
+  }
+
+  deleteWorkWellByIdFromApi(idWWS: number): Observable<void> {
+    return this.http.delete<void>(
+      `${this.baseUrl}/api/WorkWell/DeleteWorkWellById/${idWWS}`
+    );
+  }
 }

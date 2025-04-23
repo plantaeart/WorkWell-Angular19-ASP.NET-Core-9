@@ -23,6 +23,6 @@ export class AppComponent {
 
   // Load work wells on initialization
   ngOnInit() {
-    this.workWellStore.getAllWorkWell();
+    this.workWellStore.getAllWorkWellFromStore();
   }
 }

@@ -1,8 +1,47 @@
 <div>
-  <h2 class="text-lg">Your templates</h2>
-  <div *ngIf="isLoading()">Loading...</div>
+  <h2 class="text-2xl mb-2">Your templates</h2>
+  <div *ngIf="isLoading()" class="loading-message" aria-live="polite">
+    Loading...
+  </div>
 
-  <div *ngFor="let workWell of workWellList()">
-    {{ workWell.idWWS }} - {{ workWell.name }} - {{ workWell.description }}
+  <!-- Use grid layout with fixed row height -->
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 grid-auto-rows-[minmax(150px,_1fr)]"
+  >
+    <!-- WorkWell items -->
+    <div class="h-50" *ngFor="let workWell of workWellList()" @listAnimation>
+      <div
+        class="h-full shadow-lg bg-sky-100 p-4 rounded-lg flex flex-col justify-start"
+      >
+        <div class="flex justify-between items-center mb-2">
+          <h3 class="font-bold text-lg">
+            <span *ngIf="isDebug()">{{ workWell.idWWS }} </span
+            >{{ workWell.name }}
+          </h3>
+          <div class="flex justify-start h-full">
+            <p-button
+              class="flex items-center size-10 cursor-pointer bg-red-400 hover:bg-red-500 text-white font-bold rounded-lg shadow-lg"
+              icon="pi pi-trash"
+              severity="danger"
+              aria-label="Delete"
+              (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
+            ></p-button>
+          </div>
+        </div>
+        <p class="font-light">{{ workWell.description }}</p>
+      </div>
+    </div>
+
+    <!-- Add button -->
+    <div class="h-50">
+      <button
+        class="cursor-pointer h-full w-full p-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg"
+        aria-label="Add new template"
+        title="Add new template"
+        (click)="createWorkWellFromTemplate()"
+      >
+        <p class="text-8xl">+</p>
+      </button>
+    </div>
   </div>
 </div>
