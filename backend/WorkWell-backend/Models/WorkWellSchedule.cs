@@ -10,13 +10,13 @@ public class WorkWellSchedule
     public required WorkWellDayType IdDay { get; set; }
 
     [FirestoreProperty(nameof(WorkDay))]
-    public WorkWellEvent? WorkDay { get; set; }
+    public WorkWellEvent WorkDay { get; set; }
 
     [FirestoreProperty(nameof(Meetings))]
-    public List<WorkWellEvent>? Meetings { get; set; }
+    public List<WorkWellEvent> Meetings { get; set; }
 
     [FirestoreProperty(nameof(Lunch))]
-    public WorkWellEvent? Lunch { get; set; }
+    public WorkWellEvent Lunch { get; set; }
 
     public WorkWellSchedule()
     {

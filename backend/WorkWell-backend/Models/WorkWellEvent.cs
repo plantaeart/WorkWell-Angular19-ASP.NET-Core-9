@@ -8,22 +8,22 @@ namespace WorkWell_backend.Models;
 public class WorkWellEvent
 {
     [FirestoreProperty(nameof(StartDate))]
-    public DateTime StartDate { get; set; }
+    public string StartDate { get; set; }
 
     [FirestoreProperty(nameof(EndDate))]
-    public DateTime EndDate { get; set; }
+    public string EndDate { get; set; }
 
     [FirestoreProperty(nameof(EventType))]
     public WorkWellEventType EventType { get; set; }
 
     public WorkWellEvent()
     {
-        StartDate = DateTime.Now;
-        EndDate = DateTime.Now.AddHours(1); // Default to 1 hour duration
+        StartDate = "09:00";
+        EndDate = "18:00";
         EventType = WorkWellEventType.NONE;
     }
 
-    public WorkWellEvent(DateTime startDate, DateTime endDate, WorkWellEventType eventType)
+    public WorkWellEvent(string startDate, string endDate, WorkWellEventType eventType)
     {
         StartDate = startDate;
         EndDate = endDate;
