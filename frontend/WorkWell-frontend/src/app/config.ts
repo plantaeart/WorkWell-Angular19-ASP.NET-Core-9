@@ -20,12 +20,6 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({
       theme: {
         preset: WwThemeColor,
-        options: {
-          cssLayer: {
-            name: 'primeng',
-            order: 'tailwind, primeng',
-          },
-        },
       },
     }),
   ],

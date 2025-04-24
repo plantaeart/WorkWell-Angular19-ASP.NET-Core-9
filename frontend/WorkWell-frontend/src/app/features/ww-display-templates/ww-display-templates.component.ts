@@ -1,10 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
-import { WorkWell } from '../../models/workWell.model';
 import { CommonModule } from '@angular/common';
 import { WorkWellStore } from '../../store/workWell.store';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { environment } from '../../environments/environment.development';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ww-display-templates',
@@ -34,17 +34,15 @@ export class WwDisplayTemplatesComponent {
   private workWellStore = inject(WorkWellStore);
   public workWellList = this.workWellStore.workWellList;
   public isLoading = this.workWellStore.loading;
-
-  createWorkWellFromTemplate = () => {
-    const newWorkWell: WorkWell = new WorkWell({
-      name: 'New Work Well Template',
-      description: 'Description of the new work well template',
-    });
-    this.workWellStore.createWorkWellFromStore(newWorkWell);
-  };
+  constructor(private router: Router) {}
 
   deleteWorkWellByIdFromTemplate = (idWWS: number) => {
     console.log('Deleting work well with ID:', idWWS);
     this.workWellStore.deleteWorkWellFromStore(idWWS);
   };
+
+  // Navigate to the "addNewWorkWell" page
+  navigateToAddNewWorkWell() {
+    this.router.navigate(['/addNewWorkWell']);
+  }
 }

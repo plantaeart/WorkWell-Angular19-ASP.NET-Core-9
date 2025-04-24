@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'ww-header',
@@ -6,4 +7,10 @@ import { Component } from '@angular/core';
   templateUrl: './ww-header.component.html',
   styleUrl: './ww-header.component.scss',
 })
-export class WwHeaderComponent {}
+export class WwHeaderComponent {
+  constructor(private router: Router) {}
+
+  navigateToRoot() {
+    this.router.navigate(['/']); // Navigate to the root page
+  }
+}

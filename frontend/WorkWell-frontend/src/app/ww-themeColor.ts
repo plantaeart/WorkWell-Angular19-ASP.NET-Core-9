@@ -1,42 +1,53 @@
 import { definePreset } from '@primeng/themes';
-import Material from '@primeng/themes/material';
+import Aura from '@primeng/themes/aura';
 
-export const WwThemeColor = definePreset(Material, {
+export const WwThemeColor = definePreset(Aura, {
   semantic: {
     primary: {
-      50: '{indigo.50}',
-      100: '{indigo.100}',
-      200: '{indigo.200}',
-      300: '{indigo.300}',
-      400: '{indigo.400}',
-      500: '{indigo.500}',
-      600: '{indigo.600}',
-      700: '{indigo.700}',
-      800: '{indigo.800}',
-      900: '{indigo.900}',
-      950: '{indigo.950}',
+      50: '#e6f2fc',
+      100: '#cce5f9',
+      200: '#99cbf3',
+      300: '#66b0ed',
+      400: '#3396e7',
+      500: '#0267C1', // Primary color
+      600: '#025aa9',
+      700: '#024c91',
+      800: '#013f79',
+      900: '#013161',
+    },
+    secondary: {
+      50: '#ffffff',
+      100: '#fefefe',
+      200: '#fcfdfc',
+      300: '#fafcf9',
+      400: '#f8fbf6',
+      500: '#F5FBEF', // Secondary color
+      600: '#dce2d7',
+      700: '#c3c9bf',
+      800: '#aab0a7',
+      900: '#91978f',
     },
     colorScheme: {
       light: {
         primary: {
-          color: '{indigo.950}',
+          color: '#0267C1', // Primary color
           inverseColor: '#ffffff',
-          hoverColor: '{indigo.900}',
-          activeColor: '{indigo.800}',
+          hoverColor: '#3396e7', // Lighter shade for hover
+          activeColor: '#024c91', // Darker shade for active
         },
         highlight: {
-          background: '{indigo.950}',
-          focusBackground: '{indigo.700}',
-          color: '#ffffff',
-          focusColor: '#ffffff',
+          background: '#0267C1',
+          focusBackground: '#3396e7',
+          color: '#000411', // Text color
+          focusColor: '#000411', // Focused text color
         },
       },
       dark: {
         primary: {
-          color: '{indigo.50}',
-          inverseColor: '{indigo.950}',
-          hoverColor: '{indigo.100}',
-          activeColor: '{indigo.200}',
+          color: '#3396e7', // Lighter shade for dark mode
+          inverseColor: '#0267C1',
+          hoverColor: '#66b0ed',
+          activeColor: '#cce5f9',
         },
         highlight: {
           background: 'rgba(250, 250, 250, .16)',
@@ -45,6 +56,21 @@ export const WwThemeColor = definePreset(Material, {
           focusColor: 'rgba(255,255,255,.87)',
         },
       },
+    },
+  },
+  typography: {
+    fontFamily: {
+      sans: ['Inter', 'sans-serif'],
+      serif: ['Merriweather', 'serif'],
+    },
+    fontSize: {
+      sm: '0.875rem',
+      base: '1rem',
+      lg: '1.125rem',
+      xl: '1.25rem',
+    },
+    textColor: {
+      primary: '#000411', // Text color
     },
   },
 });
