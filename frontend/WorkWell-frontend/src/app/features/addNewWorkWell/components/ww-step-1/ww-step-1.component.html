@@ -1,0 +1,36 @@
+<div class="flex flex-col gap-4 p-4">
+  <div
+    class="flex flex-column justify-between items-center gap-3 text-[#000411]"
+  >
+    <p class="text-xl">💼 How many days do you work a week ?</p>
+    <p-inputnumber
+      [(ngModel)]="addNewWorkWell.nbDayWork"
+      [showButtons]="true"
+      buttonLayout="vertical"
+      spinnerMode="vertical"
+      inputId="vertical"
+      [inputStyle]="{ width: '3rem' }"
+      [min]="1"
+      [max]="7"
+    >
+      <ng-template #incrementbuttonicon>
+        <span class="pi pi-plus"></span>
+      </ng-template>
+      <ng-template #decrementbuttonicon>
+        <span class="pi pi-minus"></span>
+      </ng-template>
+    </p-inputnumber>
+  </div>
+  <div
+    class="flex flex-column justify-between items-center gap-3 text-[#000411]"
+  >
+    <p class="text-xl">💼 What schedule type do you have ?</p>
+    <p-selectbutton
+      [options]="stateOptions"
+      [(ngModel)]="addNewWorkWell.scheduleType"
+      optionLabel="label"
+      optionValue="value"
+      aria-labelledby="basic"
+    />
+  </div>
+</div>

@@ -11,6 +11,7 @@ export class WorkWellStore {
 
   // State
   workWellList = signal<WorkWell[]>([]);
+  addNewWorkWell = signal<WorkWell>(new WorkWell({}));
   loading = signal(false);
   error = signal<string | null>(null);
 

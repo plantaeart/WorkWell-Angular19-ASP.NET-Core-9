@@ -4,22 +4,20 @@ import { WorkWellEventType } from '../../types/enums/workWellEventType';
 
 export class WorkWellSchedule {
   idDay: WorkWellDayType;
-  workDay: WorkWellEvent | null;
-  meetings: WorkWellEvent[] | null;
-  lunch: WorkWellEvent | null;
+  workDay: WorkWellEvent;
+  meetings: WorkWellEvent[];
+  lunch: WorkWellEvent;
 
   constructor(params: {
     idDay?: WorkWellDayType;
-    workDay?: WorkWellEvent | null;
-    meetings?: WorkWellEvent[] | null;
-    lunch?: WorkWellEvent | null;
+    workDay?: WorkWellEvent;
+    meetings?: WorkWellEvent[];
+    lunch?: WorkWellEvent;
   }) {
     this.idDay = params.idDay || WorkWellDayType.NONE;
     this.workDay =
       params.workDay ||
       new WorkWellEvent({
-        startDate: new Date(),
-        endDate: new Date(new Date().getTime() + 60 * 60 * 1000),
         eventType: WorkWellEventType.NONE,
       });
     this.meetings = params.meetings || new Array<WorkWellEvent>();
@@ -29,8 +27,6 @@ export class WorkWellSchedule {
     this.lunch =
       params.lunch ||
       new WorkWellEvent({
-        startDate: new Date(),
-        endDate: new Date(new Date().getTime() + 60 * 60 * 1000),
         eventType: WorkWellEventType.LUNCH,
       });
   }

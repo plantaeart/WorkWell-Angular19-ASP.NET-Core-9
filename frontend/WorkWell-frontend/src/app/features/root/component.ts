@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { WwHeaderComponent } from '../ww-header/ww-header.component';
-import { SeparatorComponent } from '../separator/separator.component';
+import { WwHeaderComponent } from '../components/ww-header/ww-header.component';
+import { SeparatorComponent } from '../components/separator/separator.component';
 import { WorkWellStore } from '../../store/workWell.store';
 
 @Component({

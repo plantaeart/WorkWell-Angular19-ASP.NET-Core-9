@@ -5,6 +5,7 @@ export class WorkWell {
   idWWS: number;
   name: string;
   description?: string;
+  nbDayWork: number;
   updateDate: Date;
   scheduleType: WorkWellScheduleType;
   workWellSchedule: WorkWellSchedule[];
@@ -13,17 +14,19 @@ export class WorkWell {
     idWWS?: number;
     name?: string;
     description?: string;
+    nbDayWork?: number;
     updateDate?: Date;
     scheduleType?: WorkWellScheduleType;
     workWellSchedule?: WorkWellSchedule[];
   }) {
     this.idWWS = params.idWWS || 0;
-    this.name = params.name || 'Default WorkWell';
-    this.description = params.description || 'Default description';
+    this.name = params.name || '';
+    this.description = params.description || '';
+    this.nbDayWork = params.nbDayWork || 0;
     this.updateDate = params.updateDate || new Date();
     this.scheduleType = params.scheduleType || WorkWellScheduleType.STATIC;
-    this.workWellSchedule = params.workWellSchedule || [
-      new WorkWellSchedule({}),
-    ];
+    this.workWellSchedule =
+      params.workWellSchedule ||
+      new Array<WorkWellSchedule>(new WorkWellSchedule({}));
   }
 }

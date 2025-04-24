@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { ButtonModule } from 'primeng/button';
 import { CommonModule } from '@angular/common';
-import { WorkWellStore } from '../../store/workWell.store';
+import { WorkWellStore } from '../../../store/workWell.store';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../../environments/environment.development';
 import { Router } from '@angular/router';
 
 @Component({
