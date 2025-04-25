@@ -9,10 +9,16 @@ import { WorkWellStore } from '../../../../store/workWell.store';
 import { WorkWellEvent } from '../../../../models/workWellEvent.model';
 import { WorkWellEventType } from '../../../../../types/enums/workWellEventType';
 import { convertTimeStringToDate } from '../../../../utils/string.utils';
+import { WwShowScheduleInfosComponent } from '../ww-show-schedule-infos/ww-show-schedule-infos.component';
 
 @Component({
   selector: 'ww-step-3',
-  imports: [FormsModule, FlatpickrDirective, CommonModule],
+  imports: [
+    FormsModule,
+    FlatpickrDirective,
+    CommonModule,
+    WwShowScheduleInfosComponent,
+  ],
   providers: [
     provideFlatpickrDefaults({
       enableTime: true,
@@ -34,6 +40,10 @@ export class WwStep3Component {
     this.workWellStore.addNewWorkWell().workWellSchedule[0].workDay;
   public lunch = this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch;
 
+  // Create copies of the data
+  public workDayCopy = { ...this.workDay };
+  public lunchCopy = { ...this.lunch };
+
   public flatpickrConfig = {
     enableTime: true,
     noCalendar: true,
@@ -46,20 +56,20 @@ export class WwStep3Component {
 
   constructor() {
     // Convert startDate and endDate to Date for workDay if they are not already Date objects
-    if (!(this.workDay.startDate instanceof Date)) {
+    if (this.workDay.startDate.constructor.name !== 'Date') {
       this.workDay.startDate = convertTimeStringToDate(this.workDay.startDate);
     }
 
-    if (!(this.workDay.endDate instanceof Date)) {
+    if (this.workDay.endDate.constructor.name !== 'Date') {
       this.workDay.endDate = convertTimeStringToDate(this.workDay.endDate);
     }
 
     // Convert startDate and endDate to Date for lunch if they are not already Date objects
-    if (!(this.lunch.startDate instanceof Date)) {
+    if (this.lunch.startDate instanceof String) {
       this.lunch.startDate = convertTimeStringToDate(this.lunch.startDate);
     }
 
-    if (!(this.lunch.endDate instanceof Date)) {
+    if (this.lunch.endDate instanceof String) {
       this.lunch.endDate = convertTimeStringToDate(this.lunch.endDate);
     }
 
@@ -77,10 +87,10 @@ export class WwStep3Component {
       ) {
         const meeting =
           this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[i];
-        if (!(meeting.startDate instanceof Date)) {
+        if (meeting.startDate.constructor.name !== 'Date') {
           meeting.startDate = convertTimeStringToDate(meeting.startDate);
         }
-        if (!(meeting.endDate instanceof Date)) {
+        if (meeting.endDate.constructor.name !== 'Date') {
           meeting.endDate = convertTimeStringToDate(meeting.endDate);
         }
       }
@@ -104,14 +114,14 @@ export class WwStep3Component {
     this.verifyMeetings(); // Re-verify after removing a meeting
   }
 
-  onMeetingStartChange(index: number, newValue: any): void {
+  onMeetingStartChange(index: number, newValue: Date): void {
     this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[
       index
     ].startDate = newValue;
     this.verifyMeetings(); // Re-verify after changing start time
   }
 
-  onMeetingEndChange(index: number, newValue: any): void {
+  onMeetingEndChange(index: number, newValue: Date): void {
     this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[
       index
     ].endDate = newValue;

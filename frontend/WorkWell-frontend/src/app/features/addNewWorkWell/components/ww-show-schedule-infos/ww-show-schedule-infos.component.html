@@ -1,0 +1,25 @@
+<div class="p-4">
+  <!-- WorkDay Info -->
+  <div *ngIf="workDay">
+    <h3 class="text-lg font-bold">💼 Work Day</h3>
+    <p *ngIf="workDay.startDate">Start: {{ workDay.startDate }}</p>
+    <p *ngIf="workDay.endDate">End: {{ workDay.endDate }}</p>
+  </div>
+
+  <!-- Lunch Info -->
+  <div *ngIf="lunch" class="mt-4">
+    <h3 class="text-lg font-bold">🍴 Lunch</h3>
+    <p *ngIf="lunch.startDate">Start: {{ lunch.startDate }}</p>
+    <p *ngIf="lunch.endDate">End: {{ lunch.endDate }}</p>
+  </div>
+
+  <!-- Meetings Info -->
+  <div *ngIf="meetings && meetings.length > 0" class="mt-4">
+    <h3 class="text-lg font-bold">📅 Meetings</h3>
+    <div *ngFor="let meeting of meetings; let i = index" class="mt-2">
+      <p>Meeting {{ i + 1 }}</p>
+      <p *ngIf="meeting.startDate">Start: {{ meeting.startDate }}</p>
+      <p *ngIf="meeting.endDate">End: {{ meeting.endDate }}</p>
+    </div>
+  </div>
+</div>

@@ -24,7 +24,6 @@ import { convertTimeStringToDate } from '../../../../utils/string.utils';
 })
 export class WwStep2Component {
   private workWellStore = inject(WorkWellStore);
-  private initWorkDayAndLunch = false;
   public addNewWorkWell: WorkWell = this.workWellStore.addNewWorkWell();
 
   // Flatpickr preset configuration
@@ -82,7 +81,7 @@ export class WwStep2Component {
     }
   }
 
-  onWorkDayStartChange(newValue: any): void {
+  onWorkDayStartChange(newValue: Date): void {
     const workDayStart = newValue;
     const workDayEnd =
       this.addNewWorkWell.workWellSchedule?.[0]?.workDay.endDate;
@@ -108,7 +107,7 @@ export class WwStep2Component {
     }
   }
 
-  onWorkDayEndChange(newValue: any): void {
+  onWorkDayEndChange(newValue: Date): void {
     const workDayEnd = newValue;
     const workDayStart =
       this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
@@ -134,7 +133,7 @@ export class WwStep2Component {
     }
   }
 
-  onLunchStartChange(newValue: any): void {
+  onLunchStartChange(newValue: Date): void {
     const lunchStart = newValue;
     const minDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
     const maxDate = this.addNewWorkWell.workWellSchedule?.[0].workDay?.endDate;
@@ -154,7 +153,7 @@ export class WwStep2Component {
     }
   }
 
-  onLunchEndChange(newValue: any): void {
+  onLunchEndChange(newValue: Date): void {
     const lunchEnd = newValue;
     const minDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
     const maxDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.endDate;

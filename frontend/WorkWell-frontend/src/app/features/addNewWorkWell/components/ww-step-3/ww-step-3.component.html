@@ -1,79 +1,89 @@
-<div class="flex flex-col gap-4 p-4 text-[#000411]">
-  <div class="flex flex-col justify-between items-center gap-3">
-    <p class="text-xl">📅 Meetings</p>
-    <!-- Button to add a new meeting -->
-    <button
-      class="w-50 cursor-pointer font-bold bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700"
-      (click)="addNewMeeting()"
-    >
-      <span class="pi pi-plus"></span> Add New Meeting
-    </button>
+<div class="flex flex-row w-[100%] justify-between text-[#000411]">
+  <div class="mr-10">
+    <ww-show-schedule-infos
+      [workDay]="workDayCopy"
+      [lunch]="lunchCopy"
+    ></ww-show-schedule-infos>
   </div>
+  <div class="flex flex-col gap-4 p-4">
+    <div class="flex flex-col justify-between items-center gap-3">
+      <p class="text-xl">📅 Meetings</p>
+      <!-- Button to add a new meeting -->
+      <button
+        class="w-50 cursor-pointer font-bold bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700"
+        (click)="addNewMeeting()"
+      >
+        <span class="pi pi-plus"></span> Add New Meeting
+      </button>
+    </div>
 
-  <!-- List of meetings -->
-  <div
-    *ngFor="
-      let meeting of workWellStore.addNewWorkWell().workWellSchedule[0]
-        .meetings;
-      let i = index
-    "
-    class="flex flex-col justify-start"
-  >
-    <div class="flex items-center gap-2">
-      <p class="text-lg">🏢 Meeting n°{{ i + 1 }}</p>
-      <span *ngIf="meetingErrors[i]" class="text-red-500 font-bold">❌</span>
-      <span *ngIf="!meetingErrors[i]" class="text-green-500 font-bold">✅</span>
-    </div>
-    <div class="flex flex-row items-center gap-4 mt-4">
-      <div>
-        <p class="text-lg">🗣️ Start</p>
-        <input
-          class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
-          type="text"
-          mwlFlatpickr
-          [(ngModel)]="meeting.startDate"
-          [minDate]="workDay.startDate"
-          [maxDate]="workDay.endDate"
-          (flatpickrChange)="onMeetingStartChange(i, $event.selectedDates[0])"
-        />
-      </div>
-      <div>
-        <p class="text-lg">⏱️ End</p>
-        <input
-          class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
-          type="text"
-          mwlFlatpickr
-          [(ngModel)]="meeting.endDate"
-          [minDate]="workDay.startDate"
-          [maxDate]="workDay.endDate"
-          (flatpickrChange)="onMeetingEndChange(i, $event.selectedDates[0])"
-        />
-      </div>
-      <div>
-        <button
-          class="cursor-pointer font-bold bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700"
-          (click)="removeMeeting(i)"
-        >
-          <span class="pi pi-trash"></span>
-        </button>
-      </div>
-    </div>
-    <div *ngIf="meetingErrors[i]" class="text-red-500 mt-2">
-      {{ meetingErrors[i] }}
-    </div>
-  </div>
-
-  <!-- Verify Information Button -->
-  <div class="flex flex-col justify-between items-center gap-3">
-    <button
-      *ngIf="
-        workWellStore.addNewWorkWell().workWellSchedule[0].meetings &&
-        workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length > 0
+    <!-- List of meetings -->
+    <div
+      *ngFor="
+        let meeting of workWellStore.addNewWorkWell().workWellSchedule[0]
+          .meetings;
+        let i = index
       "
-      class="w-50 cursor-pointer font-bold bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-green-700 mt-4"
-      (click)="verifyMeetings()"
+      class="flex flex-col justify-start"
     >
-      Verify Information
-    </button>
+      <div class="flex items-center gap-2">
+        <p class="text-lg">🏢 Meeting n°{{ i + 1 }}</p>
+        <span *ngIf="meetingErrors[i]" class="text-red-500 font-bold">❌</span>
+        <span *ngIf="!meetingErrors[i]" class="text-green-500 font-bold"
+          >✅</span
+        >
+      </div>
+      <div class="flex flex-row items-center gap-4 mt-4">
+        <div>
+          <p class="text-lg">🗣️ Start</p>
+          <input
+            class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
+            type="text"
+            mwlFlatpickr
+            [(ngModel)]="meeting.startDate"
+            [minDate]="workDay.startDate"
+            [maxDate]="workDay.endDate"
+            (flatpickrChange)="onMeetingStartChange(i, $event.selectedDates[0])"
+          />
+        </div>
+        <div>
+          <p class="text-lg">⏱️ End</p>
+          <input
+            class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
+            type="text"
+            mwlFlatpickr
+            [(ngModel)]="meeting.endDate"
+            [minDate]="workDay.startDate"
+            [maxDate]="workDay.endDate"
+            (flatpickrChange)="onMeetingEndChange(i, $event.selectedDates[0])"
+          />
+        </div>
+        <div>
+          <button
+            class="cursor-pointer font-bold bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700"
+            (click)="removeMeeting(i)"
+          >
+            <span class="pi pi-trash"></span>
+          </button>
+        </div>
+      </div>
+      <div *ngIf="meetingErrors[i]" class="text-red-500 mt-2">
+        {{ meetingErrors[i] }}
+      </div>
+    </div>
+
+    <!-- Verify Information Button -->
+    <div class="flex flex-col justify-between items-center gap-3">
+      <button
+        *ngIf="
+          workWellStore.addNewWorkWell().workWellSchedule[0].meetings &&
+          workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length > 0
+        "
+        class="w-50 cursor-pointer font-bold bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-green-700 mt-4"
+        (click)="verifyMeetings()"
+      >
+        Verify Information
+      </button>
+    </div>
   </div>
 </div>
