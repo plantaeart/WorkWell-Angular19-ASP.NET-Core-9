@@ -176,10 +176,6 @@ export class WwStep2Component {
 
   // Get the minimum date for lunch start
   getLunchMinDate(): string | Date {
-    console.log(
-      'getLunchMinDate : ',
-      this.addNewWorkWell.workWellSchedule?.[0]?.workDay.startDate
-    );
     return this.addNewWorkWell.workWellSchedule?.[0]?.workDay.startDate;
   }
 
