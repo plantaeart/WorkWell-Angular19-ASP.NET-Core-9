@@ -1,9 +1,66 @@
-<div>
-  <div>
-    <p-datepicker
-      inputId="calendar-timeonly"
-      [(ngModel)]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
-      [timeOnly]="true"
-    />
+<div class="flex flex-col gap-4 p-4">
+  <div
+    class="flex flex-column justify-between items-center gap-3 text-[#000411]"
+  >
+    <p class="text-xl">💼 What is your work day?</p>
+    <div class="w-30">
+      <div>
+        <p class="text-lg w-fit">🌞 Start</p>
+        <input
+          class="form-control text-lg w-30 border-2 border-[#000411] rounded-lg"
+          type="text"
+          mwlFlatpickr
+          [(ngModel)]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
+          [options]="workFlatpickrConfig"
+          [maxTime]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
+          (flatpickrChange)="onWorkDayStartChange($event.selectedDates[0])"
+        />
+      </div>
+      <div>
+        <p class="text-lg w-30">🌜 End</p>
+        <input
+          class="form-control text-lg w-30 border-2 border-[#000411] rounded-lg"
+          type="text"
+          mwlFlatpickr
+          [(ngModel)]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
+          [options]="workFlatpickrConfig"
+          [minTime]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
+          (flatpickrChange)="onWorkDayEndChange($event.selectedDates[0])"
+        />
+      </div>
+    </div>
+  </div>
+  <div
+    class="flex flex-column justify-between items-center gap-3 text-[#000411]"
+  >
+    <p class="text-xl">🍴 When do you take lunch?</p>
+    <div class="w-30">
+      <div>
+        <p class="text-lg w-fit">🍽️ Start</p>
+        <input
+          class="form-control text-lg w-30 border-2 border-[#000411] rounded-lg"
+          type="text"
+          mwlFlatpickr
+          [(ngModel)]="addNewWorkWell.workWellSchedule[0].lunch.startDate"
+          [options]="lunchFlatpickrConfig"
+          [minTime]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
+          [maxTime]="addNewWorkWell.workWellSchedule[0].lunch.endDate"
+          (flatpickrChange)="onLunchStartChange($event.selectedDates[0])"
+        />
+      </div>
+      <div>
+        <p class="text-lg w-30">😋 End</p>
+        <input
+          class="form-control text-lg w-30 border-2 border-[#000411] rounded-lg"
+          type="text"
+          mwlFlatpickr
+          [(ngModel)]="addNewWorkWell.workWellSchedule[0].lunch.endDate"
+          [options]="lunchFlatpickrConfig"
+          [minTime]="addNewWorkWell.workWellSchedule[0].lunch.startDate"
+          [maxTime]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
+          (flatpickrChange)="onLunchEndChange($event.selectedDates[0])"
+        />
+      </div>
+    </div>
   </div>
 </div>

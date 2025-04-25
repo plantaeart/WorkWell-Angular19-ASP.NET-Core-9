@@ -1,20 +1,178 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { WorkWellStore } from '../../../../store/workWell.store';
 import { WorkWell } from '../../../../models/workWell.model';
-import { DatePickerModule } from 'primeng/datepicker';
 import { FormsModule } from '@angular/forms';
+import {
+  FlatpickrDirective,
+  provideFlatpickrDefaults,
+} from 'angularx-flatpickr';
+import { formatDateToHHmm } from '../../../../utils/string.utils';
 
 @Component({
   selector: 'ww-step-2',
-  imports: [FormsModule, DatePickerModule],
+  imports: [FormsModule, FlatpickrDirective],
+  providers: [
+    provideFlatpickrDefaults({
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: 'H:i',
+      time24hr: true,
+    }),
+  ],
   templateUrl: './ww-step-2.component.html',
-  styleUrl: './ww-step-2.component.scss',
+  styleUrls: ['./ww-step-2.component.scss'],
 })
 export class WwStep2Component {
   private workWellStore = inject(WorkWellStore);
   public addNewWorkWell: WorkWell = this.workWellStore.addNewWorkWell();
 
+  // Flatpickr preset configuration
+  public workFlatpickrConfig = {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: 'H:i',
+    time24hr: true,
+  };
+
+  public lunchFlatpickrConfig = {
+    ...this.workFlatpickrConfig,
+  };
+
   constructor() {
+    // Initialize the work well schedule with default values
+    this.addNewWorkWell.workWellSchedule[0].workDay.startDate = '09:00';
+    this.addNewWorkWell.workWellSchedule[0].workDay.endDate = '18:00';
+    this.addNewWorkWell.workWellSchedule[0].lunch.startDate = '12:00';
+    this.addNewWorkWell.workWellSchedule[0].lunch.endDate = '13:00';
+  }
+
+  onWorkDayStartChange(newValue: any): void {
+    const workDayStart = formatDateToHHmm(newValue);
+    const workDayEnd =
+      this.addNewWorkWell.workWellSchedule?.[0]?.workDay.endDate;
+
+    if (!workDayEnd) {
+      console.error('Work day end date is not defined.');
+      return;
+    }
+
+    // Ensure work day start is not after work day end
+    if (workDayStart > workDayEnd) {
+      this.addNewWorkWell.workWellSchedule[0].workDay.startDate = workDayEnd;
+    } else {
+      this.addNewWorkWell.workWellSchedule[0].workDay.startDate = workDayStart;
+    }
+
+    // Set lunch start date to work day start date if it's not already set
+    if (
+      !this.addNewWorkWell.workWellSchedule[0].lunch.startDate ||
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate < workDayStart
+    ) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate = workDayStart;
+    }
+
     console.log(this.addNewWorkWell.workWellSchedule[0].workDay.startDate);
+  }
+
+  onWorkDayEndChange(newValue: any): void {
+    const workDayEnd = formatDateToHHmm(newValue);
+    const workDayStart =
+      this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
+
+    if (!workDayStart) {
+      console.error('Work day start date is not defined.');
+      return;
+    }
+
+    // Ensure work day end is not before work day start
+    if (workDayEnd < workDayStart) {
+      this.addNewWorkWell.workWellSchedule[0].workDay.endDate = workDayStart;
+    } else {
+      this.addNewWorkWell.workWellSchedule[0].workDay.endDate = workDayEnd;
+    }
+
+    // Set lunch end date to work day end date if it's not already set or is invalid
+    if (
+      !this.addNewWorkWell.workWellSchedule[0].lunch.endDate ||
+      this.addNewWorkWell.workWellSchedule[0].lunch.endDate > workDayEnd
+    ) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.endDate = workDayEnd;
+    }
+  }
+
+  onLunchStartChange(newValue: any): void {
+    const lunchStart = formatDateToHHmm(newValue);
+    const minDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
+    const maxDate = this.addNewWorkWell.workWellSchedule?.[0].workDay?.endDate;
+
+    if (!minDate || !maxDate) {
+      console.error('Work day start or end date is not defined.');
+      return;
+    }
+
+    // Validate the selected lunch start time
+    if (lunchStart < minDate) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate = minDate;
+    } else if (lunchStart > maxDate) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate = maxDate;
+    } else {
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate = lunchStart;
+    }
+  }
+
+  onLunchEndChange(newValue: any): void {
+    console.log('onLunchEndChange', formatDateToHHmm(newValue));
+    const lunchEnd = formatDateToHHmm(newValue);
+    const minDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
+    const maxDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.endDate;
+
+    if (!minDate || !maxDate) {
+      console.error('Work day start or end date is not defined.');
+      return;
+    }
+
+    // Validate the selected lunch end time
+    if (lunchEnd < minDate) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.endDate = minDate;
+    } else if (lunchEnd > maxDate) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.endDate = maxDate;
+    } else {
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate = lunchEnd;
+    }
+  }
+
+  // Get the minimum date for lunch start
+  getLunchMinDate(): string {
+    console.log(
+      'getLunchMinDate : ',
+      this.addNewWorkWell.workWellSchedule?.[0]?.workDay.startDate
+    );
+    return this.addNewWorkWell.workWellSchedule?.[0]?.workDay.startDate;
+  }
+
+  // Get the maximum date for lunch start and end
+  getLunchMaxDate(): string {
+    return this.addNewWorkWell.workWellSchedule?.[0]?.workDay.endDate;
+  }
+
+  // Validate lunch times against work day times
+  validateLunchTimes(): void {
+    const workDayStart =
+      this.addNewWorkWell.workWellSchedule[0].workDay.startDate;
+    const workDayEnd = this.addNewWorkWell.workWellSchedule[0].workDay.endDate;
+    const lunchStart = this.addNewWorkWell.workWellSchedule[0].lunch.startDate;
+    const lunchEnd = this.addNewWorkWell.workWellSchedule[0].lunch.endDate;
+
+    // Reset lunch start if it is before work day start or after work day end
+    if (lunchStart < workDayStart || lunchStart > workDayEnd) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate =
+        this.addNewWorkWell.workWellSchedule[0].workDay.startDate;
+    }
+
+    // Reset lunch end if it is before work day start or after work day end
+    if (lunchEnd < workDayStart || lunchEnd > workDayEnd) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.endDate =
+        this.addNewWorkWell.workWellSchedule[0].workDay.endDate;
+    }
   }
 }

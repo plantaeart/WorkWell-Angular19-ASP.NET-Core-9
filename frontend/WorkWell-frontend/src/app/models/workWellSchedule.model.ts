@@ -18,6 +18,8 @@ export class WorkWellSchedule {
     this.workDay =
       params.workDay ||
       new WorkWellEvent({
+        startDate: '09:00',
+        endDate: '18:00',
         eventType: WorkWellEventType.NONE,
       });
     this.meetings = params.meetings || new Array<WorkWellEvent>();
@@ -27,6 +29,8 @@ export class WorkWellSchedule {
     this.lunch =
       params.lunch ||
       new WorkWellEvent({
+        startDate: '12:00',
+        endDate: '14:00',
         eventType: WorkWellEventType.LUNCH,
       });
   }
