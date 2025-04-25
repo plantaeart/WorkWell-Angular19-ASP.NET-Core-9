@@ -4,7 +4,7 @@
  * @returns A Date object with the time set to the provided hours and minutes.
  * @throws Error if the input is not a valid HH:mm string.
  */
-export function convertTimeStringToDate(time: string): Date {
+export function convertTimeStringToDate(time: string | Date): Date {
   if (typeof time !== 'string') {
     throw new Error(
       `Invalid time format: expected a string, but got ${typeof time}`

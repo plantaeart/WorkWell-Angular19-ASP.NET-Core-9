@@ -1,0 +1,195 @@
+import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {
+  FlatpickrDirective,
+  provideFlatpickrDefaults,
+} from 'angularx-flatpickr';
+import { CommonModule } from '@angular/common';
+import { WorkWellStore } from '../../../../store/workWell.store';
+import { WorkWellEvent } from '../../../../models/workWellEvent.model';
+import { WorkWellEventType } from '../../../../../types/enums/workWellEventType';
+import { convertTimeStringToDate } from '../../../../utils/string.utils';
+
+@Component({
+  selector: 'ww-step-3',
+  imports: [FormsModule, FlatpickrDirective, CommonModule],
+  providers: [
+    provideFlatpickrDefaults({
+      enableTime: true,
+      noCalendar: true,
+      dateFormat: 'H:i',
+      time24hr: true,
+    }),
+  ],
+  templateUrl: './ww-step-3.component.html',
+  styleUrls: ['./ww-step-3.component.scss'],
+})
+export class WwStep3Component {
+  @Output() meetingStateChange = new EventEmitter<{
+    isCoherent: boolean;
+    hasMeetings: boolean;
+  }>();
+  public workWellStore = inject(WorkWellStore);
+  public workDay: WorkWellEvent =
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].workDay;
+  public lunch = this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch;
+
+  public flatpickrConfig = {
+    enableTime: true,
+    noCalendar: true,
+    dateFormat: 'H:i',
+    time24hr: true,
+  };
+
+  public meetingCoherencyOk = false;
+  public meetingErrors: string[] = [];
+
+  constructor() {
+    // Convert startDate and endDate to Date for workDay if they are not already Date objects
+    if (!(this.workDay.startDate instanceof Date)) {
+      this.workDay.startDate = convertTimeStringToDate(this.workDay.startDate);
+    }
+
+    if (!(this.workDay.endDate instanceof Date)) {
+      this.workDay.endDate = convertTimeStringToDate(this.workDay.endDate);
+    }
+
+    // Convert startDate and endDate to Date for lunch if they are not already Date objects
+    if (!(this.lunch.startDate instanceof Date)) {
+      this.lunch.startDate = convertTimeStringToDate(this.lunch.startDate);
+    }
+
+    if (!(this.lunch.endDate instanceof Date)) {
+      this.lunch.endDate = convertTimeStringToDate(this.lunch.endDate);
+    }
+
+    // Check is meetings exists, if yes, make sure start/endDate are Date objects
+    if (
+      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings &&
+      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length >
+        0
+    ) {
+      for (
+        let i = 0;
+        i <
+        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length;
+        i++
+      ) {
+        const meeting =
+          this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[i];
+        if (!(meeting.startDate instanceof Date)) {
+          meeting.startDate = convertTimeStringToDate(meeting.startDate);
+        }
+        if (!(meeting.endDate instanceof Date)) {
+          meeting.endDate = convertTimeStringToDate(meeting.endDate);
+        }
+      }
+    }
+    this.verifyMeetings(); // Initial verification of meetings
+  }
+
+  addNewMeeting(): void {
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.push({
+      startDate: this.workDay.startDate,
+      endDate: this.workDay.endDate,
+      eventType: WorkWellEventType.MEETING,
+    });
+    this.verifyMeetings();
+  }
+
+  removeMeeting(index: number): void {
+    this.workWellStore
+      .addNewWorkWell()
+      .workWellSchedule[0].meetings.splice(index, 1);
+    this.verifyMeetings(); // Re-verify after removing a meeting
+  }
+
+  onMeetingStartChange(index: number, newValue: any): void {
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[
+      index
+    ].startDate = newValue;
+    this.verifyMeetings(); // Re-verify after changing start time
+  }
+
+  onMeetingEndChange(index: number, newValue: any): void {
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[
+      index
+    ].endDate = newValue;
+    this.verifyMeetings(); // Re-verify after changing end time
+  }
+
+  verifyMeetings(): void {
+    this.meetingErrors = [];
+    this.meetingCoherencyOk = true;
+
+    // Check if there are no meetings
+    if (
+      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings ==
+        undefined ||
+      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings
+        .length === 0
+    )
+      return;
+
+    for (
+      let i = 0;
+      i <
+      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length;
+      i++
+    ) {
+      const meeting =
+        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[i];
+      let error = '';
+
+      // Check for overlap with other meetings
+      for (
+        let j = 0;
+        j <
+        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length;
+        j++
+      ) {
+        if (i !== j) {
+          const otherMeeting =
+            this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[j];
+
+          if (
+            (meeting.startDate >= otherMeeting.startDate &&
+              meeting.startDate < otherMeeting.endDate) ||
+            (meeting.endDate > otherMeeting.startDate &&
+              meeting.endDate <= otherMeeting.endDate) ||
+            (meeting.startDate <= otherMeeting.startDate &&
+              meeting.endDate >= otherMeeting.endDate)
+          ) {
+            error = '📅 Overlaps with another meeting.';
+            break;
+          }
+        }
+      }
+
+      // Check for overlap with lunch
+      if (
+        (meeting.startDate >= this.lunch.startDate &&
+          meeting.startDate < this.lunch.endDate) ||
+        (meeting.endDate > this.lunch.startDate &&
+          meeting.endDate <= this.lunch.endDate) ||
+        (meeting.startDate <= this.lunch.startDate &&
+          meeting.endDate >= this.lunch.endDate)
+      ) {
+        error = '🍽️ Overlaps with lunch time.';
+      }
+
+      // Add error or mark as valid
+      this.meetingErrors[i] = error;
+      if (error) {
+        this.meetingCoherencyOk = false;
+      }
+    }
+
+    this.meetingStateChange.emit({
+      isCoherent: this.meetingCoherencyOk,
+      hasMeetings:
+        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings
+          .length > 0,
+    });
+  }
+}

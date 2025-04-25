@@ -6,10 +6,7 @@ import {
   FlatpickrDirective,
   provideFlatpickrDefaults,
 } from 'angularx-flatpickr';
-import {
-  convertTimeStringToDate,
-  formatDateToHHmm,
-} from '../../../../utils/string.utils';
+import { convertTimeStringToDate } from '../../../../utils/string.utils';
 
 @Component({
   selector: 'ww-step-2',
@@ -27,6 +24,7 @@ import {
 })
 export class WwStep2Component {
   private workWellStore = inject(WorkWellStore);
+  private initWorkDayAndLunch = false;
   public addNewWorkWell: WorkWell = this.workWellStore.addNewWorkWell();
 
   // Flatpickr preset configuration
@@ -42,19 +40,50 @@ export class WwStep2Component {
   };
 
   constructor() {
-    // Initialize the work well schedule with default values
-    this.addNewWorkWell.workWellSchedule[0].workDay.startDate =
-      convertTimeStringToDate('09:00');
-    this.addNewWorkWell.workWellSchedule[0].workDay.endDate =
-      convertTimeStringToDate('18:00');
-    this.addNewWorkWell.workWellSchedule[0].lunch.startDate =
-      convertTimeStringToDate('12:00');
-    this.addNewWorkWell.workWellSchedule[0].lunch.endDate =
-      convertTimeStringToDate('13:00');
+    // Convert startDate and endDate to Date for workDay if they are not already Date objects
+    if (
+      !(
+        this.addNewWorkWell.workWellSchedule[0].workDay.startDate instanceof
+        Date
+      )
+    ) {
+      this.addNewWorkWell.workWellSchedule[0].workDay.startDate =
+        convertTimeStringToDate(
+          this.addNewWorkWell.workWellSchedule[0].workDay.startDate
+        );
+    }
+
+    if (
+      !(this.addNewWorkWell.workWellSchedule[0].workDay.endDate instanceof Date)
+    ) {
+      this.addNewWorkWell.workWellSchedule[0].workDay.endDate =
+        convertTimeStringToDate(
+          this.addNewWorkWell.workWellSchedule[0].workDay.endDate
+        );
+    }
+
+    // Convert startDate and endDate to Date for lunch if they are not already Date objects
+    if (
+      !(this.addNewWorkWell.workWellSchedule[0].lunch.startDate instanceof Date)
+    ) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.startDate =
+        convertTimeStringToDate(
+          this.addNewWorkWell.workWellSchedule[0].lunch.startDate
+        );
+    }
+
+    if (
+      !(this.addNewWorkWell.workWellSchedule[0].lunch.endDate instanceof Date)
+    ) {
+      this.addNewWorkWell.workWellSchedule[0].lunch.endDate =
+        convertTimeStringToDate(
+          this.addNewWorkWell.workWellSchedule[0].lunch.endDate
+        );
+    }
   }
 
   onWorkDayStartChange(newValue: any): void {
-    const workDayStart = formatDateToHHmm(newValue);
+    const workDayStart = newValue;
     const workDayEnd =
       this.addNewWorkWell.workWellSchedule?.[0]?.workDay.endDate;
 
@@ -77,12 +106,10 @@ export class WwStep2Component {
     ) {
       this.addNewWorkWell.workWellSchedule[0].lunch.startDate = workDayStart;
     }
-
-    console.log(this.addNewWorkWell.workWellSchedule[0].workDay.startDate);
   }
 
   onWorkDayEndChange(newValue: any): void {
-    const workDayEnd = formatDateToHHmm(newValue);
+    const workDayEnd = newValue;
     const workDayStart =
       this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
 
@@ -108,7 +135,7 @@ export class WwStep2Component {
   }
 
   onLunchStartChange(newValue: any): void {
-    const lunchStart = formatDateToHHmm(newValue);
+    const lunchStart = newValue;
     const minDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
     const maxDate = this.addNewWorkWell.workWellSchedule?.[0].workDay?.endDate;
 
@@ -128,8 +155,7 @@ export class WwStep2Component {
   }
 
   onLunchEndChange(newValue: any): void {
-    console.log('onLunchEndChange', formatDateToHHmm(newValue));
-    const lunchEnd = formatDateToHHmm(newValue);
+    const lunchEnd = newValue;
     const minDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.startDate;
     const maxDate = this.addNewWorkWell.workWellSchedule?.[0].workDay.endDate;
 

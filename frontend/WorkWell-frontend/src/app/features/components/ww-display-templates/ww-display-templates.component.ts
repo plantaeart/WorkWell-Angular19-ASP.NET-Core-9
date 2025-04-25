@@ -37,7 +37,6 @@ export class WwDisplayTemplatesComponent {
   constructor(private router: Router) {}
 
   deleteWorkWellByIdFromTemplate = (idWWS: number) => {
-    console.log('Deleting work well with ID:', idWWS);
     this.workWellStore.deleteWorkWellFromStore(idWWS);
   };
 
