@@ -1,8 +1,8 @@
 import { WorkWellEventType } from '../../types/enums/workWellEventType';
 
 export class WorkWellEvent {
-  startDate: string; // Store time as a string in HH:mm format
-  endDate: string; // Store time as a string in HH:mm format
+  startDate: string | Date; // Store time as a string in HH:mm format
+  endDate: string | Date; // Store time as a string in HH:mm format
   eventType: WorkWellEventType;
 
   constructor(params: {

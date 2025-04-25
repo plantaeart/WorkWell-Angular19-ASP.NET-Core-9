@@ -6,7 +6,10 @@ import {
   FlatpickrDirective,
   provideFlatpickrDefaults,
 } from 'angularx-flatpickr';
-import { formatDateToHHmm } from '../../../../utils/string.utils';
+import {
+  convertTimeStringToDate,
+  formatDateToHHmm,
+} from '../../../../utils/string.utils';
 
 @Component({
   selector: 'ww-step-2',
@@ -40,10 +43,14 @@ export class WwStep2Component {
 
   constructor() {
     // Initialize the work well schedule with default values
-    this.addNewWorkWell.workWellSchedule[0].workDay.startDate = '09:00';
-    this.addNewWorkWell.workWellSchedule[0].workDay.endDate = '18:00';
-    this.addNewWorkWell.workWellSchedule[0].lunch.startDate = '12:00';
-    this.addNewWorkWell.workWellSchedule[0].lunch.endDate = '13:00';
+    this.addNewWorkWell.workWellSchedule[0].workDay.startDate =
+      convertTimeStringToDate('09:00');
+    this.addNewWorkWell.workWellSchedule[0].workDay.endDate =
+      convertTimeStringToDate('18:00');
+    this.addNewWorkWell.workWellSchedule[0].lunch.startDate =
+      convertTimeStringToDate('12:00');
+    this.addNewWorkWell.workWellSchedule[0].lunch.endDate =
+      convertTimeStringToDate('13:00');
   }
 
   onWorkDayStartChange(newValue: any): void {
@@ -142,7 +149,7 @@ export class WwStep2Component {
   }
 
   // Get the minimum date for lunch start
-  getLunchMinDate(): string {
+  getLunchMinDate(): string | Date {
     console.log(
       'getLunchMinDate : ',
       this.addNewWorkWell.workWellSchedule?.[0]?.workDay.startDate
@@ -151,7 +158,7 @@ export class WwStep2Component {
   }
 
   // Get the maximum date for lunch start and end
-  getLunchMaxDate(): string {
+  getLunchMaxDate(): string | Date {
     return this.addNewWorkWell.workWellSchedule?.[0]?.workDay.endDate;
   }
 

@@ -12,7 +12,7 @@
           mwlFlatpickr
           [(ngModel)]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
           [options]="workFlatpickrConfig"
-          [maxTime]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
+          [maxDate]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
           (flatpickrChange)="onWorkDayStartChange($event.selectedDates[0])"
         />
       </div>
@@ -24,7 +24,7 @@
           mwlFlatpickr
           [(ngModel)]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
           [options]="workFlatpickrConfig"
-          [minTime]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
+          [minDate]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
           (flatpickrChange)="onWorkDayEndChange($event.selectedDates[0])"
         />
       </div>
@@ -43,8 +43,8 @@
           mwlFlatpickr
           [(ngModel)]="addNewWorkWell.workWellSchedule[0].lunch.startDate"
           [options]="lunchFlatpickrConfig"
-          [minTime]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
-          [maxTime]="addNewWorkWell.workWellSchedule[0].lunch.endDate"
+          [minDate]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
+          [maxDate]="addNewWorkWell.workWellSchedule[0].lunch.endDate"
           (flatpickrChange)="onLunchStartChange($event.selectedDates[0])"
         />
       </div>
@@ -56,8 +56,8 @@
           mwlFlatpickr
           [(ngModel)]="addNewWorkWell.workWellSchedule[0].lunch.endDate"
           [options]="lunchFlatpickrConfig"
-          [minTime]="addNewWorkWell.workWellSchedule[0].lunch.startDate"
-          [maxTime]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
+          [minDate]="addNewWorkWell.workWellSchedule[0].lunch.startDate"
+          [maxDate]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
           (flatpickrChange)="onLunchEndChange($event.selectedDates[0])"
         />
       </div>
