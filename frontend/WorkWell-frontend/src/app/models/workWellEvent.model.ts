@@ -6,8 +6,8 @@ export class WorkWellEvent {
   eventType: WorkWellEventType;
 
   constructor(params: {
-    startDate?: string;
-    endDate?: string;
+    startDate?: string | Date;
+    endDate?: string | Date;
     eventType?: WorkWellEventType;
   }) {
     // Set default startDate to "09:00"

@@ -28,8 +28,12 @@
     >
       <div class="flex items-center gap-2">
         <p class="text-lg">🏢 Meeting n°{{ i + 1 }}</p>
-        <span *ngIf="meetingErrors[i]" class="text-red-500 font-bold">❌</span>
-        <span *ngIf="!meetingErrors[i]" class="text-green-500 font-bold"
+        <span
+          *ngIf="meetingErrors[i] && meetingErrors[i].length > 0"
+          class="text-red-500 font-bold"
+          >❌</span
+        >
+        <span *ngIf="!meetingErrors[i]?.length" class="text-green-500 font-bold"
           >✅</span
         >
       </div>
@@ -67,23 +71,14 @@
           </button>
         </div>
       </div>
-      <div *ngIf="meetingErrors[i]" class="text-red-500 mt-2">
-        {{ meetingErrors[i] }}
+      <div>
+        <ul
+          *ngIf="meetingErrors[i] && meetingErrors[i].length > 0"
+          class="text-red-500"
+        >
+          <li *ngFor="let error of meetingErrors[i]">❌ {{ error }}</li>
+        </ul>
       </div>
-    </div>
-
-    <!-- Verify Information Button -->
-    <div class="flex flex-col justify-between items-center gap-3">
-      <button
-        *ngIf="
-          workWellStore.addNewWorkWell().workWellSchedule[0].meetings &&
-          workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length > 0
-        "
-        class="w-50 cursor-pointer font-bold bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-green-700 mt-4"
-        (click)="verifyMeetings()"
-      >
-        Verify Information
-      </button>
     </div>
   </div>
 </div>

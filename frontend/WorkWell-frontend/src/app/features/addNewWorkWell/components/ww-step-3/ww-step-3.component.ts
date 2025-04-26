@@ -49,10 +49,14 @@ export class WwStep3Component {
     noCalendar: true,
     dateFormat: 'H:i',
     time24hr: true,
+    onChange: (selectedDates: Date[]) => {
+      // Ensure Flatpickr returns Date objects
+      return selectedDates[0];
+    },
   };
 
   public meetingCoherencyOk = false;
-  public meetingErrors: string[] = [];
+  public meetingErrors: string[][] = [];
 
   constructor() {
     // Convert startDate and endDate to Date for workDay if they are not already Date objects
@@ -115,16 +119,32 @@ export class WwStep3Component {
   }
 
   onMeetingStartChange(index: number, newValue: Date): void {
-    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[
-      index
-    ].startDate = newValue;
+    const meeting =
+      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[index];
+
+    // Update startDate
+    meeting.startDate = newValue;
+
+    // Ensure endDate is a Date object
+    if (typeof meeting.endDate === 'string') {
+      meeting.endDate = convertTimeStringToDate(meeting.endDate);
+    }
+
     this.verifyMeetings(); // Re-verify after changing start time
   }
 
   onMeetingEndChange(index: number, newValue: Date): void {
-    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[
-      index
-    ].endDate = newValue;
+    const meeting =
+      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[index];
+
+    // Update endDate
+    meeting.endDate = newValue;
+
+    // Ensure startDate is a Date object
+    if (typeof meeting.startDate === 'string') {
+      meeting.startDate = convertTimeStringToDate(meeting.startDate);
+    }
+
     this.verifyMeetings(); // Re-verify after changing end time
   }
 
@@ -149,7 +169,17 @@ export class WwStep3Component {
     ) {
       const meeting =
         this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[i];
-      let error = '';
+      const errors: string[] = [];
+
+      // Check if startDate is earlier than endDate
+      if (meeting.startDate >= meeting.endDate) {
+        errors.push('⏰⬆️ Start time must be earlier than end time');
+      }
+
+      // Check is endDate is later than workDay endDate
+      if (meeting.endDate > this.workDay.endDate) {
+        errors.push('⏰⬇️ End time must be earlier than work day end time');
+      }
 
       // Check for overlap with other meetings
       for (
@@ -170,7 +200,7 @@ export class WwStep3Component {
             (meeting.startDate <= otherMeeting.startDate &&
               meeting.endDate >= otherMeeting.endDate)
           ) {
-            error = '📅 Overlaps with another meeting.';
+            errors.push('📅 Overlaps with meeting ' + (j + 1));
             break;
           }
         }
@@ -185,12 +215,12 @@ export class WwStep3Component {
         (meeting.startDate <= this.lunch.startDate &&
           meeting.endDate >= this.lunch.endDate)
       ) {
-        error = '🍽️ Overlaps with lunch time.';
+        errors.push('🍽️ Overlaps with lunch time');
       }
 
-      // Add error or mark as valid
-      this.meetingErrors[i] = error;
-      if (error) {
+      // Add errors or mark as valid
+      this.meetingErrors[i] = errors;
+      if (errors.length > 0) {
         this.meetingCoherencyOk = false;
       }
     }
