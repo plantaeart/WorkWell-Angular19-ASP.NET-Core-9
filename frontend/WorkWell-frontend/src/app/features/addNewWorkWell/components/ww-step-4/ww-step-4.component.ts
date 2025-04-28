@@ -44,9 +44,11 @@ export class WwStep4Component {
     this.workWellStore.addNewWorkWell().workWellSchedule[0].workDay;
   public lunch: WorkWellEvent =
     this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch;
-
   public meetings: WorkWellEvent[] =
     this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings;
+
+  public pauses: WorkWellEvent[] =
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses || [];
 
   // Create copies of the data
   public workDayCopy: WorkWellEvent = { ...this.workDay };
@@ -88,18 +90,9 @@ export class WwStep4Component {
     }
 
     // Check if pauses exists, if yes, make sure start/endDate are Date objects
-    if (
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses &&
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses.length > 0
-    ) {
-      for (
-        let i = 0;
-        i <
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses.length;
-        i++
-      ) {
-        const pause =
-          this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses[i];
+    if (this.pauses && this.pauses.length > 0) {
+      for (let i = 0; i < this.pauses.length; i++) {
+        const pause = this.pauses[i];
         if (pause.startDate.constructor.name !== 'Date') {
           pause.startDate = convertTimeStringToDate(pause.startDate);
         }
@@ -113,7 +106,7 @@ export class WwStep4Component {
   }
 
   addNewPause(): void {
-    this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses.push({
+    this.pauses.push({
       startDate: this.workDay.startDate,
       endDate: this.workDay.endDate,
       eventType: WorkWellEventType.MEETING,
@@ -123,15 +116,12 @@ export class WwStep4Component {
   }
 
   removePause(index: number): void {
-    this.workWellStore
-      .addNewWorkWell()
-      .workWellSchedule[0].pauses.splice(index, 1);
+    this.pauses.splice(index, 1);
     this.verifyPauses();
   }
 
   onPauseStartChange(index: number, newValue: Date): void {
-    const pause =
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses[index];
+    const pause = this.pauses[index];
 
     // Update startDate
     pause.startDate = newValue;
@@ -145,8 +135,7 @@ export class WwStep4Component {
   }
 
   onPauseEndChange(index: number, newValue: Date): void {
-    const pause =
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses[index];
+    const pause = this.pauses[index];
 
     // Update endDate
     pause.endDate = newValue;
@@ -164,28 +153,16 @@ export class WwStep4Component {
     this.pauseCoherencyOk = true;
 
     // Check if there are no pauses
-    if (
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses ==
-        undefined ||
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses.length ===
-        0
-    ) {
+    if (this.pauses == undefined || this.pauses.length === 0) {
       this.pauseStateChange.emit({
         isCoherent: this.pauseCoherencyOk,
-        hasPauses:
-          this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses
-            .length > 0,
+        hasPauses: this.pauses.length > 0,
       });
       return;
     }
 
-    for (
-      let i = 0;
-      i < this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses.length;
-      i++
-    ) {
-      const pause =
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses[i];
+    for (let i = 0; i < this.pauses.length; i++) {
+      const pause = this.pauses[i];
       const errors: string[] = [];
 
       // Check if startDate is earlier than endDate
@@ -226,15 +203,9 @@ export class WwStep4Component {
       }
 
       // Check for overlap with other pauses
-      for (
-        let j = 0;
-        j <
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses.length;
-        j++
-      ) {
+      for (let j = 0; j < this.pauses.length; j++) {
         if (i !== j) {
-          const otherPause =
-            this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses[j];
+          const otherPause = this.pauses[j];
           if (
             (pause.startDate >= otherPause.startDate &&
               pause.startDate < otherPause.endDate) ||
@@ -257,9 +228,7 @@ export class WwStep4Component {
 
     this.pauseStateChange.emit({
       isCoherent: this.pauseCoherencyOk,
-      hasPauses:
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses.length >
-        0,
+      hasPauses: this.pauses.length > 0,
     });
   }
 }

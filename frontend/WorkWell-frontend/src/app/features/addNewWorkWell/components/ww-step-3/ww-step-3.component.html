@@ -19,11 +19,7 @@
 
     <!-- List of meetings -->
     <div
-      *ngFor="
-        let meeting of workWellStore.addNewWorkWell().workWellSchedule[0]
-          .meetings;
-        let i = index
-      "
+      *ngFor="let meeting of this.meetings; let i = index"
       class="flex flex-col justify-start"
     >
       <div class="flex items-center gap-2">

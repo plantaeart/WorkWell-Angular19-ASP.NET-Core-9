@@ -20,11 +20,7 @@
 
     <!-- List of pauses -->
     <div
-      *ngFor="
-        let pause of this.workWellStore.addNewWorkWell().workWellSchedule[0]
-          .pauses;
-        let i = index
-      "
+      *ngFor="let pause of this.pauses; let i = index"
       class="flex flex-col justify-start"
     >
       <div class="flex items-center gap-2">

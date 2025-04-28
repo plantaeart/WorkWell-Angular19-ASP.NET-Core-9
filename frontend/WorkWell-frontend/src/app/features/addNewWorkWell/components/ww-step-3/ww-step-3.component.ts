@@ -38,6 +38,8 @@ export class WwStep3Component {
   public workDay: WorkWellEvent =
     this.workWellStore.addNewWorkWell().workWellSchedule[0].workDay;
   public lunch = this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch;
+  public meetings: WorkWellEvent[] =
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings || [];
 
   // Create copies of the data
   public workDayCopy: WorkWellEvent = { ...this.workDay };
@@ -66,19 +68,9 @@ export class WwStep3Component {
     }
 
     // Check is meetings exists, if yes, make sure start/endDate are Date objects
-    if (
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings &&
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length >
-        0
-    ) {
-      for (
-        let i = 0;
-        i <
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length;
-        i++
-      ) {
-        const meeting =
-          this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[i];
+    if (this.meetings && this.meetings.length > 0) {
+      for (let i = 0; i < this.meetings.length; i++) {
+        const meeting = this.meetings[i];
         if (meeting.startDate.constructor.name !== 'Date') {
           meeting.startDate = convertTimeStringToDate(meeting.startDate);
         }
@@ -91,7 +83,7 @@ export class WwStep3Component {
   }
 
   addNewMeeting(): void {
-    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.push({
+    this.meetings.push({
       startDate: this.workDay.startDate,
       endDate: this.workDay.endDate,
       eventType: WorkWellEventType.MEETING,
@@ -100,15 +92,12 @@ export class WwStep3Component {
   }
 
   removeMeeting(index: number): void {
-    this.workWellStore
-      .addNewWorkWell()
-      .workWellSchedule[0].meetings.splice(index, 1);
+    this.meetings.splice(index, 1);
     this.verifyMeetings(); // Re-verify after removing a meeting
   }
 
   onMeetingStartChange(index: number, newValue: Date): void {
-    const meeting =
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[index];
+    const meeting = this.meetings[index];
 
     // Update startDate
     meeting.startDate = newValue;
@@ -122,8 +111,7 @@ export class WwStep3Component {
   }
 
   onMeetingEndChange(index: number, newValue: Date): void {
-    const meeting =
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[index];
+    const meeting = this.meetings[index];
 
     // Update endDate
     meeting.endDate = newValue;
@@ -141,26 +129,15 @@ export class WwStep3Component {
     this.meetingCoherencyOk = true;
 
     // Check if there are no meetings
-    if (
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings ==
-        undefined ||
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings
-        .length === 0
-    ) {
+    if (this.meetings == undefined || this.meetings.length === 0) {
       this.meetingStateChange.emit({
         isCoherent: this.meetingCoherencyOk,
       });
       return;
     }
 
-    for (
-      let i = 0;
-      i <
-      this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length;
-      i++
-    ) {
-      const meeting =
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[i];
+    for (let i = 0; i < this.meetings.length; i++) {
+      const meeting = this.meetings[i];
       const errors: string[] = [];
 
       // Check if startDate is earlier than endDate
@@ -174,15 +151,9 @@ export class WwStep3Component {
       }
 
       // Check for overlap with other meetings
-      for (
-        let j = 0;
-        j <
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings.length;
-        j++
-      ) {
+      for (let j = 0; j < this.meetings.length; j++) {
         if (i !== j) {
-          const otherMeeting =
-            this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings[j];
+          const otherMeeting = this.meetings[j];
 
           if (
             (meeting.startDate >= otherMeeting.startDate &&
