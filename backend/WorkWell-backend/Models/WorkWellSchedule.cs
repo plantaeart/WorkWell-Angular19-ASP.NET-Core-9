@@ -18,6 +18,9 @@ public class WorkWellSchedule
     [FirestoreProperty(nameof(Lunch))]
     public WorkWellEvent Lunch { get; set; }
 
+    [FirestoreProperty(nameof(Pauses))]
+    public List<WorkWellEvent> Pauses { get; set; }
+
     public WorkWellSchedule()
     {
         IdDay = WorkWellDayType.NONE;
@@ -35,6 +38,12 @@ public class WorkWellSchedule
         {
             EventType = WorkWellEventType.LUNCH
         };
+        Pauses = new List<WorkWellEvent>();
+        // Update EventType for each element in the Meetings list
+        foreach (var pause in Pauses)
+        {
+            pause.EventType = WorkWellEventType.PAUSE;
+        }
     }
 
     public WorkWellSchedule(WorkWellDayType idDay)
@@ -54,5 +63,11 @@ public class WorkWellSchedule
         {
             EventType = WorkWellEventType.LUNCH
         };
+        Pauses = new List<WorkWellEvent>();
+        // Update EventType for each element in the Meetings list
+        foreach (var pause in Pauses)
+        {
+            pause.EventType = WorkWellEventType.PAUSE;
+        }
     }
 }
