@@ -5,6 +5,7 @@ import { WwStep1Component } from '../components/ww-step-1/ww-step-1.component';
 import { WwStep2Component } from '../components/ww-step-2/ww-step-2.component';
 import { SeparatorComponent } from '../../components/separator/separator.component';
 import { WwStep3Component } from '../components/ww-step-3/ww-step-3.component';
+import { WwStep4Component } from '../components/ww-step-4/ww-step-4.component';
 
 @Component({
   selector: 'ww-add-new-work-well',
@@ -15,19 +16,23 @@ import { WwStep3Component } from '../components/ww-step-3/ww-step-3.component';
     WwStep2Component,
     SeparatorComponent,
     WwStep3Component,
+    WwStep4Component,
   ],
   templateUrl: './ww-add-new-work-well.component.html',
   styleUrl: './ww-add-new-work-well.component.scss',
 })
 export class WwAddNewWorkWellComponent {
-  public meetingCoherencyOk = false;
-  public hasMeetings = false;
+  public meetingCoherencyOk = true;
 
-  onMeetingStateChange(state: {
-    isCoherent: boolean;
-    hasMeetings: boolean;
-  }): void {
+  onMeetingStateChange(state: { isCoherent: boolean }): void {
     this.meetingCoherencyOk = state.isCoherent;
-    this.hasMeetings = state.hasMeetings;
+  }
+
+  public pauseCoherencyOk = false;
+  public hasPauses = false;
+
+  onPauseStateChange(state: { isCoherent: boolean; hasPauses: boolean }): void {
+    this.pauseCoherencyOk = state.isCoherent;
+    this.hasPauses = state.hasPauses;
   }
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output, signal } from '@angular/core';
+import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   FlatpickrDirective,
@@ -33,7 +33,6 @@ import { WwShowScheduleInfosComponent } from '../ww-show-schedule-infos/ww-show-
 export class WwStep3Component {
   @Output() meetingStateChange = new EventEmitter<{
     isCoherent: boolean;
-    hasMeetings: boolean;
   }>();
   public workWellStore = inject(WorkWellStore);
   public workDay: WorkWellEvent =
@@ -41,19 +40,8 @@ export class WwStep3Component {
   public lunch = this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch;
 
   // Create copies of the data
-  public workDayCopy = { ...this.workDay };
-  public lunchCopy = { ...this.lunch };
-
-  public flatpickrConfig = {
-    enableTime: true,
-    noCalendar: true,
-    dateFormat: 'H:i',
-    time24hr: true,
-    onChange: (selectedDates: Date[]) => {
-      // Ensure Flatpickr returns Date objects
-      return selectedDates[0];
-    },
-  };
+  public workDayCopy: WorkWellEvent = { ...this.workDay };
+  public lunchCopy: WorkWellEvent = { ...this.lunch };
 
   public meetingCoherencyOk = false;
   public meetingErrors: string[][] = [];
@@ -69,11 +57,11 @@ export class WwStep3Component {
     }
 
     // Convert startDate and endDate to Date for lunch if they are not already Date objects
-    if (this.lunch.startDate instanceof String) {
+    if (this.lunch.startDate.constructor.name !== 'Date') {
       this.lunch.startDate = convertTimeStringToDate(this.lunch.startDate);
     }
 
-    if (this.lunch.endDate instanceof String) {
+    if (this.lunch.endDate.constructor.name !== 'Date') {
       this.lunch.endDate = convertTimeStringToDate(this.lunch.endDate);
     }
 
@@ -158,8 +146,12 @@ export class WwStep3Component {
         undefined ||
       this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings
         .length === 0
-    )
+    ) {
+      this.meetingStateChange.emit({
+        isCoherent: this.meetingCoherencyOk,
+      });
       return;
+    }
 
     for (
       let i = 0;
@@ -227,9 +219,6 @@ export class WwStep3Component {
 
     this.meetingStateChange.emit({
       isCoherent: this.meetingCoherencyOk,
-      hasMeetings:
-        this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings
-          .length > 0,
     });
   }
 }

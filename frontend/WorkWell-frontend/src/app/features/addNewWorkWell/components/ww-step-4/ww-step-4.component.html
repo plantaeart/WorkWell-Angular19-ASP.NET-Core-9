@@ -1,0 +1,85 @@
+<div class="flex flex-row w-[100%] justify-between text-[#000411]">
+  <div class="mr-10">
+    <ww-show-schedule-infos
+      [workDay]="workDayCopy"
+      [lunch]="lunchCopy"
+      [meetings]="meetingsCopy"
+    ></ww-show-schedule-infos>
+  </div>
+  <div class="flex flex-col gap-4 p-4">
+    <div class="flex flex-col justify-between items-center gap-3">
+      <p class="text-xl">⏸️ Pauses</p>
+      <!-- Button to add a new pause -->
+      <button
+        class="w-50 cursor-pointer font-bold bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-blue-700"
+        (click)="addNewPause()"
+      >
+        <span class="pi pi-plus"></span> Add New Pause
+      </button>
+    </div>
+
+    <!-- List of pauses -->
+    <div
+      *ngFor="
+        let pause of this.workWellStore.addNewWorkWell().workWellSchedule[0]
+          .pauses;
+        let i = index
+      "
+      class="flex flex-col justify-start"
+    >
+      <div class="flex items-center gap-2">
+        <p class="text-lg">⏸️ Pause n°{{ i + 1 }}</p>
+        <span
+          *ngIf="pauseErrors[i] && pauseErrors[i].length > 0"
+          class="text-red-500 font-bold"
+          >❌</span
+        >
+        <span *ngIf="!pauseErrors[i]?.length" class="text-green-500 font-bold"
+          >✅</span
+        >
+      </div>
+      <div class="flex flex-row items-center gap-4 mt-4">
+        <div>
+          <p class="text-lg">🗣️ Start</p>
+          <input
+            class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
+            type="text"
+            mwlFlatpickr
+            [(ngModel)]="pause.startDate"
+            [minDate]="workDay.startDate"
+            [maxDate]="workDay.endDate"
+            (flatpickrChange)="onPauseStartChange(i, $event.selectedDates[0])"
+          />
+        </div>
+        <div>
+          <p class="text-lg">⏱️ End</p>
+          <input
+            class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
+            type="text"
+            mwlFlatpickr
+            [(ngModel)]="pause.endDate"
+            [minDate]="workDay.startDate"
+            [maxDate]="workDay.endDate"
+            (flatpickrChange)="onPauseEndChange(i, $event.selectedDates[0])"
+          />
+        </div>
+        <div>
+          <button
+            class="cursor-pointer font-bold bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-red-700"
+            (click)="removePause(i)"
+          >
+            <span class="pi pi-trash"></span>
+          </button>
+        </div>
+      </div>
+      <div
+        *ngIf="pauseErrors && pauseErrors[i].length > 0"
+        class="text-red-500 mt-2"
+      >
+        <ul>
+          <li *ngFor="let error of pauseErrors[i]">❌ {{ error }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -7,12 +7,14 @@ export class WorkWellSchedule {
   workDay: WorkWellEvent;
   meetings: WorkWellEvent[];
   lunch: WorkWellEvent;
+  pauses: WorkWellEvent[];
 
   constructor(params: {
     idDay?: WorkWellDayType;
     workDay?: WorkWellEvent;
     meetings?: WorkWellEvent[];
     lunch?: WorkWellEvent;
+    pauses?: WorkWellEvent[];
   }) {
     this.idDay = params.idDay || WorkWellDayType.NONE;
     this.workDay =
@@ -33,5 +35,10 @@ export class WorkWellSchedule {
         endDate: '14:00',
         eventType: WorkWellEventType.LUNCH,
       });
+
+    this.pauses = params.pauses || new Array<WorkWellEvent>();
+    this.pauses.forEach((pause) => {
+      pause.eventType = WorkWellEventType.PAUSE;
+    });
   }
 }
