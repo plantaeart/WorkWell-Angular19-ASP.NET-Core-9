@@ -17,7 +17,47 @@ export class WwTimelineComponent {
     eventType: WorkWellEventType;
   }[] = [];
 
-  @Input() workDay: WorkWellEvent | null = null; // Add workDay as an input
+  @Input() workDay: WorkWellEvent | null = null;
+
+  get filledEvents() {
+    if (!this.workDay) {
+      return this.sortedEvents; // If no workDay is provided, return sorted events as is
+    }
+
+    const filledEvents = [];
+    let currentTime = this.workDay.startDate;
+
+    // Sort events by start time
+    const sorted = this.sortedEvents;
+
+    // Fill gaps with empty events
+    for (const event of sorted) {
+      if (currentTime < event.startDate) {
+        filledEvents.push({
+          startDate: currentTime,
+          endDate: event.startDate,
+          name: 'Work',
+          eventType: WorkWellEventType.NONE, // Custom type for empty events
+        });
+      }
+      filledEvents.push(event);
+      currentTime = event.endDate;
+    }
+
+    // Add an empty event for the time after the last event until the end of the workday
+    if (currentTime < this.workDay.endDate) {
+      filledEvents.push({
+        startDate: currentTime,
+        endDate: this.workDay.endDate,
+        name: 'Work',
+        eventType: WorkWellEventType.NONE,
+      });
+    }
+
+    console.log('filledEvents', filledEvents);
+
+    return filledEvents;
+  }
 
   get sortedEvents() {
     return this.events.sort(
@@ -35,6 +75,8 @@ export class WwTimelineComponent {
         return 'bg-yellow-500';
       case WorkWellEventType.PAUSE:
         return 'bg-red-500';
+      case WorkWellEventType.NONE:
+        return 'bg-gray-500';
       default:
         return 'bg-gray-500';
     }

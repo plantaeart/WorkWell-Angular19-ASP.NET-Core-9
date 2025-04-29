@@ -14,7 +14,7 @@
     class="timeline-container flex items-center gap-4 overflow-x-auto relative w-full"
   >
     <div
-      *ngFor="let event of sortedEvents"
+      *ngFor="let event of filledEvents"
       class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px]"
       [ngClass]="getEventClass(event.eventType)"
     >
