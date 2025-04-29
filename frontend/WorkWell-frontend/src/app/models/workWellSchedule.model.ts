@@ -22,7 +22,7 @@ export class WorkWellSchedule {
       new WorkWellEvent({
         startDate: '09:00',
         endDate: '18:00',
-        eventType: WorkWellEventType.NONE,
+        eventType: WorkWellEventType.WORKDAY,
       });
     this.meetings = params.meetings || new Array<WorkWellEvent>();
     this.meetings.forEach((meeting) => {

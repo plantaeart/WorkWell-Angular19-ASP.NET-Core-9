@@ -10,6 +10,7 @@ import { WorkWellStore } from '../../../../store/workWell.store';
 import { WorkWellEventType } from '../../../../../types/enums/workWellEventType';
 import { convertTimeStringToDate } from '../../../../utils/string.utils';
 import { WwShowScheduleInfosComponent } from '../ww-show-schedule-infos/ww-show-schedule-infos.component';
+import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
 
 @Component({
   selector: 'ww-step-4',
@@ -58,49 +59,12 @@ export class WwStep4Component {
   }));
 
   constructor() {
-    // Convert startDate and endDate to Date for workDay if they are not already Date objects
-    if (this.workDay.startDate.constructor.name !== 'Date') {
-      this.workDay.startDate = convertTimeStringToDate(this.workDay.startDate);
-    }
-
-    if (this.workDay.endDate.constructor.name !== 'Date') {
-      this.workDay.endDate = convertTimeStringToDate(this.workDay.endDate);
-    }
-
-    // Convert startDate and endDate to Date for lunch if they are not already Date objects
-    if (this.lunch.startDate.constructor.name !== 'Date') {
-      this.lunch.startDate = convertTimeStringToDate(this.lunch.startDate);
-    }
-
-    if (this.lunch.endDate.constructor.name !== 'Date') {
-      this.lunch.endDate = convertTimeStringToDate(this.lunch.endDate);
-    }
-
-    // Check if meetings exists, if yes, make sure start/endDate are Date objects
-    if (this.meetings && this.meetings.length > 0) {
-      for (let i = 0; i < this.meetings.length; i++) {
-        const meeting = this.meetings[i];
-        if (meeting.startDate.constructor.name !== 'Date') {
-          meeting.startDate = convertTimeStringToDate(meeting.startDate);
-        }
-        if (meeting.endDate.constructor.name !== 'Date') {
-          meeting.endDate = convertTimeStringToDate(meeting.endDate);
-        }
-      }
-    }
-
-    // Check if pauses exists, if yes, make sure start/endDate are Date objects
-    if (this.pauses && this.pauses.length > 0) {
-      for (let i = 0; i < this.pauses.length; i++) {
-        const pause = this.pauses[i];
-        if (pause.startDate.constructor.name !== 'Date') {
-          pause.startDate = convertTimeStringToDate(pause.startDate);
-        }
-        if (pause.endDate.constructor.name !== 'Date') {
-          pause.endDate = convertTimeStringToDate(pause.endDate);
-        }
-      }
-    }
+    convertWorkWellTimeToDate({
+      workDay: this.workDay,
+      lunch: this.lunch,
+      meetings: this.meetings,
+      pauses: this.pauses,
+    });
 
     this.verifyPauses(); // Initial verification of pauses
   }
@@ -109,7 +73,7 @@ export class WwStep4Component {
     this.pauses.push({
       startDate: this.workDay.startDate,
       endDate: this.workDay.endDate,
-      eventType: WorkWellEventType.MEETING,
+      eventType: WorkWellEventType.PAUSE,
     });
 
     this.verifyPauses();

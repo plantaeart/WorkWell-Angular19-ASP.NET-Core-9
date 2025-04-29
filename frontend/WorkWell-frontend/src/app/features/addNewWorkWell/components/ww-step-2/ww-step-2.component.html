@@ -10,9 +10,8 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
-          [options]="workFlatpickrConfig"
-          [maxDate]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
+          [(ngModel)]="this.workDay.startDate"
+          [maxDate]="this.workDay.endDate"
           (flatpickrChange)="onWorkDayStartChange($event.selectedDates[0])"
         />
       </div>
@@ -22,9 +21,8 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
-          [options]="workFlatpickrConfig"
-          [minDate]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
+          [(ngModel)]="this.workDay.endDate"
+          [minDate]="this.workDay.startDate"
           (flatpickrChange)="onWorkDayEndChange($event.selectedDates[0])"
         />
       </div>
@@ -41,10 +39,9 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="addNewWorkWell.workWellSchedule[0].lunch.startDate"
-          [options]="lunchFlatpickrConfig"
-          [minDate]="addNewWorkWell.workWellSchedule[0].workDay.startDate"
-          [maxDate]="addNewWorkWell.workWellSchedule[0].lunch.endDate"
+          [(ngModel)]="this.lunch.startDate"
+          [minDate]="this.workDay.startDate"
+          [maxDate]="this.lunch.endDate"
           (flatpickrChange)="onLunchStartChange($event.selectedDates[0])"
         />
       </div>
@@ -54,10 +51,9 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="addNewWorkWell.workWellSchedule[0].lunch.endDate"
-          [options]="lunchFlatpickrConfig"
-          [minDate]="addNewWorkWell.workWellSchedule[0].lunch.startDate"
-          [maxDate]="addNewWorkWell.workWellSchedule[0].workDay.endDate"
+          [(ngModel)]="this.lunch.endDate"
+          [minDate]="this.lunch.startDate"
+          [maxDate]="this.workDay.endDate"
           (flatpickrChange)="onLunchEndChange($event.selectedDates[0])"
         />
       </div>

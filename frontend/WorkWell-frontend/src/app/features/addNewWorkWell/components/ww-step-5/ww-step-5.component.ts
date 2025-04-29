@@ -1,42 +1,65 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TimelineModule } from 'primeng/timeline';
-
+import { WorkWellStore } from '../../../../store/workWell.store';
+import { formatDateToHHmm } from '../../../../utils/string.utils';
+import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
+import { CommonModule } from '@angular/common';
+import { WwTimelineComponent } from '../../../ww-timeline/ww-timeline.component';
+import { start } from 'repl';
+import e from 'express';
 @Component({
   selector: 'ww-step-5',
-  imports: [TimelineModule],
+  imports: [TimelineModule, CommonModule, WwTimelineComponent],
   templateUrl: './ww-step-5.component.html',
   styleUrl: './ww-step-5.component.scss',
 })
 export class WwStep5Component {
   events: any[] = [];
+  public workWellStore = inject(WorkWellStore);
+
+  formatDateToHHmm = formatDateToHHmm;
+
+  // Example data for workDay, lunch, meetings, and pauses
+  workDay =
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].workDay ?? {};
+  lunch = this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch ?? {};
+  meetings =
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings ?? [];
+  pauses = this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses ?? [];
 
   constructor() {
+    convertWorkWellTimeToDate({
+      workDay: this.workDay,
+      lunch: this.lunch,
+      meetings: this.meetings,
+      pauses: this.pauses,
+    });
+
     this.events = [
       {
-        status: 'Ordered',
-        date: '15/10/2020 10:30',
-        icon: 'pi pi-shopping-cart',
-        color: '#9C27B0',
-        image: 'game-controller.jpg',
+        startDate: this.workDay.startDate,
+        endDate: this.workDay.endDate,
+        name: 'Work Day',
+        eventType: this.workDay.eventType,
       },
       {
-        status: 'Processing',
-        date: '15/10/2020 14:00',
-        icon: 'pi pi-cog',
-        color: '#673AB7',
+        startDate: this.lunch.startDate,
+        endDate: this.lunch.endDate,
+        name: 'Lunch',
+        eventType: this.lunch.eventType,
       },
-      {
-        status: 'Shipped',
-        date: '15/10/2020 16:15',
-        icon: 'pi pi-shopping-cart',
-        color: '#FF9800',
-      },
-      {
-        status: 'Delivered',
-        date: '16/10/2020 10:00',
-        icon: 'pi pi-check',
-        color: '#607D8B',
-      },
+      ...this.meetings.map((meeting, index) => ({
+        startDate: meeting.startDate,
+        endDate: meeting.endDate,
+        name: 'Meeting ' + (index + 1),
+        eventType: meeting.eventType,
+      })),
+      ...this.pauses.map((pause, index) => ({
+        startDate: pause.startDate,
+        endDate: pause.endDate,
+        name: 'Pause ' + (index + 1),
+        eventType: pause.eventType,
+      })),
     ];
   }
 }

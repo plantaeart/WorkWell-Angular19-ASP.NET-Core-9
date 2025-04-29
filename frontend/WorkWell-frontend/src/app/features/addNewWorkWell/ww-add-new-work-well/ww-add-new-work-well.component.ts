@@ -6,6 +6,7 @@ import { WwStep2Component } from '../components/ww-step-2/ww-step-2.component';
 import { SeparatorComponent } from '../../components/separator/separator.component';
 import { WwStep3Component } from '../components/ww-step-3/ww-step-3.component';
 import { WwStep4Component } from '../components/ww-step-4/ww-step-4.component';
+import { WwStep5Component } from '../components/ww-step-5/ww-step-5.component';
 
 @Component({
   selector: 'ww-add-new-work-well',
@@ -17,6 +18,7 @@ import { WwStep4Component } from '../components/ww-step-4/ww-step-4.component';
     SeparatorComponent,
     WwStep3Component,
     WwStep4Component,
+    WwStep5Component,
   ],
   templateUrl: './ww-add-new-work-well.component.html',
   styleUrl: './ww-add-new-work-well.component.scss',

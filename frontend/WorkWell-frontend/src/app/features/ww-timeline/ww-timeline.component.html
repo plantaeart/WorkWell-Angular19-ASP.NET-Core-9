@@ -1,0 +1,13 @@
+<div class="timeline-container flex items-center gap-4 overflow-x-auto">
+  <div
+    *ngFor="let event of sortedEvents"
+    class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px]"
+    [ngClass]="getEventClass(event.eventType)"
+  >
+    <div class="event-name font-bold text-center">{{ event.name }}</div>
+    <div class="event-dates text-sm text-center">
+      {{ event.startDate | date : "shortTime" }} -
+      {{ event.endDate | date : "shortTime" }}
+    </div>
+  </div>
+</div>
