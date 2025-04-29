@@ -1,42 +1,61 @@
-<div
-  class="workday-container flex items-center w-full gap-4"
-  [ngClass]="getIsHorizontal()"
->
-  <!-- WorkDay Start -->
+<div class="flex flex row justify-start">
+  <!-- Current Time -->
   <div
-    class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
+    class="current-time flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] h-fit bg-gray-700"
   >
-    <div class="event-name font-bold text-center">Start Day</div>
-    <div class="event-dates text-sm text-center">
-      {{ workDay?.startDate | date : "HH:mm" }}
+    <div class="time-label font-bold text-center">Current Time</div>
+    <div class="time-value text-sm text-center text-xl">
+      {{ currentTime | date : "HH:mm" }}
+    </div>
+    <!-- Progress Bar -->
+    <div class="progress-bar w-full bg-gray-500 h-2 rounded mt-2">
+      <div
+        class="progress bg-green-500 h-full rounded transition-all duration-[1000ms] ease-linear"
+        [style.width.%]="(currentTime.getSeconds() / 60) * 100"
+      ></div>
     </div>
   </div>
-
   <!-- Timeline -->
   <div
-    class="timeline-container flex items-center gap-4 overflow-x-auto relative w-full"
+    class="workday-container flex items-center w-full gap-4"
     [ngClass]="getIsHorizontal()"
   >
+    <!-- WorkDay Start -->
     <div
-      *ngFor="let event of filledEvents"
-      class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md flex-grow min-w-[150px] max-w-[300px]"
-      [ngClass]="getEventClass(event.eventType)"
+      class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
     >
-      <div class="event-name font-bold text-center">{{ event.name }}</div>
+      <div class="event-name font-bold text-center">Start Day</div>
       <div class="event-dates text-sm text-center">
-        {{ event.startDate | date : "HH:mm" }} -
-        {{ event.endDate | date : "HH:mm" }}
+        {{ workDay?.startDate | date : "HH:mm" }}
       </div>
     </div>
-  </div>
 
-  <!-- WorkDay End -->
-  <div
-    class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
-  >
-    <div class="event-name font-bold text-center">End Day</div>
-    <div class="event-dates text-sm text-center">
-      {{ workDay?.endDate | date : "HH:mm" }}
+    <!-- Timeline -->
+    <div
+      class="timeline-container flex items-center gap-4 overflow-x-auto relative w-full"
+      [ngClass]="getIsHorizontal()"
+    >
+      <div
+        *ngFor="let event of filledEvents"
+        class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md flex-grow min-w-[150px] max-w-[300px]"
+        [ngClass]="getEventClass(event.eventType)"
+      >
+        <div class="event-name font-bold text-center">{{ event.name }}</div>
+        <div class="event-dates text-sm text-center">
+          {{ event.startDate | date : "HH:mm" }} -
+          {{ event.endDate | date : "HH:mm" }}
+        </div>
+      </div>
+    </div>
+
+    <!-- WorkDay End -->
+    <div
+      class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
+    >
+      <div class="event-name font-bold text-center">End Day</div>
+      <div class="event-dates text-sm text-center">
+        {{ workDay?.endDate | date : "HH:mm" }}
+      </div>
     </div>
   </div>
 </div>

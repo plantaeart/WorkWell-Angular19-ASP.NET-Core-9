@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkWellEventType } from '../../../types/enums/workWellEventType';
 import { WorkWellEvent } from '../../models/workWellEvent.model';
@@ -7,9 +7,9 @@ import { WorkWellEvent } from '../../models/workWellEvent.model';
   selector: 'ww-timeline',
   imports: [CommonModule],
   templateUrl: './ww-timeline.component.html',
-  styles: [],
+  styleUrl: './ww-timeline.component.scss',
 })
-export class WwTimelineComponent {
+export class WwTimelineComponent implements OnInit, OnDestroy {
   @Input() events: {
     startDate: Date;
     endDate: Date;
@@ -19,6 +19,32 @@ export class WwTimelineComponent {
 
   @Input() workDay: WorkWellEvent | null = null;
   @Input() isHorizontal = false; // Default to vertical timeline
+
+  currentTime: Date = new Date(); // Property to hold the current time
+  private clockTimeout: any; // To store the timeout reference
+  private clockInterval: any; // To store the interval reference
+
+  ngOnInit() {
+    // Start an interval to update the time every milisecond
+
+    this.clockInterval = setInterval(() => {
+      this.updateTime();
+    }, 1000); // Update every second
+  }
+
+  ngOnDestroy() {
+    // Clear the timeout and interval when the component is destroyed
+    if (this.clockTimeout) {
+      clearTimeout(this.clockTimeout);
+    }
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+    }
+  }
+
+  private updateTime = () => {
+    this.currentTime = new Date();
+  };
 
   get filledEvents() {
     if (!this.workDay) {
@@ -54,8 +80,6 @@ export class WwTimelineComponent {
         eventType: WorkWellEventType.NONE,
       });
     }
-
-    console.log('filledEvents', filledEvents);
 
     return filledEvents;
   }
