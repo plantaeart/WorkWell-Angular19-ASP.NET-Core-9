@@ -18,6 +18,7 @@ export class WwTimelineComponent {
   }[] = [];
 
   @Input() workDay: WorkWellEvent | null = null;
+  @Input() isHorizontal = false; // Default to vertical timeline
 
   get filledEvents() {
     if (!this.workDay) {
@@ -80,5 +81,9 @@ export class WwTimelineComponent {
       default:
         return 'bg-gray-500';
     }
+  }
+
+  getIsHorizontal(): string {
+    return this.isHorizontal ? 'flex-row' : 'flex-col';
   }
 }
