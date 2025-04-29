@@ -37,12 +37,6 @@ export class WwStep5Component {
 
     this.events = [
       {
-        startDate: this.workDay.startDate,
-        endDate: this.workDay.endDate,
-        name: 'Work Day',
-        eventType: this.workDay.eventType,
-      },
-      {
         startDate: this.lunch.startDate,
         endDate: this.lunch.endDate,
         name: 'Lunch',

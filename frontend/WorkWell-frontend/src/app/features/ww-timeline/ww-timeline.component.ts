@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkWellEventType } from '../../../types/enums/workWellEventType';
+import { WorkWellEvent } from '../../models/workWellEvent.model';
 
 @Component({
   selector: 'ww-timeline',
@@ -15,6 +16,8 @@ export class WwTimelineComponent {
     name: string;
     eventType: WorkWellEventType;
   }[] = [];
+
+  @Input() workDay: WorkWellEvent | null = null; // Add workDay as an input
 
   get sortedEvents() {
     return this.events.sort(
