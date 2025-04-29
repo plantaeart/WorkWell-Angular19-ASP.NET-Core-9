@@ -3,8 +3,9 @@ namespace WorkWell_backend.Types.Enum
     public enum WorkWellEventType
     {
         NONE = 0,
-        MEETING = 1,
-        PAUSE = 2,
-        LUNCH = 3,
+        WORKDAY = 1,
+        MEETING = 2,
+        PAUSE = 3,
+        LUNCH = 4,
     }
 }

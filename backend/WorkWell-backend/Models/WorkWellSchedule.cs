@@ -26,7 +26,7 @@ public class WorkWellSchedule
         IdDay = WorkWellDayType.NONE;
         WorkDay = new WorkWellEvent
         {
-            EventType = WorkWellEventType.NONE
+            EventType = WorkWellEventType.WORKDAY
         };
         Meetings = new List<WorkWellEvent>();
         // Update EventType for each element in the Meetings list
