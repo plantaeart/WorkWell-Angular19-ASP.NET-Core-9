@@ -39,6 +39,8 @@
         *ngFor="let event of filledEvents"
         class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md flex-grow min-w-[150px] max-w-[300px]"
         [ngClass]="getEventClass(event.eventType)"
+        [class.border-red-500]="isCurrentTimeInEvent(event)"
+        [class.border-2]="isCurrentTimeInEvent(event)"
       >
         <div class="event-name font-bold text-center">{{ event.name }}</div>
         <div class="event-dates text-sm text-center">

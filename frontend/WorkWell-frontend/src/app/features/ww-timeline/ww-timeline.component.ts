@@ -46,13 +46,42 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     this.currentTime = new Date();
   };
 
+  public isCurrentTimeInEvent(event: {
+    startDate: Date;
+    endDate: Date;
+    name: string;
+    eventType: WorkWellEventType;
+  }): boolean {
+    const now = this.currentTime.getTime();
+
+    // Highlight StartDay if current time is before the workDay start
+    if (
+      event.name === 'Start Day' &&
+      this.workDay &&
+      now < (this.workDay.startDate as Date).getTime()
+    ) {
+      return true;
+    }
+
+    // Highlight EndDay if current time is after the workDay end
+    if (
+      event.name === 'End Day' &&
+      this.workDay &&
+      now > (this.workDay.endDate as Date).getTime()
+    ) {
+      return true;
+    }
+
+    return now >= event.startDate.getTime() && now <= event.endDate.getTime();
+  }
+
   get filledEvents() {
     if (!this.workDay) {
       return this.sortedEvents; // If no workDay is provided, return sorted events as is
     }
 
     const filledEvents = [];
-    let currentTime = this.workDay.startDate;
+    let currentTime = this.workDay.startDate as Date; // Start from the workday start time
 
     // Sort events by start time
     const sorted = this.sortedEvents;
@@ -75,7 +104,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     if (currentTime < this.workDay.endDate) {
       filledEvents.push({
         startDate: currentTime,
-        endDate: this.workDay.endDate,
+        endDate: this.workDay.endDate as Date,
         name: 'Work',
         eventType: WorkWellEventType.NONE,
       });
