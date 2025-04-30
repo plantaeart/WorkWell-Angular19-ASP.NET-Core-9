@@ -7,6 +7,11 @@ import { CommonModule } from '@angular/common';
 import { WwTimelineComponent } from '../../../ww-timeline/ww-timeline.component';
 import { start } from 'repl';
 import e from 'express';
+import {
+  lunchName,
+  meetingName,
+  pauseName,
+} from '../../../../../types/enums/workWellEventName';
 @Component({
   selector: 'ww-step-5',
   imports: [TimelineModule, CommonModule, WwTimelineComponent],
@@ -39,19 +44,19 @@ export class WwStep5Component {
       {
         startDate: this.lunch.startDate,
         endDate: this.lunch.endDate,
-        name: 'Lunch',
+        name: lunchName,
         eventType: this.lunch.eventType,
       },
       ...this.meetings.map((meeting, index) => ({
         startDate: meeting.startDate,
         endDate: meeting.endDate,
-        name: 'Meeting ' + (index + 1),
+        name: meetingName + ' ' + (index + 1),
         eventType: meeting.eventType,
       })),
       ...this.pauses.map((pause, index) => ({
         startDate: pause.startDate,
         endDate: pause.endDate,
-        name: 'Pause ' + (index + 1),
+        name: pauseName + ' ' + (index + 1),
         eventType: pause.eventType,
       })),
     ];

@@ -2,6 +2,11 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkWellEventType } from '../../../types/enums/workWellEventType';
 import { WorkWellEvent } from '../../models/workWellEvent.model';
+import {
+  endDayName,
+  startDayName,
+  workDayName,
+} from '../../../types/enums/workWellEventName';
 
 @Component({
   selector: 'ww-timeline',
@@ -23,6 +28,8 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   currentTime: Date = new Date(); // Property to hold the current time
   private clockTimeout: any; // To store the timeout reference
   private clockInterval: any; // To store the interval reference
+  public startDayName = startDayName; // Expose startDayName for use in the template
+  public endDayName = endDayName; // Expose endDayName for use in the template
 
   ngOnInit() {
     // Start an interval to update the time every milisecond
@@ -56,7 +63,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
 
     // Highlight StartDay if current time is before the workDay start
     if (
-      event.name === 'Start Day' &&
+      event.name === startDayName &&
       this.workDay &&
       now < (this.workDay.startDate as Date).getTime()
     ) {
@@ -65,7 +72,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
 
     // Highlight EndDay if current time is after the workDay end
     if (
-      event.name === 'End Day' &&
+      event.name === endDayName &&
       this.workDay &&
       now > (this.workDay.endDate as Date).getTime()
     ) {
@@ -92,7 +99,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
         filledEvents.push({
           startDate: currentTime,
           endDate: event.startDate,
-          name: 'Work',
+          name: workDayName,
           eventType: WorkWellEventType.NONE, // Custom type for empty events
         });
       }
@@ -105,7 +112,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       filledEvents.push({
         startDate: currentTime,
         endDate: this.workDay.endDate as Date,
-        name: 'Work',
+        name: workDayName,
         eventType: WorkWellEventType.NONE,
       });
     }
@@ -159,6 +166,31 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
         nextEvent = event;
         break;
       }
+    }
+
+    // If no next event found and current time is after EndDay
+    if (this.workDay && now > (this.workDay.endDate as Date).getTime()) {
+      return { currentEvent: null, nextEvent: null };
+    }
+
+    // If no next event found, the next event is End Day
+    if (!nextEvent && this.workDay) {
+      nextEvent = {
+        startDate: this.workDay.endDate as Date,
+        endDate: this.workDay.endDate as Date,
+        name: endDayName,
+        eventType: WorkWellEventType.WORKDAY,
+      };
+    }
+
+    // And if current time is before the first event, set currentEvent to Start Day
+    if (!currentEvent && this.workDay) {
+      currentEvent = {
+        startDate: this.workDay.startDate as Date,
+        endDate: this.workDay.startDate as Date,
+        name: startDayName,
+        eventType: WorkWellEventType.WORKDAY,
+      };
     }
 
     return { currentEvent, nextEvent };

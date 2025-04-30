@@ -23,22 +23,35 @@
         <div class="event-info font-bold text-center text-lg">
           Event Information
         </div>
-        <div class="current-event text-sm text-center mt-2">
-          <span class="font-semibold">Current Event:</span>
-          {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
-        </div>
-        <div class="next-event text-sm text-center mt-2">
-          <span class="font-semibold">Next Event:</span>
-          {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
-        </div>
-        <div class="time-between text-sm text-center mt-2">
-          <span class="font-semibold">Time Until Next Event:</span>
-          {{
-            getCurrentAndNextEvents().nextEvent
-              ? getTimeBetweenEvents(getCurrentAndNextEvents().nextEvent)
-              : "N/A"
-          }}
-        </div>
+        <ng-container
+          *ngIf="
+            getCurrentAndNextEvents().currentEvent ||
+              getCurrentAndNextEvents().nextEvent;
+            else endOfDay
+          "
+        >
+          <div class="current-event text-sm text-center mt-2">
+            <span class="font-semibold">Current Event:</span>
+            {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
+          </div>
+          <div class="next-event text-sm text-center mt-2">
+            <span class="font-semibold">Next Event:</span>
+            {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
+          </div>
+          <div class="time-between text-sm text-center mt-2">
+            <span class="font-semibold">Time Until Next Event:</span>
+            {{
+              getCurrentAndNextEvents().nextEvent
+                ? getTimeBetweenEvents(getCurrentAndNextEvents().nextEvent)
+                : "N/A"
+            }}
+          </div>
+        </ng-container>
+        <ng-template #endOfDay>
+          <div class="end-of-day text-center text-lg font-bold mt-4">
+            End of the day 🎉
+          </div>
+        </ng-template>
       </div>
     </div>
   </div>
@@ -51,7 +64,9 @@
     <div
       class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
     >
-      <div class="event-name font-bold text-center">Start Day</div>
+      <div class="event-name font-bold text-center">
+        {{ startDayName }}
+      </div>
       <div class="event-dates text-sm text-center">
         {{ workDay?.startDate | date : "HH:mm" }}
       </div>
@@ -81,7 +96,7 @@
     <div
       class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
     >
-      <div class="event-name font-bold text-center">End Day</div>
+      <div class="event-name font-bold text-center">{{ endDayName }}</div>
       <div class="event-dates text-sm text-center">
         {{ workDay?.endDate | date : "HH:mm" }}
       </div>
