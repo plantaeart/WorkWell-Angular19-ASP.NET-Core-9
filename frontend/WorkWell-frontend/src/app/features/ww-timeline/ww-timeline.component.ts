@@ -119,7 +119,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     );
   }
 
-  getEventClass(eventType: WorkWellEventType): string {
+  public getEventClass(eventType: WorkWellEventType): string {
     switch (eventType) {
       case WorkWellEventType.WORKDAY:
         return 'bg-blue-500';
@@ -136,7 +136,48 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     }
   }
 
-  getIsHorizontal(): string {
+  public getIsHorizontal(): string {
     return this.isHorizontal ? 'flex-row' : 'flex-col';
+  }
+
+  public getCurrentAndNextEvents() {
+    const now = this.currentTime.getTime();
+
+    // Sort events by start time
+    const filledEvents = this.filledEvents;
+
+    let currentEvent = null;
+    let nextEvent = null;
+
+    for (let i = 0; i < filledEvents.length; i++) {
+      const event = filledEvents[i];
+      if (now >= event.startDate.getTime() && now <= event.endDate.getTime()) {
+        currentEvent = event;
+        nextEvent = filledEvents[i + 1] || null; // Get the next event if it exists
+        break;
+      } else if (now < event.startDate.getTime()) {
+        nextEvent = event;
+        break;
+      }
+    }
+
+    return { currentEvent, nextEvent };
+  }
+
+  public getTimeBetweenEvents(nextEvent: { startDate: Date } | null): string {
+    if (!nextEvent) {
+      return 'N/A';
+    }
+
+    const timeDiff = nextEvent.startDate.getTime() - this.currentTime.getTime(); // Corrected logic
+    if (timeDiff < 0) {
+      return '0 min 0 sec'; // If the next event has already started
+    }
+
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+    return `${hours} hour ${minutes} min ${seconds} sec`;
   }
 }

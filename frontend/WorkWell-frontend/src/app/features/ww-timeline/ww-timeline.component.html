@@ -1,18 +1,45 @@
 <div class="flex flex row justify-start">
   <!-- Current Time -->
-  <div
-    class="current-time flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] h-fit bg-gray-700"
-  >
-    <div class="time-label font-bold text-center">Current Time</div>
-    <div class="time-value text-sm text-center text-xl">
-      {{ currentTime | date : "HH:mm" }}
+  <div class="current-time flex flex-col items-center">
+    <div
+      class="p-4 rounded-lg text-white shadow-md min-w-[150px] h-fit bg-gray-700"
+    >
+      <div class="time-label font-bold text-center">Current Time</div>
+      <div class="time-value text-sm text-center text-xl">
+        {{ currentTime | date : "HH:mm" }}
+      </div>
+      <!-- Progress Bar -->
+      <div class="progress-bar w-full bg-gray-500 h-2 rounded mt-2">
+        <div
+          class="progress bg-green-500 h-full rounded transition-all duration-[1000ms] ease-linear"
+          [style.width.%]="(currentTime.getSeconds() / 60) * 100"
+        ></div>
+      </div>
     </div>
-    <!-- Progress Bar -->
-    <div class="progress-bar w-full bg-gray-500 h-2 rounded mt-2">
+    <div>
       <div
-        class="progress bg-green-500 h-full rounded transition-all duration-[1000ms] ease-linear"
-        [style.width.%]="(currentTime.getSeconds() / 60) * 100"
-      ></div>
+        class="current-next-events flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[300px] h-fit bg-gray-800 mt-4"
+      >
+        <div class="event-info font-bold text-center text-lg">
+          Event Information
+        </div>
+        <div class="current-event text-sm text-center mt-2">
+          <span class="font-semibold">Current Event:</span>
+          {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
+        </div>
+        <div class="next-event text-sm text-center mt-2">
+          <span class="font-semibold">Next Event:</span>
+          {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
+        </div>
+        <div class="time-between text-sm text-center mt-2">
+          <span class="font-semibold">Time Until Next Event:</span>
+          {{
+            getCurrentAndNextEvents().nextEvent
+              ? getTimeBetweenEvents(getCurrentAndNextEvents().nextEvent)
+              : "N/A"
+          }}
+        </div>
+      </div>
     </div>
   </div>
   <!-- Timeline -->
