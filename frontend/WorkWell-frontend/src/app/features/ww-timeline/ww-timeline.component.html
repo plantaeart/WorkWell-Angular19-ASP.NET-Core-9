@@ -1,6 +1,10 @@
 <div class="flex flex row justify-start">
-  <!-- Current Time -->
-  <div class="current-time flex flex-col items-center">
+  <!-- Current Time + Current and nextevent -->
+  <div
+    class="current-time flex flex-col items-center"
+    *ngIf="isShowCurrentTime"
+  >
+    <!-- Current Time -->
     <div
       class="p-4 rounded-lg text-white shadow-md min-w-[150px] h-fit bg-gray-700"
     >
@@ -17,6 +21,7 @@
       </div>
     </div>
     <div>
+      <!-- Current and Next Events -->
       <div
         class="current-next-events flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[300px] h-fit bg-gray-800 mt-4"
       >
@@ -42,7 +47,9 @@
             <span class="font-semibold">Time Until Next Event:</span>
             {{
               getCurrentAndNextEvents().nextEvent
-                ? getTimeBetweenEvents(getCurrentAndNextEvents().nextEvent)
+                ? getTimeBetweenEvents({
+                    startDate: getCurrentAndNextEvents().nextEvent?.startDate
+                  })
                 : "N/A"
             }}
           </div>
@@ -68,7 +75,7 @@
         {{ startDayName }}
       </div>
       <div class="event-dates text-sm text-center">
-        {{ workDay?.startDate | date : "HH:mm" }}
+        {{ workDay.startDate | date : "HH:mm" }}
       </div>
     </div>
 
@@ -95,10 +102,12 @@
     <!-- WorkDay End -->
     <div
       class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
+      [class.border-red-500]="isCurrentTimeInEvent(workDay)"
+      [class.border-2]="isCurrentTimeInEvent(workDay)"
     >
       <div class="event-name font-bold text-center">{{ endDayName }}</div>
       <div class="event-dates text-sm text-center">
-        {{ workDay?.endDate | date : "HH:mm" }}
+        {{ workDay.endDate | date : "HH:mm" }}
       </div>
     </div>
   </div>

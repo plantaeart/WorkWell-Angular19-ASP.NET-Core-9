@@ -74,6 +74,7 @@ export class WwStep4Component {
       startDate: this.workDay.startDate,
       endDate: this.workDay.endDate,
       eventType: WorkWellEventType.PAUSE,
+      name: 'Pause ' + (this.pauses.length + 1),
     });
 
     this.verifyPauses();

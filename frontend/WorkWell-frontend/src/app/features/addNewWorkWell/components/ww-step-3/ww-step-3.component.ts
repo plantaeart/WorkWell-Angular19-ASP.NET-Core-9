@@ -63,6 +63,7 @@ export class WwStep3Component {
       startDate: this.workDay.startDate,
       endDate: this.workDay.endDate,
       eventType: WorkWellEventType.MEETING,
+      name: 'Meeting ' + (this.meetings.length + 1),
     });
     this.verifyMeetings();
   }

@@ -9,6 +9,11 @@ import {
 import { convertTimeStringToDate } from '../../../../utils/string.utils';
 import { WorkWellEvent } from '../../../../models/workWellEvent.model';
 import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
+import {
+  lunchName,
+  workDayName,
+  workHoursName,
+} from '../../../../../types/enums/workWellEventName';
 
 @Component({
   selector: 'ww-step-2',
@@ -33,6 +38,8 @@ export class WwStep2Component {
 
   constructor() {
     convertWorkWellTimeToDate({ workDay: this.workDay, lunch: this.lunch });
+    this.workDay.name = workHoursName;
+    this.lunch.name = lunchName;
   }
 
   onWorkDayStartChange(newValue: Date): void {
