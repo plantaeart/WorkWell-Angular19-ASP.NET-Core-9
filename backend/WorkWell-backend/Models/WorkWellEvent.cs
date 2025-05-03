@@ -16,17 +16,22 @@ public class WorkWellEvent
     [FirestoreProperty(nameof(EventType))]
     public WorkWellEventType EventType { get; set; }
 
+    [FirestoreProperty(nameof(Name))]
+    public string Name { get; set; }
+
     public WorkWellEvent()
     {
         StartDate = "09:00";
         EndDate = "18:00";
         EventType = WorkWellEventType.NONE;
+        Name = string.Empty;
     }
 
-    public WorkWellEvent(string startDate, string endDate, WorkWellEventType eventType)
+    public WorkWellEvent(string startDate, string endDate, WorkWellEventType eventType, string name)
     {
         StartDate = startDate;
         EndDate = endDate;
         EventType = eventType;
+        Name = name;
     }
 }
