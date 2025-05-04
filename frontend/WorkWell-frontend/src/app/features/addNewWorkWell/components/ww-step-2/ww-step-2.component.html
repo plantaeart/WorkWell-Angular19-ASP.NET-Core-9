@@ -5,7 +5,22 @@
     <p class="text-xl">💼 What is your work day?</p>
     <div class="w-30">
       <div>
-        <p class="text-lg w-fit">🌞 Start</p>
+        <div>
+          <div class="flex flex-row items-center gap-2">
+            <p class="text-lg w-fit">🌞 Start</p>
+            <span
+              *ngIf="workDayErrors.length > 0"
+              class="text-red-500 font-bold"
+              >❌</span
+            >
+            <span
+              *ngIf="workDayErrors.length === 0"
+              class="text-green-500 font-bold"
+            >
+              ✅
+            </span>
+          </div>
+        </div>
         <input
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
@@ -25,6 +40,11 @@
           [minDate]="this.workDay.startDate"
           (flatpickrChange)="onWorkDayEndChange($event.selectedDates[0])"
         />
+      </div>
+      <div>
+        <ul *ngIf="workDayErrors.length > 0" class="text-red-500">
+          <li *ngFor="let error of workDayErrors">❌ {{ error }}</li>
+        </ul>
       </div>
     </div>
   </div>

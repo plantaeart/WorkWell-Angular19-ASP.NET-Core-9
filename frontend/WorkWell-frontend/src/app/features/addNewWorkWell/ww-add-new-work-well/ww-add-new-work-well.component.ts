@@ -46,6 +46,12 @@ export class WwAddNewWorkWellComponent {
     this.lunchCoherencyOk = state.isCoherent;
   }
 
+  public workDayCoherencyOk = true;
+
+  onWorkDayStateChange(state: { isCoherent: boolean }): void {
+    this.workDayCoherencyOk = state.isCoherent;
+  }
+
   constructor() {
     this.workWellStore.resetAddNewWorkWell();
   }

@@ -62,7 +62,7 @@
                 label="Next"
                 iconPos="right"
                 (click)="activateCallback(3)"
-                [disabled]="!lunchCoherencyOk"
+                [disabled]="!lunchCoherencyOk || !workDayCoherencyOk"
               >
                 <p class="mr-1">Next</p>
                 <span class="pi pi-arrow-right"></span>

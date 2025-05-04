@@ -11,6 +11,7 @@ import { WorkWellEventType } from '../../../../../types/enums/workWellEventType'
 import { convertTimeStringToDate } from '../../../../utils/string.utils';
 import { WwShowScheduleInfosComponent } from '../ww-show-schedule-infos/ww-show-schedule-infos.component';
 import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
+import { meetingName } from '../../../../../types/enums/workWellEventName';
 
 @Component({
   selector: 'ww-step-3',
@@ -63,7 +64,7 @@ export class WwStep3Component {
       startDate: this.workDay.startDate,
       endDate: this.workDay.endDate,
       eventType: WorkWellEventType.MEETING,
-      name: 'Meeting ' + (this.meetings.length + 1),
+      name: meetingName + (this.meetings.length + 1),
     });
     this.verifyMeetings();
   }

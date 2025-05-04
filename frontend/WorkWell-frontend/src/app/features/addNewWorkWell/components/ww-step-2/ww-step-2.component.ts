@@ -29,6 +29,7 @@ import { CommonModule } from '@angular/common';
 })
 export class WwStep2Component {
   @Output() lunchStateChange = new EventEmitter<{ isCoherent: boolean }>();
+  @Output() WorkDayStateChange = new EventEmitter<{ isCoherent: boolean }>();
 
   private workWellStore = inject(WorkWellStore);
   public workDay: WorkWellEvent =
@@ -38,6 +39,8 @@ export class WwStep2Component {
 
   public lunchErrors: string[] = []; // Store lunch validation errors
   public lunchCoherencyOk = true; // Track if lunch times are coherent
+  public workDayErrors: string[] = []; // Store workday validation errors
+  public workDayCoherencyOk = true; // Track if workday times are coherent
 
   constructor() {
     convertWorkWellTimeToDate({ workDay: this.workDay, lunch: this.lunch });
@@ -65,6 +68,25 @@ export class WwStep2Component {
   onLunchEndChange(newValue: Date): void {
     this.lunch.endDate = newValue;
     this.verifyLunch(); // Verify lunch after lunch end change
+  }
+
+  verifyWorkDay(): void {
+    this.workDayErrors = []; // Reset errors
+    this.workDayCoherencyOk = true; // Assume lunch is coherent initially
+
+    // Check if workDay start time is equal to workDay end time
+    if (
+      (this.workDay.startDate as Date).getTime() ===
+      (this.workDay.endDate as Date).getTime()
+    ) {
+      this.workDayErrors.push(
+        '🍽️ Lunch start time cannot be the same as lunch end time'
+      );
+      this.workDayCoherencyOk = false;
+    }
+
+    // Emit the lunch coherency state
+    this.lunchStateChange.emit({ isCoherent: this.workDayCoherencyOk });
   }
 
   verifyLunch(): void {

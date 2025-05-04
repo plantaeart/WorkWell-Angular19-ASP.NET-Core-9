@@ -11,6 +11,7 @@ import { WorkWellEventType } from '../../../../../types/enums/workWellEventType'
 import { convertTimeStringToDate } from '../../../../utils/string.utils';
 import { WwShowScheduleInfosComponent } from '../ww-show-schedule-infos/ww-show-schedule-infos.component';
 import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
+import { pauseName } from '../../../../../types/enums/workWellEventName';
 
 @Component({
   selector: 'ww-step-4',
@@ -74,7 +75,7 @@ export class WwStep4Component {
       startDate: this.workDay.startDate,
       endDate: this.workDay.endDate,
       eventType: WorkWellEventType.PAUSE,
-      name: 'Pause ' + (this.pauses.length + 1),
+      name: pauseName + (this.pauses.length + 1),
     });
 
     this.verifyPauses();

@@ -12,10 +12,7 @@ import {
   endDayName,
   startDayName,
   workDayName,
-  workHoursName,
 } from '../../../types/enums/workWellEventName';
-import e from 'express';
-import { WorkWell } from '../../models/workWell.model';
 import { convertWorkWellTimeToDate } from '../../utils/workWellUtils';
 
 @Component({
@@ -154,7 +151,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
         filledEvents.push({
           startDate: currentTime,
           endDate: event.startDate,
-          name: workDayName,
+          name: event.name,
           eventType: WorkWellEventType.NONE, // Custom type for empty events
         });
       }
@@ -167,7 +164,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       filledEvents.push({
         startDate: currentTime,
         endDate: this.workDay.endDate as Date,
-        name: workDayName,
+        name: this.workDay.name,
         eventType: WorkWellEventType.NONE,
       });
     }
@@ -258,12 +255,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
 
     // If no current event is found and the current time is before the first event, set currentEvent to Start Day
     if (!currentEvent && this.workDay) {
-      currentEvent = {
-        startDate: this.workDay.startDate as Date,
-        endDate: this.workDay.startDate as Date,
-        name: startDayName,
-        eventType: WorkWellEventType.WORKDAY,
-      };
+      currentEvent = this.workDayStart; // Set to Start Day if no current event is found
     }
 
     return { currentEvent, nextEvent };
