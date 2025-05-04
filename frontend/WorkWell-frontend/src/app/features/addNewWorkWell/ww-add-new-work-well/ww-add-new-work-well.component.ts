@@ -52,6 +52,12 @@ export class WwAddNewWorkWellComponent {
     this.workDayCoherencyOk = state.isCoherent;
   }
 
+  public workWellNameCoherencyOk = true;
+
+  onWorkWellNameStateChange(state: { isCoherent: boolean }): void {
+    this.workWellNameCoherencyOk = state.isCoherent;
+  }
+
   constructor() {
     this.workWellStore.resetAddNewWorkWell();
   }

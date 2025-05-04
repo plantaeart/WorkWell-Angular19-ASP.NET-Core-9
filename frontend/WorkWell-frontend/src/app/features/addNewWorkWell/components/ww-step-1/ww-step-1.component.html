@@ -2,13 +2,38 @@
   <div
     class="flex flex-column justify-between items-center gap-3 text-[#000411]"
   >
-    <p class="text-xl">💼 How many days do you work a week ?</p>
+    <p class="text-xl">📝 What is the name of your Work Well?</p>
+    <div>
+      <input
+        class="form-control text-center text-lg w-50 border-2 border-[#000411] rounded-lg"
+        pInputText
+        type="text"
+        name="workWellName"
+        [(ngModel)]="addNewWorkWell.name"
+        placeholder="Enter a name"
+        [minlength]="3"
+        [maxlength]="20"
+        (ngModelChange)="isWorkWellNameCoherent()"
+      />
+      <p *ngIf="!isWorkWellNameCoherent()" class="text-red-500">
+        ❌ Name must be at least 3 characters long
+      </p>
+      <p *ngIf="isWorkWellNameCoherent()" class="text-green-500">
+        ✅ Name is valid
+      </p>
+    </div>
+  </div>
+  <div
+    class="flex flex-column justify-between items-center gap-3 text-[#000411]"
+  >
+    <p class="text-xl">💼 How many days do you work a week?</p>
     <p-inputnumber
       [(ngModel)]="addNewWorkWell.nbDayWork"
       [showButtons]="true"
       buttonLayout="vertical"
       spinnerMode="vertical"
       inputId="vertical"
+      name="nbDayWork"
       [inputStyle]="{ width: '3rem' }"
       [min]="1"
       [max]="7"
@@ -24,13 +49,14 @@
   <div
     class="flex flex-column justify-between items-center gap-3 text-[#000411]"
   >
-    <p class="text-xl">🕒 What schedule type do you have ?</p>
+    <p class="text-xl">🕒 What schedule type do you have?</p>
     <p-selectbutton
       [options]="stateOptions"
       [(ngModel)]="addNewWorkWell.scheduleType"
       optionLabel="label"
       optionValue="value"
       aria-labelledby="basic"
+      name="scheduleType"
     />
   </div>
 </div>

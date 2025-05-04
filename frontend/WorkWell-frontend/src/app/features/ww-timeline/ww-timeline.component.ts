@@ -12,6 +12,7 @@ import {
   endDayName,
   startDayName,
   workDayName,
+  workHoursName,
 } from '../../../types/enums/workWellEventName';
 import { convertWorkWellTimeToDate } from '../../utils/workWellUtils';
 
@@ -151,7 +152,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
         filledEvents.push({
           startDate: currentTime,
           endDate: event.startDate,
-          name: event.name,
+          name: workHoursName,
           eventType: WorkWellEventType.NONE, // Custom type for empty events
         });
       }
@@ -186,13 +187,13 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       case WorkWellEventType.LUNCH:
         return 'bg-emerald-500';
       case WorkWellEventType.MEETING:
-        return 'bg-yellow-500';
+        return 'bg-amber-500';
       case WorkWellEventType.PAUSE:
-        return 'bg-fuchsia-500';
+        return 'bg-rose-500';
       case WorkWellEventType.NONE:
-        return 'bg-gray-500';
+        return 'bg-stone-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-stone-500';
     }
   }
 

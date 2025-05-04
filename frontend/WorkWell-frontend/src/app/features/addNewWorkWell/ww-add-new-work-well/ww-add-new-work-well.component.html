@@ -18,14 +18,17 @@
             <div
               class="border-2 border-dashed border-surface-200 dark:border-surface-700 rounded bg-surface-50 dark:bg-surface-950 flex-auto flex justify-center items-center font-medium"
             >
-              <ww-step-1></ww-step-1>
+              <ww-step-1
+                (workWellNameStateChange)="onWorkWellNameStateChange($event)"
+              ></ww-step-1>
             </div>
             <div class="flex items-center">
               <button
-                class="cursor-pointer flex items-center h-fit w-fit ml-2 p-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg"
+                class="cursor-pointer flex items-center h-fit w-fit ml-2 p-2 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded-lg shadow-lg disabled:bg-gray-400 disabled:cursor-not-allowed"
                 label="Next"
                 iconPos="right"
                 (click)="activateCallback(2)"
+                [disabled]="!workWellNameCoherencyOk"
               >
                 <p class="mr-1">Next</p>
                 <span class="pi pi-arrow-right"></span>

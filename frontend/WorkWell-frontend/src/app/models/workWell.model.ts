@@ -20,7 +20,7 @@ export class WorkWell {
     workWellSchedule?: WorkWellSchedule[];
   }) {
     this.idWWS = params.idWWS || 0;
-    this.name = params.name || '';
+    this.name = params.name || 'Default WorkWell Name';
     this.description = params.description || '';
     this.nbDayWork = params.nbDayWork || 5;
     this.updateDate = params.updateDate || new Date();
