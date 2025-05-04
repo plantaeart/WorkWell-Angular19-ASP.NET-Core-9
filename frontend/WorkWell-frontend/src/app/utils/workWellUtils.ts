@@ -7,6 +7,7 @@ export function convertWorkWellTimeToDate(params: {
   lunch?: WorkWellEvent;
   meetings?: WorkWellEvent[];
   pauses?: WorkWellEvent[];
+  anything?: WorkWellEvent[];
 }) {
   // Convert startDate and endDate to Date for workDay if they are not already Date objects
   if (params.workDay) {
@@ -57,6 +58,21 @@ export function convertWorkWellTimeToDate(params: {
         }
         if (pause.endDate.constructor.name !== 'Date') {
           pause.endDate = convertTimeStringToDate(pause.endDate);
+        }
+      }
+    }
+  }
+
+  if (params.anything) {
+    // Check if anything exists, if yes, make sure start/endDate are Date objects
+    if (params.anything && params.anything.length > 0) {
+      for (let i = 0; i < params.anything.length; i++) {
+        const anything = params.anything[i];
+        if (anything.startDate.constructor.name !== 'Date') {
+          anything.startDate = convertTimeStringToDate(anything.startDate);
+        }
+        if (anything.endDate.constructor.name !== 'Date') {
+          anything.endDate = convertTimeStringToDate(anything.endDate);
         }
       }
     }

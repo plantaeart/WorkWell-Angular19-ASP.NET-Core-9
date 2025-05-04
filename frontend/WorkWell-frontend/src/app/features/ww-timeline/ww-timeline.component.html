@@ -30,33 +30,48 @@
         </div>
         <ng-container
           *ngIf="
-            getCurrentAndNextEvents().currentEvent ||
-              getCurrentAndNextEvents().nextEvent;
+            getCurrentAndNextEvents().currentEvent != this.workDayEnd;
             else endOfDay
           "
         >
-          <div class="current-event text-sm text-center mt-2">
-            <span class="font-semibold">Current Event:</span>
-            {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
-          </div>
-          <div class="next-event text-sm text-center mt-2">
-            <span class="font-semibold">Next Event:</span>
-            {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
-          </div>
-          <div class="time-between text-sm text-center mt-2">
-            <span class="font-semibold">Time Until Next Event:</span>
-            {{
-              getCurrentAndNextEvents().nextEvent
-                ? getTimeBetweenEvents({
-                    startDate: getCurrentAndNextEvents().nextEvent?.startDate
-                  })
-                : "N/A"
-            }}
-          </div>
+          <ng-container
+            *ngIf="
+              getCurrentAndNextEvents().currentEvent != this.workDayStart;
+              else startOfDay
+            "
+          >
+            <div class="current-event text-sm text-center mt-2">
+              <span class="font-semibold">Current Event:</span>
+              {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
+            </div>
+            <div class="next-event text-sm text-center mt-2">
+              <span class="font-semibold">Next Event:</span>
+              {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
+            </div>
+            <div class="time-between text-sm text-center mt-2">
+              <span class="font-semibold">Time Until Next Event:</span>
+              {{
+                getCurrentAndNextEvents().nextEvent
+                  ? getTimeBetweenEvents({
+                      startDate: getCurrentAndNextEvents().nextEvent?.startDate
+                    })
+                  : "N/A"
+              }}
+            </div>
+          </ng-container>
         </ng-container>
+
+        <!-- End of Day Template -->
         <ng-template #endOfDay>
           <div class="end-of-day text-center text-lg font-bold mt-4">
             End of the day 🎉
+          </div>
+        </ng-template>
+
+        <!-- Start of Day Template -->
+        <ng-template #startOfDay>
+          <div class="start-of-day text-center text-lg font-bold mt-4">
+            Soon start of the day 🌞
           </div>
         </ng-template>
       </div>
@@ -70,12 +85,14 @@
     <!-- WorkDay Start -->
     <div
       class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
+      [class.border-red-500]="isCurrentTimeInEvent(workDayStart)"
+      [class.border-2]="isCurrentTimeInEvent(workDayStart)"
     >
       <div class="event-name font-bold text-center">
-        {{ startDayName }}
+        {{ workDayStart.name }}
       </div>
       <div class="event-dates text-sm text-center">
-        {{ workDay.startDate | date : "HH:mm" }}
+        {{ workDayStart.startDate | date : "HH:mm" }}
       </div>
     </div>
 
@@ -102,12 +119,12 @@
     <!-- WorkDay End -->
     <div
       class="timeline-event flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[150px] bg-blue-600"
-      [class.border-red-500]="isCurrentTimeInEvent(workDay)"
-      [class.border-2]="isCurrentTimeInEvent(workDay)"
+      [class.border-red-500]="isCurrentTimeInEvent(workDayEnd)"
+      [class.border-2]="isCurrentTimeInEvent(workDayEnd)"
     >
-      <div class="event-name font-bold text-center">{{ endDayName }}</div>
+      <div class="event-name font-bold text-center">{{ workDayEnd.name }}</div>
       <div class="event-dates text-sm text-center">
-        {{ workDay.endDate | date : "HH:mm" }}
+        {{ workDayEnd.endDate | date : "HH:mm" }}
       </div>
     </div>
   </div>
