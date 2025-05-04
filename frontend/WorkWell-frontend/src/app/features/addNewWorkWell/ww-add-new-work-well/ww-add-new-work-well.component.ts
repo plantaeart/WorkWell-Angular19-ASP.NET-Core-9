@@ -40,6 +40,12 @@ export class WwAddNewWorkWellComponent {
     this.hasPauses = state.hasPauses;
   }
 
+  public lunchCoherencyOk = true;
+
+  onLunchStateChange(state: { isCoherent: boolean }): void {
+    this.lunchCoherencyOk = state.isCoherent;
+  }
+
   constructor() {
     this.workWellStore.resetAddNewWorkWell();
   }

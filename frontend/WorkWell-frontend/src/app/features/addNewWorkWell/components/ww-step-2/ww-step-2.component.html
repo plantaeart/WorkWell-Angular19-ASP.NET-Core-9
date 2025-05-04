@@ -34,7 +34,20 @@
     <p class="text-xl">🍴 When do you take lunch?</p>
     <div class="w-30">
       <div>
-        <p class="text-lg w-fit">🍽️ Start</p>
+        <div>
+          <div class="flex flex-row items-center gap-2">
+            <p class="text-lg w-fit">🍽️ Start</p>
+            <span *ngIf="lunchErrors.length > 0" class="text-red-500 font-bold"
+              >❌</span
+            >
+            <span
+              *ngIf="lunchErrors.length === 0"
+              class="text-green-500 font-bold"
+            >
+              ✅
+            </span>
+          </div>
+        </div>
         <input
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
@@ -56,6 +69,11 @@
           [maxDate]="this.workDay.endDate"
           (flatpickrChange)="onLunchEndChange($event.selectedDates[0])"
         />
+      </div>
+      <div>
+        <ul *ngIf="lunchErrors.length > 0" class="text-red-500">
+          <li *ngFor="let error of lunchErrors">❌ {{ error }}</li>
+        </ul>
       </div>
     </div>
   </div>

@@ -57,6 +57,10 @@ export class WwDisplayTemplatesComponent {
 
   deleteWorkWellByIdFromTemplate = (idWWS: number) => {
     this.workWellStore.deleteWorkWellFromStore(idWWS);
+    // Update the workWellList by filtering out the deleted item
+    this.workWellList = this.workWellList.filter(
+      (workWell) => workWell.idWWS !== idWWS
+    );
   };
 
   // Navigate to the "addNewWorkWell" page
