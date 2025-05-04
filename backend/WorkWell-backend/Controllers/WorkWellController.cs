@@ -25,30 +25,41 @@ public class WorkWellController : ControllerBase
     [HttpGet("GetAllWorkWell")]
     public async Task<IActionResult> GetAllWorkWell()
     {
-        var snapshot = await _firestoreDb.Collection(CollectionName).GetSnapshotAsync();
-        List<WorkWell> workWellList = snapshot.Documents.Select(doc => doc.ConvertTo<WorkWell>()).OrderBy(workWell => workWell.IdWWS).ToList();
-        return Ok(workWellList);
+        try
+        {
+            var snapshot = await _firestoreDb.Collection(CollectionName).GetSnapshotAsync();
+            List<WorkWell> workWellList = snapshot.Documents.Select(doc => doc.ConvertTo<WorkWell>()).OrderBy(workWell => workWell.IdWWS).ToList();
+            return Ok(workWellList);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: {ex.Message}");
+        }
     }
 
     // GET: api/WorkWell/GetWorkWellById/{id}
     [HttpGet("GetWorkWellById/{idWWS}")]
     public async Task<IActionResult> GetWorkWellById(int idWWS)
     {
-        // Query the collection for documents where idWWS matches the parameter
-        var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
-        var querySnapshot = await query.GetSnapshotAsync();
-
-        if (querySnapshot.Documents.Count == 0)
-            return NotFound($"(GetWorkWellById) No document found with IdWWS = {idWWS}");
-
-        var document = querySnapshot.Documents.FirstOrDefault();
-
-        if (document == null)
-            return NotFound($"(GetWorkWellById) No document found with IdWWS = {idWWS}");
-        else
+        try
         {
+            var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
+            var querySnapshot = await query.GetSnapshotAsync();
+
+            if (querySnapshot.Documents.Count == 0)
+                return NotFound($"(GetWorkWellById) No document found with IdWWS = {idWWS}");
+
+            var document = querySnapshot.Documents.FirstOrDefault();
+
+            if (document == null)
+                return NotFound($"(GetWorkWellById) No document found with IdWWS = {idWWS}");
+
             var workWell = document.ConvertTo<WorkWell>();
             return Ok(workWell);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: {ex.Message}");
         }
     }
 
@@ -56,108 +67,124 @@ public class WorkWellController : ControllerBase
     [HttpPost("CreateWorkWell")]
     public async Task<IActionResult> CreateWorkWell([FromBody] WorkWell workWell)
     {
-        // Get all documents in the collection
-        var snapshot = await _firestoreDb.Collection(CollectionName).GetSnapshotAsync();
-
-        // Determine the new idWWS
-        int newIdWWS = 0;
-        if (snapshot.Documents.Count > 0)
+        try
         {
-            // Find the maximum idWWS value in the existing documents
-            newIdWWS = snapshot.Documents
-                .Select(doc => doc.ConvertTo<WorkWell>().IdWWS)
-                .Max() + 1;
+            var snapshot = await _firestoreDb.Collection(CollectionName).GetSnapshotAsync();
+
+            int newIdWWS = 0;
+            if (snapshot.Documents.Count > 0)
+            {
+                newIdWWS = snapshot.Documents
+                    .Select(doc => doc.ConvertTo<WorkWell>().IdWWS)
+                    .Max() + 1;
+            }
+
+            workWell.IdWWS = newIdWWS;
+
+            var document = _firestoreDb.Collection(CollectionName).Document();
+            await document.SetAsync(workWell);
+
+            return CreatedAtAction(nameof(GetWorkWellById), new { idWWS = workWell.IdWWS }, workWell);
         }
-
-        // Set the new idWWS for the WorkWell object
-        workWell.IdWWS = newIdWWS;
-
-        // Create a new document in Firestore
-        var document = _firestoreDb.Collection(CollectionName).Document();
-        await document.SetAsync(workWell);
-
-        // Return the created document's details
-        return CreatedAtAction(nameof(GetWorkWellById), new { idWWS = workWell.IdWWS }, workWell);
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: {ex.Message}");
+        }
     }
 
     // PUT: api/WorkWell/UpdateWorkWell/{idWWS}
     [HttpPut("UpdateWorkWellById/{idWWS}")]
     public async Task<IActionResult> UpdateWorkWellById(int idWWS, [FromBody] WorkWell workWell)
     {
-        // Query the collection for documents where idWWS matches the parameter
-        var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
-        var querySnapshot = await query.GetSnapshotAsync();
-
-        if (querySnapshot.Documents.Count == 0)
+        try
         {
-            return NotFound($"(UpdateWorkWellById) No document found with IdWWS = {idWWS}");
-        }
+            var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
+            var querySnapshot = await query.GetSnapshotAsync();
 
-        // Get the first matching document (assuming IdWWS is unique)
-        var document = querySnapshot.Documents.FirstOrDefault();
-        if (document != null)
+            if (querySnapshot.Documents.Count == 0)
+            {
+                return NotFound($"(UpdateWorkWellById) No document found with IdWWS = {idWWS}");
+            }
+
+            var document = querySnapshot.Documents.FirstOrDefault();
+            if (document != null)
+            {
+                await document.Reference.SetAsync(workWell, SetOptions.Overwrite);
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
         {
-            // Update the document with the new data
-            await document.Reference.SetAsync(workWell, SetOptions.Overwrite);
+            return StatusCode(500, $"Error: {ex.Message}");
         }
-
-        return NoContent();
     }
 
     // DELETE: api/WorkWell/DeleteWorkWell/{idWWS}
     [HttpDelete("DeleteWorkWellById/{idWWS}")]
     public async Task<IActionResult> DeleteWorkWellById(int idWWS)
     {
-        // Query the collection for documents where idWWS matches the parameter
-        var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
-        var querySnapshot = await query.GetSnapshotAsync();
+        try
+        {
+            var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
+            var querySnapshot = await query.GetSnapshotAsync();
 
-        if (querySnapshot.Documents.Count == 0)
-            return NotFound($"(DeleteWorkWellById) No document found with IdWWS = {idWWS}");
+            if (querySnapshot.Documents.Count == 0)
+                return NotFound($"(DeleteWorkWellById) No document found with IdWWS = {idWWS}");
 
-        var document = querySnapshot.Documents.FirstOrDefault();
-        if (document != null)
-            await document.Reference.DeleteAsync();
+            var document = querySnapshot.Documents.FirstOrDefault();
+            if (document != null)
+                await document.Reference.DeleteAsync();
 
-        return NoContent();
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: {ex.Message}");
+        }
     }
 
     // DELETE: api/WorkWell/DeleteMultipleWorkWell
     [HttpDelete("DeleteMultipleWorkWell")]
     public async Task<IActionResult> DeleteMultipleWorkWell([FromBody] int[] idWWSArray)
     {
-        if (idWWSArray == null || idWWSArray.Length == 0)
+        try
         {
-            return BadRequest("No IdWWS values provided.");
-        }
-
-        var deletedIds = new List<int>();
-        var notFoundIds = new List<int>();
-
-        foreach (var idWWS in idWWSArray)
-        {
-            // Query the collection for documents where idWWS matches the current id
-            var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
-            var querySnapshot = await query.GetSnapshotAsync();
-
-            if (querySnapshot.Documents.Count == 0)
+            if (idWWSArray == null || idWWSArray.Length == 0)
             {
-                notFoundIds.Add(idWWS);
-                continue;
+                return BadRequest("No IdWWS values provided.");
             }
 
-            // Delete all matching documents (assuming IdWWS is unique, but handling multiple matches just in case)
-            foreach (var document in querySnapshot.Documents)
-            {
-                await document.Reference.DeleteAsync();
-                deletedIds.Add(idWWS);
-            }
-        }
+            var deletedIds = new List<int>();
+            var notFoundIds = new List<int>();
 
-        return Ok(new
+            foreach (var idWWS in idWWSArray)
+            {
+                var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
+                var querySnapshot = await query.GetSnapshotAsync();
+
+                if (querySnapshot.Documents.Count == 0)
+                {
+                    notFoundIds.Add(idWWS);
+                    continue;
+                }
+
+                foreach (var document in querySnapshot.Documents)
+                {
+                    await document.Reference.DeleteAsync();
+                    deletedIds.Add(idWWS);
+                }
+            }
+
+            return Ok(new
+            {
+                DeletedIds = deletedIds,
+                NotFoundIds = notFoundIds
+            });
+        }
+        catch (Exception ex)
         {
-            DeletedIds = deletedIds,
-            NotFoundIds = notFoundIds
-        });
+            return StatusCode(500, $"Error: {ex.Message}");
+        }
     }
 }
