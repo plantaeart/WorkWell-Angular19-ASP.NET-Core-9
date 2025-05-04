@@ -1,7 +1,21 @@
-<div class="w-[100%] h-fit p-4 text-[#000411]">
-  <ww-timeline
-    [events]="events"
-    [workDay]="workDay"
-    [isHorizontal]="false"
-  ></ww-timeline>
+<div class="flex flex-row jus justify-between p-4 text-[#000411]">
+  <div>
+    <ww-timeline
+      [events]="events"
+      [workDay]="workDay"
+      [isHorizontal]="false"
+    ></ww-timeline>
+  </div>
+
+  <div>
+    <button
+      class="cursor-pointer flex items-center h-fit w-fit ml-2 p-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg text-2xl"
+      label="Save"
+      iconPos="right"
+      (click)="save()"
+    >
+      <p class="mr-1">Save</p>
+      <span class="pi pi-save"></span>
+    </button>
+  </div>
 </div>

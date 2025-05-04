@@ -1,5 +1,9 @@
+import { inject } from '@angular/core';
+import { WorkWell } from '../models/workWell.model';
 import { WorkWellEvent } from '../models/workWellEvent.model';
 import { convertTimeStringToDate, formatDateToHHmm } from './string.utils';
+import { WorkWellStore } from '../store/workWell.store';
+import { WorkWellSchedule } from '../models/workWellSchedule.model';
 
 //* Converts the startDate and endDate of workDay, lunch, meetings, and pauses to Date objects
 export function convertWorkWellTimeToDate(params: {
@@ -139,4 +143,16 @@ export function convertWorkWellTimeToString(params: {
       }
     }
   }
+}
+
+export function workWellListMapping(): WorkWell[] {
+  const workWellStore = inject(WorkWellStore);
+  return workWellStore.workWellList().map((workWell) => {
+    return {
+      ...workWell,
+      workWellSchedule: workWell.workWellSchedule.map(
+        (schedule) => new WorkWellSchedule(schedule)
+      ),
+    };
+  });
 }

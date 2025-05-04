@@ -4,32 +4,42 @@
     Loading...
   </div>
 
-  <!-- Use grid layout with fixed row height -->
-  <div
-    class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 grid-auto-rows-[minmax(150px,_1fr)]"
-  >
+  <!-- Use flex layout for vertical alignment -->
+  <div class="flex flex-col gap-4">
     <!-- WorkWell items -->
-    <div class="h-50" *ngFor="let workWell of workWellList()" @listAnimation>
-      <div
-        class="h-full shadow-lg bg-sky-100 p-4 rounded-lg flex flex-col justify-start"
-      >
-        <div class="flex justify-between items-center mb-2">
-          <h3 class="font-bold text-lg">
-            <span *ngIf="isDebug()">{{ workWell.idWWS }} </span
-            >{{ workWell.name }}
-          </h3>
-          <div class="flex justify-start h-full">
-            <p-button
-              class="flex items-center size-10 cursor-pointer bg-red-400 hover:bg-red-500 text-white font-bold rounded-lg shadow-lg"
-              icon="pi pi-trash"
-              severity="danger"
-              aria-label="Delete"
-              (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
-            ></p-button>
-          </div>
-        </div>
-        <p class="font-light">{{ workWell.description }}</p>
+    <div
+      class="shadow-lg bg-sky-100 p-4 rounded-lg flex flex-col justify-start"
+      *ngFor="let workWell of workWellList"
+      @listAnimation
+    >
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold text-lg">
+          <span *ngIf="isDebug()">{{ workWell.idWWS }} </span
+          >{{ workWell.name }}
+        </h3>
       </div>
+
+      <!-- Timeline for each WorkWell -->
+      <ww-timeline
+        [events]="workWell.workWellSchedule[0].allEvents() || []"
+        [workDay]="workWell.workWellSchedule[0].workDay"
+        [isHorizontal]="true"
+        [isShowCurrentTime]="false"
+      ></ww-timeline>
+
+      <!-- Delete button -->
+      <div class="flex justify-start mt-4">
+        <p-button
+          class="flex items-center size-10 cursor-pointer bg-red-400 hover:bg-red-500 text-white font-bold rounded-lg shadow-lg"
+          icon="pi pi-trash"
+          severity="danger"
+          aria-label="Delete"
+          (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
+        ></p-button>
+      </div>
+
+      <!-- Description -->
+      <p class="font-light mt-2">{{ workWell.description }}</p>
     </div>
 
     <!-- Add button -->

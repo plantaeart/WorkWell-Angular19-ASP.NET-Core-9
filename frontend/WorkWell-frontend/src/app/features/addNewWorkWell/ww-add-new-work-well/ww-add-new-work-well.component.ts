@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { StepperModule } from 'primeng/stepper';
 import { ButtonModule } from 'primeng/button';
 import { WwStep1Component } from '../components/ww-step-1/ww-step-1.component';
@@ -7,6 +7,7 @@ import { SeparatorComponent } from '../../components/separator/separator.compone
 import { WwStep3Component } from '../components/ww-step-3/ww-step-3.component';
 import { WwStep4Component } from '../components/ww-step-4/ww-step-4.component';
 import { WwStep5Component } from '../components/ww-step-5/ww-step-5.component';
+import { WorkWellStore } from '../../../store/workWell.store';
 
 @Component({
   selector: 'ww-add-new-work-well',
@@ -25,6 +26,7 @@ import { WwStep5Component } from '../components/ww-step-5/ww-step-5.component';
 })
 export class WwAddNewWorkWellComponent {
   public meetingCoherencyOk = true;
+  private workWellStore = inject(WorkWellStore);
 
   onMeetingStateChange(state: { isCoherent: boolean }): void {
     this.meetingCoherencyOk = state.isCoherent;
@@ -36,5 +38,9 @@ export class WwAddNewWorkWellComponent {
   onPauseStateChange(state: { isCoherent: boolean; hasPauses: boolean }): void {
     this.pauseCoherencyOk = state.isCoherent;
     this.hasPauses = state.hasPauses;
+  }
+
+  constructor() {
+    this.workWellStore.resetAddNewWorkWell();
   }
 }

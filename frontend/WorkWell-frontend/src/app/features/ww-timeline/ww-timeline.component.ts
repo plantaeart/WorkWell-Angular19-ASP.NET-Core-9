@@ -44,11 +44,13 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       // Initialize workDayStart and workDayEnd based on the input workDay
       this.workDayStart = new WorkWellEvent({
         startDate: this.workDay.startDate,
+        endDate: this.workDay.startDate,
         name: startDayName,
         eventType: WorkWellEventType.WORKDAY,
       });
 
       this.workDayEnd = new WorkWellEvent({
+        startDate: this.workDay.endDate,
         endDate: this.workDay.endDate,
         name: endDayName,
         eventType: WorkWellEventType.WORKDAY,
@@ -86,47 +88,53 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   };
 
   public isCurrentTimeInEvent(event: WorkWellEvent): boolean {
-    const now = this.currentTime.getTime();
+    if (this.isShowCurrentTime) {
+      const now = this.currentTime.getTime();
 
-    // Check if the current time is within 1 hour before the workday starts
-    if (this.workDayStart) {
-      const oneHourBeforeStart = new Date(
-        (this.workDayStart.startDate as Date).getTime() - 60 * 60 * 1000
-      );
-      if (
-        now >= oneHourBeforeStart.getTime() &&
-        now < (this.workDayStart.startDate as Date).getTime()
-      ) {
-        return event === this.workDayStart; // Highlight workDayStart only before the day starts
+      // Check if the current time is within 1 hour before the workday starts
+      if (this.workDayStart) {
+        const oneHourBeforeStart = new Date(
+          (this.workDayStart.startDate as Date).getTime() - 60 * 60 * 1000
+        );
+        if (
+          now >= oneHourBeforeStart.getTime() &&
+          now < (this.workDayStart.startDate as Date).getTime()
+        ) {
+          return event === this.workDayStart; // Highlight workDayStart only before the day starts
+        }
       }
-    }
 
-    // Ensure workDayStart is not highlighted after the day starts
-    if (
-      event === this.workDayStart &&
-      now >= (this.workDayStart.startDate as Date).getTime()
-    ) {
-      return false;
-    }
+      // Ensure workDayStart is not highlighted after the day starts
+      if (
+        event === this.workDayStart &&
+        now >= (this.workDayStart.startDate as Date).getTime()
+      ) {
+        return false;
+      }
 
-    // Ensure workDayEnd is not highlighted before the day ends
-    if (
-      event === this.workDayEnd &&
-      now < (this.workDayEnd.endDate as Date).getTime()
-    ) {
-      return false;
-    }
+      // Ensure workDayEnd is not highlighted before the day ends
+      if (
+        event === this.workDayEnd &&
+        now < (this.workDayEnd.endDate as Date).getTime()
+      ) {
+        return false;
+      }
 
-    // Check if the current time is after the workday ends
-    if (this.workDayEnd && now > (this.workDayEnd.endDate as Date).getTime()) {
-      return event === this.workDayEnd; // Highlight workDayEnd
-    }
+      // Check if the current time is after the workday ends
+      if (
+        this.workDayEnd &&
+        now > (this.workDayEnd.endDate as Date).getTime()
+      ) {
+        return event === this.workDayEnd; // Highlight workDayEnd
+      }
 
-    // Check if the current time is within the event's time range
-    return (
-      now >= (event.startDate as Date).getTime() &&
-      now <= (event.endDate as Date).getTime()
-    );
+      // Check if the current time is within the event's time range
+      return (
+        now >= (event.startDate as Date).getTime() &&
+        now <= (event.endDate as Date).getTime()
+      );
+    }
+    return false; // If isShowCurrentTime is false, do not highlight any event
   }
 
   get filledEvents() {
@@ -174,12 +182,12 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     );
   }
 
-  public getEventClass(eventType: WorkWellEventType): string {
+  public getEventClass(eventType: WorkWellEventType | undefined): string {
     switch (eventType) {
       case WorkWellEventType.WORKDAY:
         return 'bg-blue-500';
       case WorkWellEventType.LUNCH:
-        return 'bg-green-500';
+        return 'bg-emerald-500';
       case WorkWellEventType.MEETING:
         return 'bg-yellow-500';
       case WorkWellEventType.PAUSE:
@@ -225,15 +233,22 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       return { currentEvent: this.workDayEnd, nextEvent: null };
     }
 
+    // New var to have filledEvents + workDayStart and workDayEnd
+    const filledEventsWithWorkDay = [
+      this.workDayStart,
+      ...filledEvents,
+      this.workDayEnd,
+    ];
+
     // Loop through events to find the current and next events
-    for (let i = 0; i < filledEvents.length; i++) {
-      const event = filledEvents[i];
+    for (let i = 0; i < filledEventsWithWorkDay.length; i++) {
+      const event = filledEventsWithWorkDay[i];
       if (
         now >= (event.startDate as Date).getTime() &&
         now <= (event.endDate as Date).getTime()
       ) {
         currentEvent = event;
-        nextEvent = filledEvents[i + 1] || null; // Get the next event if it exists
+        nextEvent = filledEventsWithWorkDay[i + 1] || null; // Get the next event if it exists
         break;
       } else if (now < (event.startDate as Date).getTime()) {
         nextEvent = event;

@@ -41,4 +41,8 @@ export class WorkWellSchedule {
       pause.eventType = WorkWellEventType.PAUSE;
     });
   }
+
+  public allEvents(): WorkWellEvent[] {
+    return [this.lunch, ...this.meetings, ...this.pauses];
+  }
 }

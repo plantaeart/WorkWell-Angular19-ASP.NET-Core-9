@@ -5,10 +5,16 @@ import { WorkWellStore } from '../../../store/workWell.store';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { environment } from '../../../environments/environment.development';
 import { Router } from '@angular/router';
+import { WwTimelineComponent } from '../../ww-timeline/ww-timeline.component';
+import {
+  convertWorkWellTimeToDate,
+  workWellListMapping,
+} from '../../../utils/workWellUtils';
+import { WorkWell } from '../../../models/workWell.model';
 
 @Component({
   selector: 'ww-display-templates',
-  imports: [ButtonModule, CommonModule],
+  imports: [ButtonModule, CommonModule, WwTimelineComponent],
   templateUrl: './ww-display-templates.component.html',
   styleUrl: './ww-display-templates.component.scss',
   animations: [
@@ -32,9 +38,22 @@ export class WwDisplayTemplatesComponent {
   public isDebug = signal(environment.debug);
 
   private workWellStore = inject(WorkWellStore);
-  public workWellList = this.workWellStore.workWellList;
+  public workWellList: WorkWell[] = [...workWellListMapping()];
   public isLoading = this.workWellStore.loading;
-  constructor(private router: Router) {}
+
+  constructor(private router: Router) {
+    // foreach workWellList and convert startDate and endDate to Date objects
+    this.workWellList.forEach((workWell) => {
+      workWell.workWellSchedule.forEach((schedule) => {
+        convertWorkWellTimeToDate({
+          workDay: schedule.workDay,
+          lunch: schedule.lunch,
+          meetings: schedule.meetings,
+          pauses: schedule.pauses,
+        });
+      });
+    });
+  }
 
   deleteWorkWellByIdFromTemplate = (idWWS: number) => {
     this.workWellStore.deleteWorkWellFromStore(idWWS);

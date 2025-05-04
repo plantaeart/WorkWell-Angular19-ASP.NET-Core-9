@@ -10,9 +10,13 @@ import {
   meetingName,
   pauseName,
 } from '../../../../../types/enums/workWellEventName';
+import { Router } from '@angular/router';
+import { WorkWell } from '../../../../models/workWell.model';
+import { RouterModule } from '@angular/router';
+
 @Component({
   selector: 'ww-step-5',
-  imports: [TimelineModule, CommonModule, WwTimelineComponent],
+  imports: [RouterModule, TimelineModule, CommonModule, WwTimelineComponent],
   templateUrl: './ww-step-5.component.html',
   styleUrl: './ww-step-5.component.scss',
 })
@@ -30,7 +34,7 @@ export class WwStep5Component {
     this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings ?? [];
   pauses = this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses ?? [];
 
-  constructor() {
+  constructor(private router: Router) {
     convertWorkWellTimeToDate({
       workDay: this.workDay,
       lunch: this.lunch,
@@ -58,5 +62,24 @@ export class WwStep5Component {
         eventType: pause.eventType,
       })),
     ];
+  }
+
+  async save(): Promise<void> {
+    // Save the work well schedule to the store or perform any other action
+    const workWellToSave: WorkWell = { ...this.workWellStore.addNewWorkWell() };
+
+    // Save the work well
+    const resp = await this.workWellStore.createWorkWellFromStore(
+      workWellToSave
+    );
+
+    if (resp) {
+      console.error('Error creating work well:', resp);
+      // Handle error (e.g., show a notification)
+    } else {
+      console.log('Work well created successfully!');
+      // Navigate to the home page
+      this.router.navigate(['/']);
+    }
   }
 }

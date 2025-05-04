@@ -1,7 +1,7 @@
 <div class="flex flex row justify-start">
   <!-- Current Time + Current and nextevent -->
   <div
-    class="current-time flex flex-col items-center"
+    class="current-time flex flex-col items-center mr-10"
     *ngIf="isShowCurrentTime"
   >
     <!-- Current Time -->
@@ -23,7 +23,7 @@
     <div>
       <!-- Current and Next Events -->
       <div
-        class="current-next-events flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[300px] h-fit bg-gray-800 mt-4"
+        class="current-next-events flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[350px] h-fit bg-gray-800 mt-4"
       >
         <div class="event-info font-bold text-center text-lg">
           Event Information
@@ -41,15 +41,31 @@
             "
           >
             <div class="current-event text-sm text-center mt-2">
-              <span class="font-semibold">Current Event:</span>
+              <span
+                class="font-semibold p-1 m-1 rounded-lg"
+                [ngClass]="
+                  getEventClass(
+                    getCurrentAndNextEvents().currentEvent?.eventType
+                  )
+                "
+                >Current Event:</span
+              >
               {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
             </div>
             <div class="next-event text-sm text-center mt-2">
-              <span class="font-semibold">Next Event:</span>
+              <span
+                class="font-semibold p-1 m-1 rounded-lg"
+                [ngClass]="
+                  getEventClass(getCurrentAndNextEvents().nextEvent?.eventType)
+                "
+                >Next Event:</span
+              >
               {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
             </div>
             <div class="time-between text-sm text-center mt-2">
-              <span class="font-semibold">Time Until Next Event:</span>
+              <span class="font-semibold rounded-lg"
+                >Time Until Next Event:</span
+              >
               {{
                 getCurrentAndNextEvents().nextEvent
                   ? getTimeBetweenEvents({
@@ -63,14 +79,18 @@
 
         <!-- End of Day Template -->
         <ng-template #endOfDay>
-          <div class="end-of-day text-center text-lg font-bold mt-4">
+          <div
+            class="end-of-day text-center text-lg font-bold mt-4 rounded-lg bg-blue-600"
+          >
             End of the day 🎉
           </div>
         </ng-template>
 
         <!-- Start of Day Template -->
         <ng-template #startOfDay>
-          <div class="start-of-day text-center text-lg font-bold mt-4">
+          <div
+            class="start-of-day text-center text-lg font-bold mt-4 rounded-lg bg-blue-600"
+          >
             Soon start of the day 🌞
           </div>
         </ng-template>
