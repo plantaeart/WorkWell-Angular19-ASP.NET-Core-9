@@ -1,8 +1,6 @@
-using System.Diagnostics;
 using Google.Cloud.Firestore;
 using Microsoft.AspNetCore.Mvc;
 using WorkWell_backend.Models;
-using WorkWell_backend.Types.Enum;
 
 namespace WorkWell_backend.Controllers;
 
@@ -29,6 +27,27 @@ public class WorkWellController : ControllerBase
         {
             var snapshot = await _firestoreDb.Collection(CollectionName).GetSnapshotAsync();
             List<WorkWell> workWellList = snapshot.Documents.Select(doc => doc.ConvertTo<WorkWell>()).OrderBy(workWell => workWell.IdWWS).ToList();
+            return Ok(workWellList);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: {ex.Message}");
+        }
+    }
+
+    // GET : api/WorkWell/GetIsPlayingWorkWell
+    [HttpGet("GetIsPlayingWorkWell")]
+    public async Task<IActionResult> GetIsPlayingWorkWell()
+    {
+        try
+        {
+            var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IsPlaying", true);
+            var querySnapshot = await query.GetSnapshotAsync();
+
+            if (querySnapshot.Documents.Count == 0)
+                return NotFound("(GetIsPlayingWorkWell) No document found with IsPlaying = true");
+
+            var workWellList = querySnapshot.Documents.Select(doc => doc.ConvertTo<WorkWell>()).ToList();
             return Ok(workWellList);
         }
         catch (Exception ex)
@@ -110,6 +129,46 @@ public class WorkWellController : ControllerBase
             if (document != null)
             {
                 await document.Reference.SetAsync(workWell, SetOptions.Overwrite);
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: {ex.Message}");
+        }
+    }
+
+    // PUT: api/WorkWell/UpdateIsPlayingWorkWell/{idWWS}
+    [HttpPut("UpdateIsPlayingWorkWell/{idWWS}")]
+    public async Task<IActionResult> UpdateIsPlayingWorkWell(int idWWS, [FromBody] bool isPlaying)
+    {
+        try
+        {
+            var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
+            var querySnapshot = await query.GetSnapshotAsync();
+
+            if (querySnapshot.Documents.Count == 0)
+                return NotFound($"(UpdateIsPlayingWorkWell) No document found with IdWWS = {idWWS}");
+
+            var document = querySnapshot.Documents.FirstOrDefault();
+            if (document != null)
+            {
+                var workWell = document.ConvertTo<WorkWell>();
+                workWell.IsPlaying = isPlaying;
+                await document.Reference.SetAsync(workWell, SetOptions.Overwrite);
+
+                // Set as false for all other documents except the one updated
+                var allDocuments = await _firestoreDb.Collection(CollectionName).GetSnapshotAsync();
+                foreach (var doc in allDocuments.Documents)
+                {
+                    if (doc.Id != document.Id)
+                    {
+                        var otherWorkWell = doc.ConvertTo<WorkWell>();
+                        otherWorkWell.IsPlaying = false;
+                        await doc.Reference.SetAsync(otherWorkWell, SetOptions.Overwrite);
+                    }
+                }
             }
 
             return NoContent();
