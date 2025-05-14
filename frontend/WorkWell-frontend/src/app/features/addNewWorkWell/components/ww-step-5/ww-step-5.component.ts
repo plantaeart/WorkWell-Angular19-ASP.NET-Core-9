@@ -13,6 +13,7 @@ import {
 import { Router } from '@angular/router';
 import { WorkWell } from '../../../../models/workWell.model';
 import { RouterModule } from '@angular/router';
+import { WorkWellSchedule } from '../../../../models/workWellSchedule.model';
 
 @Component({
   selector: 'ww-step-5',
@@ -66,7 +67,19 @@ export class WwStep5Component {
 
   async save(): Promise<void> {
     // Save the work well schedule to the store or perform any other action
-    const workWellToSave: WorkWell = { ...this.workWellStore.addNewWorkWell() };
+    const workWellToSave: WorkWell = new WorkWell({
+      idWWS: this.workWellStore.addNewWorkWell().idWWS,
+      name: this.workWellStore.addNewWorkWell().name,
+      description: this.workWellStore.addNewWorkWell().description,
+      isPlaying: this.workWellStore.addNewWorkWell().isPlaying,
+      nbDayWork: this.workWellStore.addNewWorkWell().nbDayWork,
+      updateDate: this.workWellStore.addNewWorkWell().updateDate,
+      scheduleType: this.workWellStore.addNewWorkWell().scheduleType,
+      // get all the work well schedule
+      workWellSchedule: [
+        ...this.workWellStore.addNewWorkWell().workWellSchedule,
+      ],
+    });
 
     // Save the work well
     const resp = await this.workWellStore.createWorkWellFromStore(

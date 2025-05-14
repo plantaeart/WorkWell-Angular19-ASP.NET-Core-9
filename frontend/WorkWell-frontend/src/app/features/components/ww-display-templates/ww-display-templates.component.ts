@@ -11,6 +11,7 @@ import {
   workWellListMapping,
 } from '../../../utils/workWellUtils';
 import { WorkWell } from '../../../models/workWell.model';
+import { WorkWellResponse } from '../../../models/errors/workWellResponse';
 
 @Component({
   selector: 'ww-display-templates',
@@ -62,6 +63,42 @@ export class WwDisplayTemplatesComponent {
       (workWell) => workWell.idWWS !== idWWS
     );
   };
+
+  // Update the isPlaying status of a WorkWell entry
+  async playWorkWell(idWWS: number) {
+    const workWellToUpdate = this.workWellList.find(
+      (workWell) => workWell.idWWS === idWWS
+    );
+    if (workWellToUpdate) {
+      workWellToUpdate.isPlaying = !workWellToUpdate.isPlaying;
+      const resp: WorkWellResponse | null =
+        await this.workWellStore.updateIsPlayingFromStore(
+          idWWS,
+          workWellToUpdate.isPlaying
+        );
+
+      if (resp && resp.errorType) {
+        console.error('Error updating isPlaying status:', resp.errorMessage);
+      } else {
+        if (workWellToUpdate.isPlaying) {
+          // If isPlaying is true, set all other WorkWell entries to false
+          this.workWellList.forEach((workWell) => {
+            if (workWell.idWWS !== idWWS) {
+              workWell.isPlaying = false;
+            }
+          });
+        }
+        // Else if isPlaying is false, set the WorkWell entry to false
+        else {
+          this.workWellList.forEach((workWell) => {
+            if (workWell.idWWS === idWWS) {
+              workWell.isPlaying = false;
+            }
+          });
+        }
+      }
+    }
+  }
 
   // Navigate to the "addNewWorkWell" page
   navigateToAddNewWorkWell() {

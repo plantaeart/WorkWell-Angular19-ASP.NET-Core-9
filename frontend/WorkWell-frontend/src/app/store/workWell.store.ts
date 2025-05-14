@@ -102,6 +102,95 @@ export class WorkWellStore {
     }
   }
 
+  // Update WorkWell data by ID
+  async updateWorkWellFromStore(
+    workWell: WorkWell
+  ): Promise<WorkWellResponse | null> {
+    this.loading.set(true);
+    try {
+      console.log(`Updating work well with ID: ${workWell.idWWS}...`);
+
+      convertWorkWellTimeToString({
+        workDay: workWell.workWellSchedule[0].workDay,
+        lunch: workWell.workWellSchedule[0].lunch,
+        meetings: workWell.workWellSchedule[0].meetings,
+        pauses: workWell.workWellSchedule[0].pauses,
+      });
+
+      await firstValueFrom(
+        this.workWellService.updateWorkWellFromApi(workWell)
+      );
+      this.workWellList.update((list) =>
+        list.map((item) => (item.idWWS === workWell.idWWS ? workWell : item))
+      );
+      return null; // No error
+    } catch (err) {
+      if (err instanceof Error) {
+        this.error.set(err.message); // Access message safely
+      } else {
+        this.error.set('An unknown error occurred'); // Handle non-Error types
+      }
+
+      return new WorkWellResponse({
+        errorType: WorkWellErrorType.WORK_WELL_UPDATE_FAILED,
+        errorMessage: this.error(),
+      });
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  // Update isPlaying status of WorkWell data by ID
+  async updateIsPlayingFromStore(
+    idWWS: number,
+    isPlaying: boolean
+  ): Promise<WorkWellResponse | null> {
+    this.loading.set(true);
+    try {
+      console.log(`Updating isPlaying status for ID: ${idWWS}...`);
+      await firstValueFrom(
+        this.workWellService.updateIsPlayingFromApi(idWWS, isPlaying)
+      );
+      if (isPlaying) {
+        // Set isPlaying false to all other WorkWell entries except the one being updated
+        this.workWellList.update((list) =>
+          list.map((item) => {
+            if (item.idWWS === idWWS) {
+              return new WorkWell({ ...item, isPlaying: isPlaying });
+            } else {
+              return new WorkWell({ ...item, isPlaying: false });
+            }
+          })
+        );
+      } else {
+        // Set isPlaying false to the WorkWell entry being updated
+        this.workWellList.update((list) =>
+          list.map((item) => {
+            if (item.idWWS === idWWS) {
+              return new WorkWell({ ...item, isPlaying: isPlaying });
+            } else {
+              return item;
+            }
+          })
+        );
+      }
+      return null; // No error
+    } catch (err) {
+      if (err instanceof Error) {
+        this.error.set(err.message); // Access message safely
+      } else {
+        this.error.set('An unknown error occurred'); // Handle non-Error types
+      }
+
+      return new WorkWellResponse({
+        errorType: WorkWellErrorType.WORK_WELL_UPDATE_FAILED,
+        errorMessage: this.error(),
+      });
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
   // Delete WorkWell data by ID
   async deleteWorkWellFromStore(idWWS: number) {
     this.loading.set(true);

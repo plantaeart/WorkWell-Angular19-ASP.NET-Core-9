@@ -11,18 +11,21 @@ export class WorkWellApiService {
 
   constructor(private http: HttpClient) {}
 
+  // Get all WorkWell data from API
   getAllWorkWellFromApi(): Observable<WorkWell[]> {
     return this.http.get<WorkWell[]>(
       `${this.baseUrl}/api/WorkWell/GetAllWorkWell`
     );
   }
 
+  // Get WorkWell data by ID from API
   getWorkWellByIdFromApi(idWWS: number): Observable<WorkWell> {
     return this.http.get<WorkWell>(
       `${this.baseUrl}/api/WorkWell/GetWorkWellById/${idWWS}`
     );
   }
 
+  // Create a new WorkWell entry in the API
   createWorkWellFromApi(workWell: WorkWell): Observable<WorkWell> {
     return this.http.post<WorkWell>(
       `${this.baseUrl}/api/WorkWell/CreateWorkWell`,
@@ -30,6 +33,27 @@ export class WorkWellApiService {
     );
   }
 
+  // Update an existing WorkWell entry in the API
+  updateWorkWellFromApi(workWell: WorkWell): Observable<WorkWell> {
+    let idWWS = workWell.idWWS;
+    return this.http.put<WorkWell>(
+      `${this.baseUrl}/api/WorkWell/UpdateWorkWellById/${idWWS}`,
+      workWell
+    );
+  }
+
+  // Update isPlaying status of a WorkWell entry in the API
+  updateIsPlayingFromApi(
+    idWWS: number,
+    isPlaying: boolean
+  ): Observable<WorkWell> {
+    return this.http.put<WorkWell>(
+      `${this.baseUrl}/api/WorkWell/UpdateIsPlayingWorkWell/${idWWS}`,
+      isPlaying
+    );
+  }
+
+  // Delete a WorkWell entry by ID from the API
   deleteWorkWellByIdFromApi(idWWS: number): Observable<void> {
     return this.http.delete<void>(
       `${this.baseUrl}/api/WorkWell/DeleteWorkWellById/${idWWS}`

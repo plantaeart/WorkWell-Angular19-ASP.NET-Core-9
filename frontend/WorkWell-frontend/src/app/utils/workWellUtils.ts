@@ -148,11 +148,11 @@ export function convertWorkWellTimeToString(params: {
 export function workWellListMapping(): WorkWell[] {
   const workWellStore = inject(WorkWellStore);
   return workWellStore.workWellList().map((workWell) => {
-    return {
+    return new WorkWell({
       ...workWell,
       workWellSchedule: workWell.workWellSchedule.map(
         (schedule) => new WorkWellSchedule(schedule)
       ),
-    };
+    });
   });
 }
