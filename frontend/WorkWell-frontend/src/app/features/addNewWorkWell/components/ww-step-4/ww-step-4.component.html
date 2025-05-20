@@ -41,9 +41,9 @@
             class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
             type="text"
             mwlFlatpickr
-            [(ngModel)]="pause.startDate"
-            [minDate]="workDay.startDate"
-            [maxDate]="workDay.endDate"
+            [(ngModel)]="pause.startDateTemp"
+            [minDate]="workDay.startDateTemp"
+            [maxDate]="workDay.endDateTemp"
             (flatpickrChange)="onPauseStartChange(i, $event.selectedDates[0])"
           />
         </div>
@@ -53,9 +53,9 @@
             class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
             type="text"
             mwlFlatpickr
-            [(ngModel)]="pause.endDate"
-            [minDate]="workDay.startDate"
-            [maxDate]="workDay.endDate"
+            [(ngModel)]="pause.endDateDateFormat"
+            [minDate]="workDay.startDateTemp"
+            [maxDate]="workDay.endDateTemp"
             (flatpickrChange)="onPauseEndChange(i, $event.selectedDates[0])"
           />
         </div>

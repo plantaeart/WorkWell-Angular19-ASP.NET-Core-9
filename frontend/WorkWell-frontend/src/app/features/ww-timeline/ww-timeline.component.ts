@@ -14,7 +14,6 @@ import {
   workDayName,
   workHoursName,
 } from '../../../types/enums/workWellEventName';
-import { convertWorkWellTimeToDate } from '../../utils/workWellUtils';
 
 @Component({
   selector: 'ww-timeline',
@@ -23,8 +22,9 @@ import { convertWorkWellTimeToDate } from '../../utils/workWellUtils';
   styleUrl: './ww-timeline.component.scss',
 })
 export class WwTimelineComponent implements OnInit, OnDestroy {
+  @Input() workWellName = ''; // Default to workDayName
   @Input() events: WorkWellEvent[] = [];
-  @Input() workDay!: WorkWellEvent; // Default to empty workDay
+  @Input() workDay: WorkWellEvent = new WorkWellEvent({}); // Default to empty workDay
   @Input() isHorizontal = false; // Default to vertical timeline
   @Input() isShowCurrentTime = true; // Default to show current time
 
@@ -53,15 +53,25 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
         name: endDayName,
         eventType: WorkWellEventType.WORKDAY,
       });
-      // Convert workDay times to Date objects
-      convertWorkWellTimeToDate({
-        anything: [this.workDayStart, this.workDayEnd],
-      });
     }
   }
 
   ngOnInit() {
-    if (this.isShowCurrentTime) {
+    console.log(
+      'Initializing WwTimelineComponent for workWellName:',
+      this.workWellName
+    );
+    /*this.events = [...this.events];
+    this.workDay = new WorkWellEvent({
+      ...this.workDay,
+    });*/
+
+    console.log(
+      'test to interval',
+      this.isShowCurrentTime && this.events.length > 0
+    );
+    if (this.isShowCurrentTime && this.events.length > 0) {
+      console.log('Setting up clock interval');
       // Start an interval to update the time every milisecond
       this.clockInterval = setInterval(() => {
         this.updateTime();
@@ -74,9 +84,11 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       // Clear the timeout and interval when the component is destroyed
       if (this.clockTimeout) {
         clearTimeout(this.clockTimeout);
+        this.clockInterval = null;
       }
       if (this.clockInterval) {
         clearInterval(this.clockInterval);
+        this.clockTimeout = null;
       }
     }
   }
@@ -92,11 +104,11 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       // Check if the current time is within 1 hour before the workday starts
       if (this.workDayStart) {
         const oneHourBeforeStart = new Date(
-          (this.workDayStart.startDate as Date).getTime() - 60 * 60 * 1000
+          this.workDayStart.startDateDateFormat.getTime() - 60 * 60 * 1000
         );
         if (
           now >= oneHourBeforeStart.getTime() &&
-          now < (this.workDayStart.startDate as Date).getTime()
+          now < this.workDayStart.startDateDateFormat.getTime()
         ) {
           return event === this.workDayStart; // Highlight workDayStart only before the day starts
         }
@@ -105,7 +117,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       // Ensure workDayStart is not highlighted after the day starts
       if (
         event === this.workDayStart &&
-        now >= (this.workDayStart.startDate as Date).getTime()
+        now >= this.workDayStart.startDateDateFormat.getTime()
       ) {
         return false;
       }
@@ -113,7 +125,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       // Ensure workDayEnd is not highlighted before the day ends
       if (
         event === this.workDayEnd &&
-        now < (this.workDayEnd.endDate as Date).getTime()
+        now < this.workDayEnd.endDateDateFormat.getTime()
       ) {
         return false;
       }
@@ -121,15 +133,15 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       // Check if the current time is after the workday ends
       if (
         this.workDayEnd &&
-        now > (this.workDayEnd.endDate as Date).getTime()
+        now > this.workDayEnd.endDateDateFormat.getTime()
       ) {
         return event === this.workDayEnd; // Highlight workDayEnd
       }
 
       // Check if the current time is within the event's time range
       return (
-        now >= (event.startDate as Date).getTime() &&
-        now <= (event.endDate as Date).getTime()
+        now >= event.startDateDateFormat.getTime() &&
+        now <= event.endDateDateFormat.getTime()
       );
     }
     return false; // If isShowCurrentTime is false, do not highlight any event
@@ -141,33 +153,37 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     }
 
     const filledEvents = [];
-    let currentTime = this.workDay.startDate as Date; // Start from the workday start time
+    let currentTime = this.workDay.startDateDateFormat; // Start from the workday start time
 
     // Sort events by start time
     const sorted = this.sortedEvents;
 
     // Fill gaps with empty events
     for (const event of sorted) {
-      if (currentTime < event.startDate) {
-        filledEvents.push({
-          startDate: currentTime,
-          endDate: event.startDate,
-          name: workHoursName,
-          eventType: WorkWellEventType.NONE, // Custom type for empty events
-        });
+      if (currentTime < event.startDateDateFormat) {
+        filledEvents.push(
+          new WorkWellEvent({
+            startDateDateFormat: currentTime,
+            endDateDateFormat: event.startDateDateFormat,
+            name: workHoursName,
+            eventType: WorkWellEventType.NONE, // Custom type for empty events
+          })
+        );
       }
       filledEvents.push(event);
-      currentTime = event.endDate as Date;
+      currentTime = event.endDateDateFormat as Date;
     }
 
     // Add an empty event for the time after the last event until the end of the workday
-    if (currentTime < this.workDay.endDate) {
-      filledEvents.push({
-        startDate: currentTime,
-        endDate: this.workDay.endDate as Date,
-        name: this.workDay.name,
-        eventType: WorkWellEventType.NONE,
-      });
+    if (currentTime < this.workDay.endDateDateFormat) {
+      filledEvents.push(
+        new WorkWellEvent({
+          startDateDateFormat: currentTime,
+          endDateDateFormat: this.workDay.endDateDateFormat,
+          name: workHoursName,
+          eventType: WorkWellEventType.NONE,
+        })
+      );
     }
 
     return filledEvents;
@@ -176,7 +192,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   get sortedEvents() {
     return this.events.sort(
       (a, b) =>
-        (a.startDate as Date).getTime() - (b.startDate as Date).getTime()
+        a.startDateDateFormat.getTime() - b.startDateDateFormat.getTime()
     );
   }
 
@@ -201,6 +217,10 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     return this.isHorizontal ? 'flex-row' : 'flex-col';
   }
 
+  public getIsHorizontalTop(): string {
+    return this.isHorizontal ? 'flex-col' : 'flex-row';
+  }
+
   public getCurrentAndNextEvents() {
     const now = this.currentTime.getTime();
 
@@ -213,11 +233,11 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     // Check if we are within 1 hour before the workday starts
     if (this.workDayStart) {
       const oneHourBeforeStart = new Date(
-        (this.workDayStart.startDate as Date).getTime() - 60 * 60 * 1000
+        this.workDayStart.startDateDateFormat.getTime() - 60 * 60 * 1000
       );
       if (
         now >= oneHourBeforeStart.getTime() &&
-        now < (this.workDayStart.startDate as Date).getTime()
+        now < this.workDayStart.startDateDateFormat.getTime()
       ) {
         return {
           currentEvent: this.workDayStart,
@@ -227,7 +247,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     }
 
     // Check if we are after the workday ends
-    if (this.workDayEnd && now > (this.workDayEnd.endDate as Date).getTime()) {
+    if (this.workDayEnd && now > this.workDayEnd.endDateDateFormat.getTime()) {
       return { currentEvent: this.workDayEnd, nextEvent: null };
     }
 
@@ -242,13 +262,13 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     for (let i = 0; i < filledEventsWithWorkDay.length; i++) {
       const event = filledEventsWithWorkDay[i];
       if (
-        now >= (event.startDate as Date).getTime() &&
-        now <= (event.endDate as Date).getTime()
+        now >= event.startDateDateFormat.getTime() &&
+        now <= event.endDateDateFormat.getTime()
       ) {
         currentEvent = event;
         nextEvent = filledEventsWithWorkDay[i + 1] || null; // Get the next event if it exists
         break;
-      } else if (now < (event.startDate as Date).getTime()) {
+      } else if (now < event.startDateDateFormat.getTime()) {
         nextEvent = event;
         break;
       }
@@ -263,14 +283,15 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   }
 
   public getTimeBetweenEvents(
-    nextEvent: { startDate: string | Date | undefined } | null
+    nextEvent: { startDateDateFormat: Date | undefined } | null
   ): string {
     if (!nextEvent) {
       return 'N/A';
     }
 
     const timeDiff =
-      (nextEvent.startDate as Date).getTime() - this.currentTime.getTime(); // Corrected logic
+      (nextEvent.startDateDateFormat as Date).getTime() -
+      this.currentTime.getTime(); // Corrected logic
     if (timeDiff < 0) {
       return '0 min 0 sec'; // If the next event has already started
     }

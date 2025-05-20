@@ -53,8 +53,8 @@
 
       <!-- Timeline for each WorkWell -->
       <ww-timeline
-        [events]="workWell.workWellSchedule[0].allEvents() || []"
-        [workDay]="workWell.workWellSchedule[0].workDay"
+        [events]="getClonedWorkWellEvents(workWell) || []"
+        [workDay]="getCloneWorkDay(workWell)"
         [isHorizontal]="true"
         [isShowCurrentTime]="false"
       ></ww-timeline>

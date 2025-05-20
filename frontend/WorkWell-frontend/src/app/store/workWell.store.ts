@@ -2,9 +2,10 @@ import { computed, inject, Injectable, signal } from '@angular/core';
 import { WorkWell } from '../models/workWell.model';
 import { firstValueFrom } from 'rxjs';
 import { WorkWellApiService } from '../core/services/workWellApi.service';
-import { convertWorkWellTimeToString } from '../utils/workWellUtils';
 import { WorkWellErrorType } from '../../types/enums/workWellErrorType';
 import { WorkWellResponse } from '../models/errors/workWellResponse';
+import { WorkWellSchedule } from '../models/workWellSchedule.model';
+import { WorkWellEvent } from '../models/workWellEvent.model';
 
 @Injectable({
   providedIn: 'root',
@@ -12,14 +13,19 @@ import { WorkWellResponse } from '../models/errors/workWellResponse';
 export class WorkWellStore {
   private workWellService = inject(WorkWellApiService);
 
-  // State
+  //* State
   workWellList = signal<WorkWell[]>([]);
   addNewWorkWell = signal<WorkWell>(new WorkWell({}));
+  workWellPlaying = signal<WorkWell>(new WorkWell({ idWWS: -1 }));
+  isWorkWellPlaying = signal<boolean>(false);
   loading = signal(false);
   error = signal<string | null>(null);
 
-  // Computed
+  //* Computed
+
   totalWorkWells = computed(() => this.workWellList().length);
+
+  //* Actions
 
   // Reset addNewWorkWell state
   resetAddNewWorkWell() {
@@ -35,6 +41,17 @@ export class WorkWellStore {
         this.workWellService.getAllWorkWellFromApi()
       );
       this.workWellList.set(new Array<WorkWell>(...res));
+      // Set workWellList workWellSchedule to new WorkWellSchedule
+      this.workWellList.update((list) =>
+        list.map((item) => {
+          const schedule = item.workWellSchedule.map(
+            (schedule: WorkWellSchedule) =>
+              new WorkWellSchedule({ ...schedule })
+          );
+          return new WorkWell({ ...item, workWellSchedule: schedule });
+        })
+      );
+      console.log('Checking if any work well is playing...');
     } catch (err) {
       if (err instanceof Error) {
         this.error.set(err.message); // Access message safely
@@ -74,13 +91,6 @@ export class WorkWellStore {
     try {
       console.log('Creating new work well...');
 
-      convertWorkWellTimeToString({
-        workDay: workWell.workWellSchedule[0].workDay,
-        lunch: workWell.workWellSchedule[0].lunch,
-        meetings: workWell.workWellSchedule[0].meetings,
-        pauses: workWell.workWellSchedule[0].pauses,
-      });
-
       const res = await firstValueFrom(
         this.workWellService.createWorkWellFromApi(workWell)
       );
@@ -109,13 +119,6 @@ export class WorkWellStore {
     this.loading.set(true);
     try {
       console.log(`Updating work well with ID: ${workWell.idWWS}...`);
-
-      convertWorkWellTimeToString({
-        workDay: workWell.workWellSchedule[0].workDay,
-        lunch: workWell.workWellSchedule[0].lunch,
-        meetings: workWell.workWellSchedule[0].meetings,
-        pauses: workWell.workWellSchedule[0].pauses,
-      });
 
       await firstValueFrom(
         this.workWellService.updateWorkWellFromApi(workWell)
@@ -174,6 +177,9 @@ export class WorkWellStore {
           })
         );
       }
+
+      // Update the workWellPlaying signal
+      this.getWorkWellPlaying();
       return null; // No error
     } catch (err) {
       if (err instanceof Error) {
@@ -203,6 +209,8 @@ export class WorkWellStore {
       this.workWellList.update((list) =>
         list.filter((item) => item.idWWS !== idWWS)
       );
+      // Update the workWellPlaying signal
+      this.getWorkWellPlaying();
     } catch (err) {
       if (err instanceof Error) {
         this.error.set(err.message); // Access message safely
@@ -211,6 +219,47 @@ export class WorkWellStore {
       }
     } finally {
       this.loading.set(false);
+    }
+  }
+
+  // Set WorkWellPlaying state
+  async getWorkWellPlaying() {
+    const res = await firstValueFrom(
+      this.workWellService.getWorkWellPlayingFromApi()
+    );
+
+    // Update the workWellPlaying signal
+    this.workWellPlaying.set(
+      res != null
+        ? new WorkWell({
+            ...res,
+            workWellSchedule: (res.workWellSchedule || []).map(
+              (s: any) =>
+                new WorkWellSchedule({
+                  ...s,
+                  meetings: (s.meetings || []).map(
+                    (m: any) => new WorkWellEvent({ ...m })
+                  ),
+                  pauses: (s.pauses || []).map(
+                    (p: any) => new WorkWellEvent({ ...p })
+                  ),
+                  lunch: s.lunch
+                    ? new WorkWellEvent({ ...s.lunch })
+                    : undefined,
+                  workDay: s.workDay
+                    ? new WorkWellEvent({ ...s.workDay })
+                    : undefined,
+                })
+            ),
+          })
+        : new WorkWell({ idWWS: -1 })
+    );
+
+    // Update the isWorkWellPlaying signal
+    this.isWorkWellPlaying.set(this.workWellPlaying().idWWS != -1);
+    console.log('isWorkWellPlaying', this.isWorkWellPlaying());
+    if (this.workWellPlaying().idWWS != -1) {
+      console.log('Work well is playing, idWWS:', this.workWellPlaying().idWWS);
     }
   }
 }

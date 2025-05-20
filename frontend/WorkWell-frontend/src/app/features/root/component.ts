@@ -3,10 +3,16 @@ import { RouterOutlet } from '@angular/router';
 import { WwHeaderComponent } from '../components/ww-header/ww-header.component';
 import { SeparatorComponent } from '../components/separator/separator.component';
 import { WorkWellStore } from '../../store/workWell.store';
+import { WwWorkwellPlayerComponent } from '../ww-workwell-player/ww-workwell-player.component';
 
 @Component({
   selector: 'root',
-  imports: [RouterOutlet, WwHeaderComponent, SeparatorComponent],
+  imports: [
+    RouterOutlet,
+    WwHeaderComponent,
+    SeparatorComponent,
+    WwWorkwellPlayerComponent,
+  ],
   templateUrl: './component.html',
   styleUrl: './component.scss',
 })
@@ -18,5 +24,7 @@ export class AppComponent {
   // Load work wells on initialization
   ngOnInit() {
     this.workWellStore.getAllWorkWellFromStore();
+    // Update the workWellPlaying signal
+    this.workWellStore.getWorkWellPlaying();
   }
 }

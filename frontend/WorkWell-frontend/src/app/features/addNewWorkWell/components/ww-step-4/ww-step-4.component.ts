@@ -10,8 +10,8 @@ import { WorkWellStore } from '../../../../store/workWell.store';
 import { WorkWellEventType } from '../../../../../types/enums/workWellEventType';
 import { convertTimeStringToDate } from '../../../../utils/string.utils';
 import { WwShowScheduleInfosComponent } from '../ww-show-schedule-infos/ww-show-schedule-infos.component';
-import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
 import { pauseName } from '../../../../../types/enums/workWellEventName';
+import { setWorkWellEventTempDate } from '../../../../utils/workWellUtils';
 
 @Component({
   selector: 'ww-step-4',
@@ -53,30 +53,34 @@ export class WwStep4Component {
     this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses || [];
 
   // Create copies of the data
-  public workDayCopy: WorkWellEvent = { ...this.workDay };
-  public lunchCopy: WorkWellEvent = { ...this.lunch };
-  public meetingsCopy: WorkWellEvent[] = this.meetings.map((meeting) => ({
-    ...meeting,
-  }));
+  public workDayCopy: WorkWellEvent = new WorkWellEvent({ ...this.workDay });
+  public lunchCopy: WorkWellEvent = new WorkWellEvent({ ...this.lunch });
+  public meetingsCopy: WorkWellEvent[] = this.meetings.map(
+    (meeting) =>
+      new WorkWellEvent({
+        ...meeting,
+      })
+  );
 
   constructor() {
-    convertWorkWellTimeToDate({
-      workDay: this.workDay,
-      lunch: this.lunch,
-      meetings: this.meetings,
-      pauses: this.pauses,
-    });
-
+    setWorkWellEventTempDate([
+      this.workDay,
+      this.lunch,
+      ...this.meetings,
+      ...this.pauses,
+    ]); // Set temporary dates for meetings
     this.verifyPauses(); // Initial verification of pauses
   }
 
   addNewPause(): void {
-    this.pauses.push({
-      startDate: this.workDay.startDate,
-      endDate: this.workDay.endDate,
-      eventType: WorkWellEventType.PAUSE,
-      name: pauseName + (this.pauses.length + 1),
-    });
+    this.pauses.push(
+      new WorkWellEvent({
+        startDate: this.workDay.startDate,
+        endDate: this.workDay.endDate,
+        eventType: WorkWellEventType.PAUSE,
+        name: pauseName + (this.pauses.length + 1),
+      })
+    );
 
     this.verifyPauses();
   }
@@ -90,12 +94,8 @@ export class WwStep4Component {
     const pause = this.pauses[index];
 
     // Update startDate
-    pause.startDate = newValue;
-
-    // Ensure endDate is a Date object
-    if (typeof pause.endDate === 'string') {
-      pause.endDate = convertTimeStringToDate(pause.endDate);
-    }
+    pause.setStartDateDateFormat(newValue);
+    pause.startDateTemp = newValue;
 
     this.verifyPauses();
   }
@@ -104,12 +104,8 @@ export class WwStep4Component {
     const pause = this.pauses[index];
 
     // Update endDate
-    pause.endDate = newValue;
-
-    // Ensure startDate is a Date object
-    if (typeof pause.startDate === 'string') {
-      pause.startDate = convertTimeStringToDate(pause.startDate);
-    }
+    pause.setEndDateDateFormat(newValue);
+    pause.endDateTemp = newValue;
 
     this.verifyPauses();
   }
@@ -132,23 +128,23 @@ export class WwStep4Component {
       const errors: string[] = [];
 
       // Check if startDate is earlier than endDate
-      if (pause.startDate >= pause.endDate) {
+      if (pause.startDateDateFormat >= pause.endDateDateFormat) {
         errors.push('⏰⬆️ Start time must be earlier than end time');
       }
 
       // Check if endDate is later than workDay endDate
-      if (pause.endDate > this.workDay.endDate) {
+      if (pause.endDateDateFormat > this.workDay.endDateDateFormat) {
         errors.push('⏰⬇️ End time must be earlier than work day end time');
       }
 
       // Check for overlap with lunch
       if (
-        (pause.startDate >= this.lunch.startDate &&
-          pause.startDate < this.lunch.endDate) ||
-        (pause.endDate > this.lunch.startDate &&
-          pause.endDate <= this.lunch.endDate) ||
-        (pause.startDate <= this.lunch.startDate &&
-          pause.endDate >= this.lunch.endDate)
+        (pause.startDateDateFormat >= this.lunch.startDateDateFormat &&
+          pause.startDateDateFormat < this.lunch.endDateDateFormat) ||
+        (pause.endDateDateFormat > this.lunch.startDateDateFormat &&
+          pause.endDateDateFormat <= this.lunch.endDateDateFormat) ||
+        (pause.startDateDateFormat <= this.lunch.startDateDateFormat &&
+          pause.endDateDateFormat >= this.lunch.endDateDateFormat)
       ) {
         errors.push('🍽️ Overlaps with lunch time');
       }
@@ -157,12 +153,12 @@ export class WwStep4Component {
       for (let j = 0; j < this.meetings.length; j++) {
         const meeting = this.meetings[j];
         if (
-          (pause.startDate >= meeting.startDate &&
-            pause.startDate < meeting.endDate) ||
-          (pause.endDate > meeting.startDate &&
-            pause.endDate <= meeting.endDate) ||
-          (pause.startDate <= meeting.startDate &&
-            pause.endDate >= meeting.endDate)
+          (pause.startDateDateFormat >= meeting.startDateDateFormat &&
+            pause.startDateDateFormat < meeting.endDateDateFormat) ||
+          (pause.endDateDateFormat > meeting.startDateDateFormat &&
+            pause.endDateDateFormat <= meeting.endDateDateFormat) ||
+          (pause.startDateDateFormat <= meeting.startDateDateFormat &&
+            pause.endDateDateFormat >= meeting.endDateDateFormat)
         ) {
           errors.push(`📅 Overlaps with meeting ${j + 1}`);
         }
@@ -173,12 +169,12 @@ export class WwStep4Component {
         if (i !== j) {
           const otherPause = this.pauses[j];
           if (
-            (pause.startDate >= otherPause.startDate &&
-              pause.startDate < otherPause.endDate) ||
-            (pause.endDate > otherPause.startDate &&
-              pause.endDate <= otherPause.endDate) ||
-            (pause.startDate <= otherPause.startDate &&
-              pause.endDate >= otherPause.endDate)
+            (pause.startDateDateFormat >= otherPause.startDateDateFormat &&
+              pause.startDateDateFormat < otherPause.endDateDateFormat) ||
+            (pause.endDateDateFormat > otherPause.startDateDateFormat &&
+              pause.endDateDateFormat <= otherPause.endDateDateFormat) ||
+            (pause.startDateDateFormat <= otherPause.startDateDateFormat &&
+              pause.endDateDateFormat >= otherPause.endDateDateFormat)
           ) {
             errors.push(`⏸️ Overlaps with pause ${j + 1}`);
             break;

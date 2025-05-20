@@ -6,12 +6,10 @@ import { trigger, transition, style, animate } from '@angular/animations';
 import { environment } from '../../../environments/environment.development';
 import { Router } from '@angular/router';
 import { WwTimelineComponent } from '../../ww-timeline/ww-timeline.component';
-import {
-  convertWorkWellTimeToDate,
-  workWellListMapping,
-} from '../../../utils/workWellUtils';
+import { workWellListMapping } from '../../../utils/workWellUtils';
 import { WorkWell } from '../../../models/workWell.model';
 import { WorkWellResponse } from '../../../models/errors/workWellResponse';
+import { WorkWellEvent } from '../../../models/workWellEvent.model';
 
 @Component({
   selector: 'ww-display-templates',
@@ -43,17 +41,8 @@ export class WwDisplayTemplatesComponent {
   public isLoading = this.workWellStore.loading;
 
   constructor(private router: Router) {
-    // foreach workWellList and convert startDate and endDate to Date objects
-    this.workWellList.forEach((workWell) => {
-      workWell.workWellSchedule.forEach((schedule) => {
-        convertWorkWellTimeToDate({
-          workDay: schedule.workDay,
-          lunch: schedule.lunch,
-          meetings: schedule.meetings,
-          pauses: schedule.pauses,
-        });
-      });
-    });
+    // Update the workWellPlaying signal
+    this.workWellStore.getWorkWellPlaying();
   }
 
   deleteWorkWellByIdFromTemplate = (idWWS: number) => {
@@ -66,6 +55,7 @@ export class WwDisplayTemplatesComponent {
 
   // Update the isPlaying status of a WorkWell entry
   async playWorkWell(idWWS: number) {
+    console.log('update isPlaying status for WorkWell with idWWS:', idWWS);
     const workWellToUpdate = this.workWellList.find(
       (workWell) => workWell.idWWS === idWWS
     );
@@ -98,6 +88,19 @@ export class WwDisplayTemplatesComponent {
         }
       }
     }
+
+    // Update the workWellPlaying signal
+    this.workWellStore.getWorkWellPlaying();
+  }
+
+  public getClonedWorkWellEvents(workWell: WorkWell): WorkWellEvent[] {
+    // Clone the workWell object to avoid mutating the original
+    return [...workWell.workWellSchedule[0].allEvents()];
+  }
+
+  public getCloneWorkDay(workWell: WorkWell): WorkWellEvent {
+    // Clone the workWell object to avoid mutating the original
+    return new WorkWellEvent({ ...workWell.workWellSchedule[0].workDay });
   }
 
   // Navigate to the "addNewWorkWell" page

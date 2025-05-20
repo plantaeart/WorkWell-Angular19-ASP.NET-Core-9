@@ -1,4 +1,4 @@
-<div class="flex flex row justify-start">
+<div class="flex justify-start" [ngClass]="getIsHorizontalTop()">
   <!-- Current Time + Current and nextevent -->
   <div
     class="current-time flex flex-col items-center mr-10"
@@ -69,7 +69,8 @@
               {{
                 getCurrentAndNextEvents().nextEvent
                   ? getTimeBetweenEvents({
-                      startDate: getCurrentAndNextEvents().nextEvent?.startDate
+                      startDateDateFormat:
+                        getCurrentAndNextEvents().nextEvent?.startDateDateFormat
                     })
                   : "N/A"
               }}
@@ -80,7 +81,7 @@
         <!-- End of Day Template -->
         <ng-template #endOfDay>
           <div
-            class="end-of-day text-center text-lg font-bold mt-4 rounded-lg bg-blue-600"
+            class="end-of-day text-center text-lg font-bold mt-2 rounded-lg bg-blue-600 p-1 m-1"
           >
             End of the day 🎉
           </div>
@@ -89,7 +90,7 @@
         <!-- Start of Day Template -->
         <ng-template #startOfDay>
           <div
-            class="start-of-day text-center text-lg font-bold mt-4 rounded-lg bg-blue-600"
+            class="start-of-day text-center text-lg font-bold mt-2 rounded-lg bg-blue-600 p-1 m-1"
           >
             Soon start of the day 🌞
           </div>
@@ -112,7 +113,7 @@
         {{ workDayStart.name }}
       </div>
       <div class="event-dates text-sm text-center">
-        {{ workDayStart.startDate | date : "HH:mm" }}
+        {{ workDayStart.startDateDateFormat | date : "HH:mm" }}
       </div>
     </div>
 
@@ -130,8 +131,8 @@
       >
         <div class="event-name font-bold text-center">{{ event.name }}</div>
         <div class="event-dates text-sm text-center">
-          {{ event.startDate | date : "HH:mm" }} -
-          {{ event.endDate | date : "HH:mm" }}
+          {{ event.startDateDateFormat | date : "HH:mm" }} -
+          {{ event.endDateDateFormat | date : "HH:mm" }}
         </div>
       </div>
     </div>
@@ -144,7 +145,7 @@
     >
       <div class="event-name font-bold text-center">{{ workDayEnd.name }}</div>
       <div class="event-dates text-sm text-center">
-        {{ workDayEnd.endDate | date : "HH:mm" }}
+        {{ workDayEnd.endDateDateFormat | date : "HH:mm" }}
       </div>
     </div>
   </div>

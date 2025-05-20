@@ -1,0 +1,106 @@
+import { Component, computed, inject } from '@angular/core';
+import { WorkWellStore } from '../../store/workWell.store';
+import { CommonModule } from '@angular/common';
+import {
+  trigger,
+  state,
+  style,
+  transition,
+  animate,
+} from '@angular/animations';
+import { WwTimelineComponent } from '../ww-timeline/ww-timeline.component';
+import { WorkWellEvent } from '../../models/workWellEvent.model';
+import { areEventsEqual } from '../../utils/workWellUtils';
+import { WorkWell } from '../../models/workWell.model';
+
+@Component({
+  selector: 'ww-workwell-player',
+  imports: [CommonModule, WwTimelineComponent],
+  templateUrl: './ww-workwell-player.component.html',
+  styleUrls: ['./ww-workwell-player.component.scss'],
+  animations: [
+    trigger('slideInOut', [
+      state(
+        'hidden',
+        style({
+          transform: 'translateY(100%)',
+          opacity: 0,
+          height: '0px',
+        })
+      ),
+      state(
+        'visible',
+        style({
+          transform: 'translateY(0)',
+          opacity: 1,
+          height: '100%',
+        })
+      ),
+      transition('hidden <=> visible', [animate('300ms ease-in-out')]),
+    ]),
+  ],
+})
+export class WwWorkwellPlayerComponent {
+  public workWellStore = inject(WorkWellStore);
+  public isVisible = false; // Controls the visibility of the component
+
+  public lastEvents: WorkWellEvent[] = [];
+  public lastCloned: WorkWellEvent[] = [];
+  public lastWorkDay: WorkWellEvent = new WorkWellEvent({});
+  public lastClonedWorkDay: WorkWellEvent = new WorkWellEvent({});
+  public isLoading = this.workWellStore.loading(); // Controls the loading state of the component
+
+  toggleVisibility() {
+    console.log('Toggling visibility');
+    this.isVisible = !this.isVisible;
+  }
+
+  // Clone the workWell events to avoid mutating the original
+  public clonedWorkWellEvents = computed(() => {
+    console.log('Cloning workWell events');
+    const playing = this.workWellStore.workWellPlaying();
+    if (
+      this.workWellStore.isWorkWellPlaying() &&
+      playing &&
+      playing.workWellSchedule.length
+    ) {
+      const events = playing.workWellSchedule[0].allEvents();
+      // Only clone if events changed
+      if (!areEventsEqual(events, this.lastEvents)) {
+        this.lastEvents = events;
+        this.lastCloned = [...events];
+      }
+      return this.lastCloned;
+    }
+    return [];
+  });
+
+  // Clone the workWell object to avoid mutating the original
+  public cloneWorkDay = computed(() => {
+    console.log('Cloning work day');
+    const playing = this.workWellStore.workWellPlaying();
+    if (
+      this.workWellStore.isWorkWellPlaying() &&
+      playing &&
+      playing.workWellSchedule.length
+    ) {
+      const workDay = playing.workWellSchedule[0].workDay;
+      // Only clone if workDay changed
+      if (!workDay.equals(this.lastWorkDay)) {
+        this.lastWorkDay = workDay;
+        this.lastClonedWorkDay = new WorkWellEvent({ ...workDay });
+      }
+      return this.lastClonedWorkDay!;
+    }
+    return new WorkWellEvent({});
+  });
+
+  public workWellName = computed(() => {
+    console.log('Getting workWell name');
+    const playing = this.workWellStore.workWellPlaying();
+    if (playing) {
+      return playing.name;
+    }
+    return '';
+  });
+}

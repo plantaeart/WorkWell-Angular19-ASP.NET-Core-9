@@ -25,8 +25,8 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="this.workDay.startDate"
-          [maxDate]="this.workDay.endDate"
+          [(ngModel)]="this.workDay.startDateTemp"
+          [maxDate]="this.workDay.endDateTemp"
           (flatpickrChange)="onWorkDayStartChange($event.selectedDates[0])"
         />
       </div>
@@ -36,8 +36,8 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="this.workDay.endDate"
-          [minDate]="this.workDay.startDate"
+          [(ngModel)]="this.workDay.endDateTemp"
+          [minDate]="this.workDay.startDateTemp"
           (flatpickrChange)="onWorkDayEndChange($event.selectedDates[0])"
         />
       </div>
@@ -72,9 +72,9 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="this.lunch.startDate"
-          [minDate]="this.workDay.startDate"
-          [maxDate]="this.lunch.endDate"
+          [(ngModel)]="this.lunch.startDateTemp"
+          [minDate]="this.workDay.startDateTemp"
+          [maxDate]="this.lunch.endDateTemp"
           (flatpickrChange)="onLunchStartChange($event.selectedDates[0])"
         />
       </div>
@@ -84,9 +84,9 @@
           class="form-control text-center text-lg w-30 border-2 border-[#000411] rounded-lg"
           type="text"
           mwlFlatpickr
-          [(ngModel)]="this.lunch.endDate"
-          [minDate]="this.lunch.startDate"
-          [maxDate]="this.workDay.endDate"
+          [(ngModel)]="this.lunch.endDateTemp"
+          [minDate]="this.lunch.startDateTemp"
+          [maxDate]="this.workDay.endDateTemp"
           (flatpickrChange)="onLunchEndChange($event.selectedDates[0])"
         />
       </div>

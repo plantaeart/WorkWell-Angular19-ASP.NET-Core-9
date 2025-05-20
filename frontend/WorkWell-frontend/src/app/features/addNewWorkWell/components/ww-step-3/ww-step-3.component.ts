@@ -8,10 +8,9 @@ import { CommonModule } from '@angular/common';
 import { WorkWellStore } from '../../../../store/workWell.store';
 import { WorkWellEvent } from '../../../../models/workWellEvent.model';
 import { WorkWellEventType } from '../../../../../types/enums/workWellEventType';
-import { convertTimeStringToDate } from '../../../../utils/string.utils';
 import { WwShowScheduleInfosComponent } from '../ww-show-schedule-infos/ww-show-schedule-infos.component';
-import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
 import { meetingName } from '../../../../../types/enums/workWellEventName';
+import { setWorkWellEventTempDate } from '../../../../utils/workWellUtils';
 
 @Component({
   selector: 'ww-step-3',
@@ -44,28 +43,26 @@ export class WwStep3Component {
     this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings || [];
 
   // Create copies of the data
-  public workDayCopy: WorkWellEvent = { ...this.workDay };
-  public lunchCopy: WorkWellEvent = { ...this.lunch };
+  public workDayCopy: WorkWellEvent = new WorkWellEvent({ ...this.workDay });
+  public lunchCopy: WorkWellEvent = new WorkWellEvent({ ...this.lunch });
 
   public meetingCoherencyOk = false;
   public meetingErrors: string[][] = [];
 
   constructor() {
-    convertWorkWellTimeToDate({
-      workDay: this.workDay,
-      lunch: this.lunch,
-      meetings: this.meetings,
-    });
+    setWorkWellEventTempDate([this.workDay, this.lunch, ...this.meetings]); // Set temporary dates for meetings
     this.verifyMeetings(); // Initial verification of meetings
   }
 
   addNewMeeting(): void {
-    this.meetings.push({
-      startDate: this.workDay.startDate,
-      endDate: this.workDay.endDate,
-      eventType: WorkWellEventType.MEETING,
-      name: meetingName + (this.meetings.length + 1),
-    });
+    this.meetings.push(
+      new WorkWellEvent({
+        startDate: this.workDay.startDate,
+        endDate: this.workDay.endDate,
+        eventType: WorkWellEventType.MEETING,
+        name: meetingName + (this.meetings.length + 1),
+      })
+    );
     this.verifyMeetings();
   }
 
@@ -75,20 +72,16 @@ export class WwStep3Component {
   }
 
   onMeetingStartChange(index: number, newValue: Date): void {
-    const meeting = this.meetings[index];
-
     // Update startDate
-    meeting.startDate = newValue;
-
+    this.meetings[index].setStartDateDateFormat(newValue);
+    this.meetings[index].startDateTemp = newValue;
     this.verifyMeetings(); // Re-verify after changing start time
   }
 
   onMeetingEndChange(index: number, newValue: Date): void {
-    const meeting = this.meetings[index];
-
     // Update endDate
-    meeting.endDate = newValue;
-
+    this.meetings[index].setEndDateDateFormat(newValue);
+    this.meetings[index].endDateTemp = newValue;
     this.verifyMeetings(); // Re-verify after changing end time
   }
 
@@ -109,12 +102,12 @@ export class WwStep3Component {
       const errors: string[] = [];
 
       // Check if startDate is earlier than endDate
-      if (meeting.startDate >= meeting.endDate) {
+      if (meeting.startDateDateFormat >= meeting.endDateDateFormat) {
         errors.push('⏰⬆️ Start time must be earlier than end time');
       }
 
       // Check is endDate is later than workDay endDate
-      if (meeting.endDate > this.workDay.endDate) {
+      if (meeting.endDateDateFormat > this.workDay.endDateDateFormat) {
         errors.push('⏰⬇️ End time must be earlier than work day end time');
       }
 
@@ -124,12 +117,12 @@ export class WwStep3Component {
           const otherMeeting = this.meetings[j];
 
           if (
-            (meeting.startDate >= otherMeeting.startDate &&
-              meeting.startDate < otherMeeting.endDate) ||
-            (meeting.endDate > otherMeeting.startDate &&
-              meeting.endDate <= otherMeeting.endDate) ||
-            (meeting.startDate <= otherMeeting.startDate &&
-              meeting.endDate >= otherMeeting.endDate)
+            (meeting.startDateDateFormat >= otherMeeting.startDateDateFormat &&
+              meeting.startDateDateFormat < otherMeeting.endDateDateFormat) ||
+            (meeting.endDateDateFormat > otherMeeting.startDateDateFormat &&
+              meeting.endDateDateFormat <= otherMeeting.endDateDateFormat) ||
+            (meeting.startDateDateFormat <= otherMeeting.startDateDateFormat &&
+              meeting.endDateDateFormat >= otherMeeting.endDateDateFormat)
           ) {
             errors.push('📅 Overlaps with meeting ' + (j + 1));
             break;
@@ -139,12 +132,12 @@ export class WwStep3Component {
 
       // Check for overlap with lunch
       if (
-        (meeting.startDate >= this.lunch.startDate &&
-          meeting.startDate < this.lunch.endDate) ||
-        (meeting.endDate > this.lunch.startDate &&
-          meeting.endDate <= this.lunch.endDate) ||
-        (meeting.startDate <= this.lunch.startDate &&
-          meeting.endDate >= this.lunch.endDate)
+        (meeting.startDateDateFormat >= this.lunch.startDateDateFormat &&
+          meeting.startDateDateFormat < this.lunch.endDateDateFormat) ||
+        (meeting.endDateDateFormat > this.lunch.startDateDateFormat &&
+          meeting.endDateDateFormat <= this.lunch.endDateDateFormat) ||
+        (meeting.startDateDateFormat <= this.lunch.startDateDateFormat &&
+          meeting.endDateDateFormat >= this.lunch.endDateDateFormat)
       ) {
         errors.push('🍽️ Overlaps with lunch time');
       }

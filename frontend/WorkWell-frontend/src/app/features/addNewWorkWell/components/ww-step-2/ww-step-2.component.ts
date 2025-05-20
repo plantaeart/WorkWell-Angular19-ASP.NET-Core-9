@@ -6,12 +6,12 @@ import {
   provideFlatpickrDefaults,
 } from 'angularx-flatpickr';
 import { WorkWellEvent } from '../../../../models/workWellEvent.model';
-import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
 import {
   lunchName,
   workHoursName,
 } from '../../../../../types/enums/workWellEventName';
 import { CommonModule } from '@angular/common';
+import { setWorkWellEventTempDate } from '../../../../utils/workWellUtils';
 
 @Component({
   selector: 'ww-step-2',
@@ -43,30 +43,34 @@ export class WwStep2Component {
   public workDayCoherencyOk = true; // Track if workday times are coherent
 
   constructor() {
-    convertWorkWellTimeToDate({ workDay: this.workDay, lunch: this.lunch });
     this.workDay.name = workHoursName;
     this.lunch.name = lunchName;
+    setWorkWellEventTempDate([this.workDay, this.lunch]); // Set temporary dates for meetings
 
     this.verifyLunch(); // Initial verification of lunch times
   }
 
   onWorkDayStartChange(newValue: Date): void {
-    this.workDay.startDate = newValue;
+    this.workDay.setStartDateDateFormat(newValue);
+    this.workDay.startDateTemp = newValue;
     this.verifyLunch(); // Verify lunch after workday start change
   }
 
   onWorkDayEndChange(newValue: Date): void {
-    this.workDay.endDate = newValue;
+    this.workDay.setEndDateDateFormat(newValue);
+    this.workDay.endDateTemp = newValue;
     this.verifyLunch(); // Verify lunch after workday end change
   }
 
   onLunchStartChange(newValue: Date): void {
-    this.lunch.startDate = newValue;
+    this.lunch.setStartDateDateFormat(newValue);
+    this.lunch.startDateTemp = newValue;
     this.verifyLunch(); // Verify lunch after lunch start change
   }
 
   onLunchEndChange(newValue: Date): void {
-    this.lunch.endDate = newValue;
+    this.lunch.setEndDateDateFormat(newValue);
+    this.lunch.endDateTemp = newValue;
     this.verifyLunch(); // Verify lunch after lunch end change
   }
 
@@ -76,8 +80,8 @@ export class WwStep2Component {
 
     // Check if workDay start time is equal to workDay end time
     if (
-      (this.workDay.startDate as Date).getTime() ===
-      (this.workDay.endDate as Date).getTime()
+      this.workDay.startDateDateFormat.getTime() ===
+      this.workDay.endDateDateFormat.getTime()
     ) {
       this.workDayErrors.push(
         '🍽️ Lunch start time cannot be the same as lunch end time'
@@ -94,13 +98,13 @@ export class WwStep2Component {
     this.lunchCoherencyOk = true; // Assume lunch is coherent initially
 
     // Check if lunch start is within workday bounds
-    if (this.lunch.startDate < this.workDay.startDate) {
+    if (this.lunch.startDateDateFormat < this.workDay.startDateDateFormat) {
       this.lunchErrors.push(
         '🍽️ Lunch start time must be after workday start time'
       );
       this.lunchCoherencyOk = false;
     }
-    if (this.lunch.startDate >= this.workDay.endDate) {
+    if (this.lunch.startDateDateFormat >= this.workDay.endDateDateFormat) {
       this.lunchErrors.push(
         '🍽️ Lunch start time must be before workday end time'
       );
@@ -108,13 +112,13 @@ export class WwStep2Component {
     }
 
     // Check if lunch end is within workday bounds
-    if (this.lunch.endDate <= this.workDay.startDate) {
+    if (this.lunch.endDateDateFormat <= this.workDay.startDateDateFormat) {
       this.lunchErrors.push(
         '🍽️ Lunch end time must be after workday start time'
       );
       this.lunchCoherencyOk = false;
     }
-    if (this.lunch.endDate > this.workDay.endDate) {
+    if (this.lunch.endDateDateFormat > this.workDay.endDateDateFormat) {
       this.lunchErrors.push(
         '🍽️ Lunch end time must be before workday end time'
       );
@@ -123,8 +127,8 @@ export class WwStep2Component {
 
     // Check if lunch start time is equal to lunch end time
     if (
-      (this.lunch.startDate as Date).getTime() ===
-      (this.lunch.endDate as Date).getTime()
+      this.lunch.startDateDateFormat.getTime() ===
+      this.lunch.endDateDateFormat.getTime()
     ) {
       this.lunchErrors.push(
         '🍽️ Lunch start time cannot be the same as lunch end time'

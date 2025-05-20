@@ -4,22 +4,22 @@
  * @returns A Date object with the time set to the provided hours and minutes.
  * @throws Error if the input is not a valid HH:mm string.
  */
-export function convertTimeStringToDate(time: string | Date): Date {
-  if (typeof time !== 'string') {
-    throw new Error(
-      `Invalid time format: expected a string, but got ${typeof time}`
-    );
-  }
-
+export function convertTimeStringToDate(time: string): Date {
   const [hours, minutes] = time.split(':').map(Number);
-
-  if (isNaN(hours) || isNaN(minutes)) {
-    throw new Error(`Invalid time format: "${time}" is not in HH:mm format`);
-  }
-
   const date = new Date();
   date.setHours(hours, minutes, 0, 0);
   return date;
+}
+
+// convert any into Date
+export function convertIntoDate(time: any): Date {
+  if (typeof time === 'string') {
+    return convertTimeStringToDate(time);
+  } else if (time instanceof Date) {
+    return time;
+  } else {
+    throw new Error('Invalid date format');
+  }
 }
 
 /**
@@ -28,12 +28,6 @@ export function convertTimeStringToDate(time: string | Date): Date {
  * @returns A string in HH:mm format.
  */
 export function formatDateToHHmm(date: Date): string {
-  if (!(date instanceof Date)) {
-    throw new Error(
-      `Invalid date format: expected a Date object, but got ${typeof date}`
-    );
-  }
-
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
   return `${hours}:${minutes}`;

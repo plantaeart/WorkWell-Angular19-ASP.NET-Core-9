@@ -25,6 +25,13 @@ export class WorkWellApiService {
     );
   }
 
+  // Get WorkWell playing from API
+  getWorkWellPlayingFromApi(): Observable<WorkWell> {
+    return this.http.get<WorkWell>(
+      `${this.baseUrl}/api/WorkWell/GetPlayingWorkWell`
+    );
+  }
+
   // Create a new WorkWell entry in the API
   createWorkWellFromApi(workWell: WorkWell): Observable<WorkWell> {
     return this.http.post<WorkWell>(

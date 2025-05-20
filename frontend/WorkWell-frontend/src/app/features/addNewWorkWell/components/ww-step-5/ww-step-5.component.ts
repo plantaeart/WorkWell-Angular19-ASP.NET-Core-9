@@ -2,7 +2,6 @@ import { Component, inject } from '@angular/core';
 import { TimelineModule } from 'primeng/timeline';
 import { WorkWellStore } from '../../../../store/workWell.store';
 import { formatDateToHHmm } from '../../../../utils/string.utils';
-import { convertWorkWellTimeToDate } from '../../../../utils/workWellUtils';
 import { CommonModule } from '@angular/common';
 import { WwTimelineComponent } from '../../../ww-timeline/ww-timeline.component';
 import {
@@ -14,6 +13,7 @@ import { Router } from '@angular/router';
 import { WorkWell } from '../../../../models/workWell.model';
 import { RouterModule } from '@angular/router';
 import { WorkWellSchedule } from '../../../../models/workWellSchedule.model';
+import { WorkWellEvent } from '../../../../models/workWellEvent.model';
 
 @Component({
   selector: 'ww-step-5',
@@ -22,7 +22,7 @@ import { WorkWellSchedule } from '../../../../models/workWellSchedule.model';
   styleUrl: './ww-step-5.component.scss',
 })
 export class WwStep5Component {
-  events: any[] = [];
+  events: WorkWellEvent[] = [];
   public workWellStore = inject(WorkWellStore);
 
   formatDateToHHmm = formatDateToHHmm;
@@ -36,32 +36,31 @@ export class WwStep5Component {
   pauses = this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses ?? [];
 
   constructor(private router: Router) {
-    convertWorkWellTimeToDate({
-      workDay: this.workDay,
-      lunch: this.lunch,
-      meetings: this.meetings,
-      pauses: this.pauses,
-    });
-
     this.events = [
-      {
+      new WorkWellEvent({
         startDate: this.lunch.startDate,
         endDate: this.lunch.endDate,
         name: lunchName,
         eventType: this.lunch.eventType,
-      },
-      ...this.meetings.map((meeting, index) => ({
-        startDate: meeting.startDate,
-        endDate: meeting.endDate,
-        name: meetingName + ' ' + (index + 1),
-        eventType: meeting.eventType,
-      })),
-      ...this.pauses.map((pause, index) => ({
-        startDate: pause.startDate,
-        endDate: pause.endDate,
-        name: pauseName + ' ' + (index + 1),
-        eventType: pause.eventType,
-      })),
+      }),
+      ...this.meetings.map(
+        (meeting, index) =>
+          new WorkWellEvent({
+            startDate: meeting.startDate,
+            endDate: meeting.endDate,
+            name: meetingName + ' ' + (index + 1),
+            eventType: meeting.eventType,
+          })
+      ),
+      ...this.pauses.map(
+        (pause, index) =>
+          new WorkWellEvent({
+            startDate: pause.startDate,
+            endDate: pause.endDate,
+            name: pauseName + ' ' + (index + 1),
+            eventType: pause.eventType,
+          })
+      ),
     ];
   }
 
