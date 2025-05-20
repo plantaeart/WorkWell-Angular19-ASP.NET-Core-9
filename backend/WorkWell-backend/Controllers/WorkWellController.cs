@@ -36,8 +36,8 @@ public class WorkWellController : ControllerBase
     }
 
     // GET : api/WorkWell/GetIsPlayingWorkWell
-    [HttpGet("GetIsPlayingWorkWell")]
-    public async Task<IActionResult> GetIsPlayingWorkWell()
+    [HttpGet("GetPlayingWorkWell")]
+    public async Task<IActionResult> GetPlayingWorkWell()
     {
         try
         {
@@ -45,9 +45,9 @@ public class WorkWellController : ControllerBase
             var querySnapshot = await query.GetSnapshotAsync();
 
             if (querySnapshot.Documents.Count == 0)
-                return NotFound("(GetIsPlayingWorkWell) No document found with IsPlaying = true");
+                return NoContent();
 
-            var workWellList = querySnapshot.Documents.Select(doc => doc.ConvertTo<WorkWell>()).ToList();
+            var workWellList = querySnapshot.Documents.Select(doc => doc.ConvertTo<WorkWell>()).FirstOrDefault();
             return Ok(workWellList);
         }
         catch (Exception ex)
