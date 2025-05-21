@@ -1,4 +1,5 @@
 <div>
+  <p-toast />
   <h2 class="text-2xl mb-2">Your templates</h2>
   <div *ngIf="isLoading()" class="loading-message" aria-live="polite">
     Loading...
@@ -54,7 +55,6 @@
             </div>
             <!-- Delete button -->
             <div class="flex justify-start">
-              <p-toast />
               <p-confirmpopup #cp>
                 <ng-template #headless let-message>
                   <div class="rounded p-4">
