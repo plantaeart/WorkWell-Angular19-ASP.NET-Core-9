@@ -11,10 +11,21 @@ import { WorkWell } from '../../../models/workWell.model';
 import { WorkWellResponse } from '../../../models/errors/workWellResponse';
 import { WorkWellEvent } from '../../../models/workWellEvent.model';
 import { PanelModule } from 'primeng/panel';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmPopupModule } from 'primeng/confirmpopup';
+import { ToastModule } from 'primeng/toast';
 
 @Component({
   selector: 'ww-display-templates',
-  imports: [ButtonModule, CommonModule, WwTimelineComponent, PanelModule],
+  imports: [
+    ButtonModule,
+    CommonModule,
+    WwTimelineComponent,
+    PanelModule,
+    ConfirmPopupModule,
+    ToastModule,
+  ],
+  providers: [ConfirmationService, MessageService],
   templateUrl: './ww-display-templates.component.html',
   styleUrl: './ww-display-templates.component.scss',
   animations: [
@@ -40,15 +51,41 @@ export class WwDisplayTemplatesComponent {
   private workWellStore = inject(WorkWellStore);
   public workWellList: WorkWell[] = [...workWellListMapping()];
   public isLoading = this.workWellStore.loading;
+  public workWellToDelete: number | null = null;
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
+  ) {
     // Update the workWellPlaying signal
     this.workWellStore.getWorkWellPlaying();
     this.workWellStore.setIsUpdateState(false); // Reset the update state
     this.workWellStore.setAddNewWorkWell(new WorkWell({})); // Reset the new work well state
   }
 
-  deleteWorkWellByIdFromTemplate = (idWWS: number) => {
+  confirmDelete(event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Delete the selected work well?',
+      accept: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Confirmed',
+          detail: 'You have deleted the work well',
+          life: 3000,
+        });
+      },
+    });
+  }
+
+  deleteWorkWellByIdFromTemplate = (idWWS: number | null) => {
+    console.log('Deleting work well with idWWS:', idWWS);
+
+    if (idWWS === null) {
+      console.error('Invalid work well ID:', idWWS);
+      return;
+    }
     this.workWellStore.deleteWorkWellFromStore(idWWS);
     // Update the workWellList by filtering out the deleted item
     this.workWellList = this.workWellList.filter(
@@ -100,6 +137,26 @@ export class WwDisplayTemplatesComponent {
 
     // Update the workWellPlaying signal
     this.workWellStore.getWorkWellPlaying();
+  }
+
+  // Update the isLocked status of a WorkWell entry
+  async lockWorkWell(idWWS: number) {
+    console.log('update isLocked status for WorkWell with idWWS:', idWWS);
+    const workWellToUpdate = this.workWellList.find(
+      (workWell) => workWell.idWWS === idWWS
+    );
+    if (workWellToUpdate) {
+      workWellToUpdate.isLocked = !workWellToUpdate.isLocked;
+      const resp: WorkWellResponse | null =
+        await this.workWellStore.updateIsLockedFromStore(
+          idWWS,
+          workWellToUpdate.isLocked
+        );
+
+      if (resp && resp.errorType) {
+        console.error('Error updating isLocked status:', resp.errorMessage);
+      }
+    }
   }
 
   public getClonedWorkWellEvents(workWell: WorkWell): WorkWellEvent[] {

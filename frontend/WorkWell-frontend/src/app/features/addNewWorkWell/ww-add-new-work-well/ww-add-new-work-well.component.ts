@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit } from '@angular/core';
 import { StepperModule } from 'primeng/stepper';
 import { ButtonModule } from 'primeng/button';
 import { WwStep1Component } from '../components/ww-step-1/ww-step-1.component';
@@ -7,6 +7,8 @@ import { SeparatorComponent } from '../../components/separator/separator.compone
 import { WwStep3Component } from '../components/ww-step-3/ww-step-3.component';
 import { WwStep4Component } from '../components/ww-step-4/ww-step-4.component';
 import { WwStep5Component } from '../components/ww-step-5/ww-step-5.component';
+import { WorkWellStore } from '../../../store/workWell.store';
+import { WorkWell } from '../../../models/workWell.model';
 
 @Component({
   selector: 'ww-add-new-work-well',
@@ -23,24 +25,31 @@ import { WwStep5Component } from '../components/ww-step-5/ww-step-5.component';
   templateUrl: './ww-add-new-work-well.component.html',
   styleUrl: './ww-add-new-work-well.component.scss',
 })
-export class WwAddNewWorkWellComponent {
+export class WwAddNewWorkWellComponent implements OnInit {
+  private workWellStore = inject(WorkWellStore);
   public meetingCoherencyOk = true;
 
   constructor(private cdRef: ChangeDetectorRef) {}
 
-  onMeetingStateChange(state: { isCoherent: boolean }): void {
-    this.meetingCoherencyOk = state.isCoherent;
-    console.log('Meeting state changed:', state);
+  ngOnInit(): void {
+    if (this.workWellStore.isUpdateState()) {
+      this.meetingCoherencyOk = true;
+      this.hasPauses = true;
+      this.pauseCoherencyOk = true;
+    }
   }
 
-  public pauseCoherencyOk = true;
-  public hasPauses = true;
+  onMeetingStateChange(state: { isCoherent: boolean }): void {
+    this.meetingCoherencyOk = state.isCoherent;
+  }
+
+  public pauseCoherencyOk = false;
+  public hasPauses = false;
 
   onPauseStateChange(state: { isCoherent: boolean; hasPauses: boolean }): void {
     this.pauseCoherencyOk = state.isCoherent;
     this.hasPauses = state.hasPauses;
-    this.cdRef.detectChanges(); // <-- Add this line
-    console.log('Pause state changed:', state);
+    this.cdRef.detectChanges();
   }
 
   public lunchCoherencyOk = true;

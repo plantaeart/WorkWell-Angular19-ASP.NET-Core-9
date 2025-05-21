@@ -19,6 +19,17 @@
             >{{ workWell.name }}
           </h3>
           <div class="flex flex-row gap-2 justify-center">
+            <!-- Locked button -->
+            <div class="flex justify-start">
+              <p-button
+                class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
+                icon="{{ workWell.getIsLockedButtonIcon() }}"
+                [severity]="workWell.getIsLockedButtonSeverity()"
+                aria-label="Lock"
+                [raised]="true"
+                (click)="lockWorkWell(workWell.idWWS)"
+              ></p-button>
+            </div>
             <!-- Playing button -->
             <div class="flex justify-start">
               <p-button
@@ -26,6 +37,7 @@
                 icon="pi pi-play"
                 [severity]="workWell.getIsPlayingButtonSeverity()"
                 aria-label="Play"
+                [raised]="true"
                 (click)="playWorkWell(workWell.idWWS)"
               ></p-button>
             </div>
@@ -36,17 +48,49 @@
                 icon="pi pi-pencil"
                 severity="warn"
                 aria-label="Update"
+                [raised]="true"
                 (click)="updateWorkWell(workWell)"
               ></p-button>
             </div>
             <!-- Delete button -->
             <div class="flex justify-start">
+              <p-toast />
+              <p-confirmpopup #cp>
+                <ng-template #headless let-message>
+                  <div class="rounded p-4">
+                    <span>{{ message.message }}</span>
+                    <div class="flex items-center gap-2 mt-4">
+                      <p-button
+                        (onClick)="
+                          deleteWorkWellByIdFromTemplate(workWellToDelete);
+                          cp.onAccept()
+                        "
+                        icon="pi pi-trash"
+                        label="Delete"
+                        severity="danger"
+                        size="small"
+                      />
+                      <p-button
+                        (onClick)="cp.onReject()"
+                        label="Cancel"
+                        [text]="true"
+                        size="small"
+                        severity="secondary"
+                      />
+                    </div>
+                  </div>
+                </ng-template>
+              </p-confirmpopup>
               <p-button
                 class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
                 icon="pi pi-trash"
                 severity="danger"
                 aria-label="Delete"
-                (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
+                (onClick)="
+                  workWellToDelete = workWell.idWWS; confirmDelete($event)
+                "
+                [raised]="true"
+                [disabled]="workWell.isLocked"
               ></p-button>
             </div>
           </div>
@@ -67,9 +111,6 @@
         [isHorizontal]="true"
         [isShowCurrentTime]="false"
       ></ww-timeline>
-
-      <!-- Description -->
-      <p class="font-light mt-2">{{ workWell.description }}</p>
     </div>
 
     <!-- Add button -->

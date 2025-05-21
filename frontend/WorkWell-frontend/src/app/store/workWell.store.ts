@@ -208,6 +208,43 @@ export class WorkWellStore {
     }
   }
 
+  // Update isLocked status of WorkWell data by ID
+  async updateIsLockedFromStore(
+    idWWS: number,
+    isLocked: boolean
+  ): Promise<WorkWellResponse | null> {
+    this.loading.set(true);
+    try {
+      console.log(`Updating isLocked status for ID: ${idWWS}...`);
+      await firstValueFrom(
+        this.workWellService.updateIsLockedFromApi(idWWS, isLocked)
+      );
+      this.workWellList.update((list) =>
+        list.map((item) => {
+          if (item.idWWS === idWWS) {
+            return new WorkWell({ ...item, isLocked: isLocked });
+          } else {
+            return item;
+          }
+        })
+      );
+      return null; // No error
+    } catch (err) {
+      if (err instanceof Error) {
+        this.error.set(err.message); // Access message safely
+      } else {
+        this.error.set('An unknown error occurred'); // Handle non-Error types
+      }
+
+      return new WorkWellResponse({
+        errorType: WorkWellErrorType.WORK_WELL_UPDATE_FAILED,
+        errorMessage: this.error(),
+      });
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
   // Delete WorkWell data by ID
   async deleteWorkWellFromStore(idWWS: number) {
     this.loading.set(true);

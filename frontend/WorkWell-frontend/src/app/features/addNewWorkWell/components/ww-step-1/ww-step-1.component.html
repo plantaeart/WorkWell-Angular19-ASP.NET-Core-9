@@ -15,10 +15,10 @@
         [maxlength]="20"
         (ngModelChange)="isWorkWellNameCoherent()"
       />
-      <p *ngIf="!isWorkWellNameCoherent()" class="text-red-500">
+      <p *ngIf="!isWorkWellNameCoherent()" class="text-red-500 w-50">
         ❌ Name must be at least 3 characters long
       </p>
-      <p *ngIf="isWorkWellNameCoherent()" class="text-green-500">
+      <p *ngIf="isWorkWellNameCoherent()" class="text-green-500 w-50">
         ✅ Name is valid
       </p>
     </div>

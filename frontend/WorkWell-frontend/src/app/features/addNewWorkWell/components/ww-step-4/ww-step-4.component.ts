@@ -117,8 +117,6 @@ export class WwStep4Component implements OnInit {
 
     // Check if there are no pauses
     if (this.pauses == undefined || this.pauses.length === 0) {
-      console.log('has pauses', this.pauses.length > 0);
-      console.log('is coherent', this.pauseCoherencyOk);
       this.pauseStateChange.emit({
         isCoherent: this.pauseCoherencyOk,
         hasPauses: this.pauses.length > 0,
@@ -191,8 +189,6 @@ export class WwStep4Component implements OnInit {
       }
     }
 
-    console.log('has pauses', this.pauses.length > 0);
-    console.log('is coherent', this.pauseCoherencyOk);
     this.pauseStateChange.emit({
       isCoherent: this.pauseCoherencyOk,
       hasPauses: this.pauses.length > 0,

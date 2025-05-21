@@ -60,6 +60,17 @@ export class WorkWellApiService {
     );
   }
 
+  // Update isLocked status of a WorkWell entry in the API
+  updateIsLockedFromApi(
+    idWWS: number,
+    isLocked: boolean
+  ): Observable<WorkWell> {
+    return this.http.put<WorkWell>(
+      `${this.baseUrl}/api/WorkWell/UpdateIsLockedWorkWell/${idWWS}`,
+      isLocked
+    );
+  }
+
   // Delete a WorkWell entry by ID from the API
   deleteWorkWellByIdFromApi(idWWS: number): Observable<void> {
     return this.http.delete<void>(

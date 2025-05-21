@@ -61,17 +61,8 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       'Initializing WwTimelineComponent for workWellName:',
       this.workWellName
     );
-    /*this.events = [...this.events];
-    this.workDay = new WorkWellEvent({
-      ...this.workDay,
-    });*/
 
-    console.log(
-      'test to interval',
-      this.isShowCurrentTime && this.events.length > 0
-    );
     if (this.isShowCurrentTime && this.events.length > 0) {
-      console.log('Setting up clock interval');
       // Start an interval to update the time every milisecond
       this.clockInterval = setInterval(() => {
         this.updateTime();

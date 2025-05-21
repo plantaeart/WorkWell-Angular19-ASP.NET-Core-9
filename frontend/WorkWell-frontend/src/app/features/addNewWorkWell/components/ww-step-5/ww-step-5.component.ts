@@ -71,13 +71,7 @@ export class WwStep5Component {
   async save(): Promise<void> {
     // Save the work well schedule to the store or perform any other action
     const workWellToSave: WorkWell = new WorkWell({
-      idWWS: this.workWellStore.addNewWorkWell().idWWS,
-      name: this.workWellStore.addNewWorkWell().name,
-      description: this.workWellStore.addNewWorkWell().description,
-      isPlaying: this.workWellStore.addNewWorkWell().isPlaying,
-      nbDayWork: this.workWellStore.addNewWorkWell().nbDayWork,
-      updateDate: this.workWellStore.addNewWorkWell().updateDate,
-      scheduleType: this.workWellStore.addNewWorkWell().scheduleType,
+      ...this.workWellStore.addNewWorkWell(),
       // get all the work well schedule
       workWellSchedule: [
         ...this.workWellStore.addNewWorkWell().workWellSchedule,
@@ -105,13 +99,7 @@ export class WwStep5Component {
   async update(): Promise<void> {
     // Update the work well schedule to the store or perform any other action
     const workWellToUpdate: WorkWell = new WorkWell({
-      idWWS: this.workWellStore.addNewWorkWell().idWWS,
-      name: this.workWellStore.addNewWorkWell().name,
-      description: this.workWellStore.addNewWorkWell().description,
-      isPlaying: this.workWellStore.addNewWorkWell().isPlaying,
-      nbDayWork: this.workWellStore.addNewWorkWell().nbDayWork,
-      updateDate: this.workWellStore.addNewWorkWell().updateDate,
-      scheduleType: this.workWellStore.addNewWorkWell().scheduleType,
+      ...this.workWellStore.addNewWorkWell(),
       // get all the work well schedule
       workWellSchedule: [
         ...this.workWellStore.addNewWorkWell().workWellSchedule,
