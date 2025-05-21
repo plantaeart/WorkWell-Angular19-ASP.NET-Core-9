@@ -179,6 +179,34 @@ public class WorkWellController : ControllerBase
         }
     }
 
+    // PUT: api/WorkWell/UpdateIsLockedWorkWell/{idWWS}
+    [HttpPut("UpdateIsLockedWorkWell/{idWWS}")]
+    public async Task<IActionResult> UpdateIsLockedWorkWell(int idWWS, [FromBody] bool isLocked)
+    {
+        try
+        {
+            var query = _firestoreDb.Collection(CollectionName).WhereEqualTo("IdWWS", idWWS);
+            var querySnapshot = await query.GetSnapshotAsync();
+
+            if (querySnapshot.Documents.Count == 0)
+                return NotFound($"(UpdateIsLockedWorkWell) No document found with IdWWS = {idWWS}");
+
+            var document = querySnapshot.Documents.FirstOrDefault();
+            if (document != null)
+            {
+                var workWell = document.ConvertTo<WorkWell>();
+                workWell.IsLocked = isLocked;
+                await document.Reference.SetAsync(workWell, SetOptions.Overwrite);
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, $"Error: {ex.Message}");
+        }
+    }
+
     // DELETE: api/WorkWell/DeleteWorkWell/{idWWS}
     [HttpDelete("DeleteWorkWellById/{idWWS}")]
     public async Task<IActionResult> DeleteWorkWellById(int idWWS)

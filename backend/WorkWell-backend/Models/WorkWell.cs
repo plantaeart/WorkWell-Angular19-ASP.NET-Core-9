@@ -18,6 +18,9 @@ public class WorkWell
     [FirestoreProperty(nameof(IsPlaying))]
     public bool IsPlaying { get; set; }
 
+    [FirestoreProperty(nameof(IsLocked))]
+    public bool IsLocked { get; set; }
+
     [FirestoreProperty(nameof(NbDayWork))]
     public int? NbDayWork { get; set; }
 
@@ -39,13 +42,14 @@ public class WorkWell
         Description = string.Empty;
         UpdateDate = DateTime.Now;
         IsPlaying = false;
+        IsLocked = false;
         NbDayWork = null;
         AlertMinuteTimeBefore = 5;
         ScheduleType = WorkWellScheduleType.STATIC;
         WorkWellSchedule = new List<WorkWellSchedule>();
     }
 
-    public WorkWell(string name, string? description, int? nbDayWork, int alertMinuteTimeBefore, DateTime updateDate, bool? isPlaying, WorkWellScheduleType scheduleType, List<WorkWellSchedule>? workWellSchedule)
+    public WorkWell(string name, string? description, int? nbDayWork, int alertMinuteTimeBefore, DateTime updateDate, bool? isPlaying, bool? isLocked, WorkWellScheduleType scheduleType, List<WorkWellSchedule>? workWellSchedule)
     {
         Name = name;
         Description = description ?? string.Empty;
@@ -53,6 +57,7 @@ public class WorkWell
         AlertMinuteTimeBefore = alertMinuteTimeBefore;
         UpdateDate = updateDate;
         IsPlaying = isPlaying ?? false;
+        IsLocked = isLocked ?? false;
         ScheduleType = scheduleType;
         WorkWellSchedule = workWellSchedule ?? new List<WorkWellSchedule>();
     }
