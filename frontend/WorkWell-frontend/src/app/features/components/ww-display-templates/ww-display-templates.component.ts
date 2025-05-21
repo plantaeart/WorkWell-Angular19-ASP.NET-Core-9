@@ -44,6 +44,8 @@ export class WwDisplayTemplatesComponent {
   constructor(private router: Router) {
     // Update the workWellPlaying signal
     this.workWellStore.getWorkWellPlaying();
+    this.workWellStore.setIsUpdateState(false); // Reset the update state
+    this.workWellStore.setAddNewWorkWell(new WorkWell({})); // Reset the new work well state
   }
 
   deleteWorkWellByIdFromTemplate = (idWWS: number) => {
@@ -53,6 +55,12 @@ export class WwDisplayTemplatesComponent {
       (workWell) => workWell.idWWS !== idWWS
     );
   };
+
+  updateWorkWell(workWell: WorkWell) {
+    this.workWellStore.setAddNewWorkWell(workWell);
+    this.workWellStore.setIsUpdateState(true);
+    this.router.navigate(['/addNewWorkWell']);
+  }
 
   // Update the isPlaying status of a WorkWell entry
   async playWorkWell(idWWS: number) {

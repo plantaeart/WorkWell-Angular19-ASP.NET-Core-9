@@ -1,4 +1,4 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   FlatpickrDirective,
@@ -32,7 +32,7 @@ import { setWorkWellEventTempDate } from '../../../../utils/workWellUtils';
   templateUrl: './ww-step-4.component.html',
   styleUrls: ['./ww-step-4.component.scss'],
 })
-export class WwStep4Component {
+export class WwStep4Component implements OnInit {
   @Output() pauseStateChange = new EventEmitter<{
     isCoherent: boolean;
     hasPauses: boolean;
@@ -62,13 +62,14 @@ export class WwStep4Component {
       })
   );
 
-  constructor() {
+  ngOnInit(): void {
     setWorkWellEventTempDate([
       this.workDay,
       this.lunch,
       ...this.meetings,
       ...this.pauses,
     ]); // Set temporary dates for meetings
+
     this.verifyPauses(); // Initial verification of pauses
   }
 
@@ -116,6 +117,8 @@ export class WwStep4Component {
 
     // Check if there are no pauses
     if (this.pauses == undefined || this.pauses.length === 0) {
+      console.log('has pauses', this.pauses.length > 0);
+      console.log('is coherent', this.pauseCoherencyOk);
       this.pauseStateChange.emit({
         isCoherent: this.pauseCoherencyOk,
         hasPauses: this.pauses.length > 0,
@@ -188,6 +191,8 @@ export class WwStep4Component {
       }
     }
 
+    console.log('has pauses', this.pauses.length > 0);
+    console.log('is coherent', this.pauseCoherencyOk);
     this.pauseStateChange.emit({
       isCoherent: this.pauseCoherencyOk,
       hasPauses: this.pauses.length > 0,

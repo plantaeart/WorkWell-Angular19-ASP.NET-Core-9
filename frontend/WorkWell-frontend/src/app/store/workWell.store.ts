@@ -18,6 +18,7 @@ export class WorkWellStore {
   addNewWorkWell = signal<WorkWell>(new WorkWell({}));
   workWellPlaying = signal<WorkWell>(new WorkWell({ idWWS: -1 }));
   isWorkWellPlaying = signal<boolean>(false);
+  isUpdateState = signal<boolean>(false);
   loading = signal(false);
   error = signal<string | null>(null);
 
@@ -30,6 +31,16 @@ export class WorkWellStore {
   // Reset addNewWorkWell state
   resetAddNewWorkWell() {
     this.addNewWorkWell.set(new WorkWell({}));
+  }
+
+  // Set addNewWorkWell state
+  setAddNewWorkWell(workWell: WorkWell) {
+    this.addNewWorkWell.set(new WorkWell({ ...workWell }));
+  }
+
+  // Set isUpdateState
+  setIsUpdateState(isUpdate: boolean) {
+    this.isUpdateState.set(isUpdate);
   }
 
   // Get all WorkWell data from API

@@ -22,18 +22,22 @@ import { WorkWellEvent } from '../../../../models/workWellEvent.model';
   styleUrl: './ww-step-5.component.scss',
 })
 export class WwStep5Component {
-  events: WorkWellEvent[] = [];
+  public events: WorkWellEvent[] = [];
   public workWellStore = inject(WorkWellStore);
 
   formatDateToHHmm = formatDateToHHmm;
 
   // Example data for workDay, lunch, meetings, and pauses
-  workDay =
+  public workDay: WorkWellEvent =
     this.workWellStore.addNewWorkWell().workWellSchedule[0].workDay ?? {};
-  lunch = this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch ?? {};
-  meetings =
+  public lunch: WorkWellEvent =
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].lunch ?? {};
+  public meetings: WorkWellEvent[] =
     this.workWellStore.addNewWorkWell().workWellSchedule[0].meetings ?? [];
-  pauses = this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses ?? [];
+  public pauses: WorkWellEvent[] =
+    this.workWellStore.addNewWorkWell().workWellSchedule[0].pauses ?? [];
+
+  public isUpdateState = this.workWellStore.isUpdateState();
 
   constructor(private router: Router) {
     this.events = [
@@ -90,6 +94,43 @@ export class WwStep5Component {
       // Handle error (e.g., show a notification)
     } else {
       console.log('Work well created successfully!');
+      // Reset the add new work well state
+      this.workWellStore.resetAddNewWorkWell();
+      this.workWellStore.setIsUpdateState(false);
+      // Navigate to the home page
+      this.router.navigate(['/']);
+    }
+  }
+
+  async update(): Promise<void> {
+    // Update the work well schedule to the store or perform any other action
+    const workWellToUpdate: WorkWell = new WorkWell({
+      idWWS: this.workWellStore.addNewWorkWell().idWWS,
+      name: this.workWellStore.addNewWorkWell().name,
+      description: this.workWellStore.addNewWorkWell().description,
+      isPlaying: this.workWellStore.addNewWorkWell().isPlaying,
+      nbDayWork: this.workWellStore.addNewWorkWell().nbDayWork,
+      updateDate: this.workWellStore.addNewWorkWell().updateDate,
+      scheduleType: this.workWellStore.addNewWorkWell().scheduleType,
+      // get all the work well schedule
+      workWellSchedule: [
+        ...this.workWellStore.addNewWorkWell().workWellSchedule,
+      ],
+    });
+
+    // Update the work well
+    const resp = await this.workWellStore.updateWorkWellFromStore(
+      workWellToUpdate
+    );
+
+    if (resp) {
+      console.error('Error updating work well:', resp);
+      // Handle error (e.g., show a notification)
+    } else {
+      console.log('Work well updated successfully!');
+      // Reset the add new work well state
+      this.workWellStore.resetAddNewWorkWell();
+      this.workWellStore.setIsUpdateState(false);
       // Navigate to the home page
       this.router.navigate(['/']);
     }

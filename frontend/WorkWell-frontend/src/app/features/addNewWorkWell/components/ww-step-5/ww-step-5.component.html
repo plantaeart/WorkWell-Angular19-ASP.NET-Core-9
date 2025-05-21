@@ -8,7 +8,7 @@
     ></ww-timeline>
   </div>
 
-  <div>
+  <div *ngIf="!isUpdateState; else updateState">
     <button
       class="cursor-pointer flex items-center h-fit w-fit ml-2 p-2 bg-green-500 hover:bg-green-700 text-white font-bold rounded-lg shadow-lg text-2xl"
       label="Save"
@@ -19,4 +19,15 @@
       <span class="pi pi-save"></span>
     </button>
   </div>
+  <ng-template #updateState>
+    <button
+      class="cursor-pointer flex items-center h-fit w-fit ml-2 p-2 bg-amber-500 hover:bg-amber-700 text-white font-bold rounded-lg shadow-lg text-2xl"
+      label="Update"
+      iconPos="right"
+      (click)="update()"
+    >
+      <p class="mr-1">Update</p>
+      <span class="pi pi-pencil"></span>
+    </button>
+  </ng-template>
 </div>
