@@ -12,43 +12,52 @@
       *ngFor="let workWell of workWellList"
       @listAnimation
     >
-      <div class="flex justify-between items-center mb-2">
-        <h3 class="font-bold text-lg">
-          <span *ngIf="isDebug()">{{ workWell.idWWS }} </span
-          >{{ workWell.name }}
-        </h3>
-        <div class="flex flex-row gap-2">
-          <!-- Playing button -->
-          <div class="flex justify-start mt-4">
-            <p-button
-              class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
-              icon="pi pi-play"
-              [severity]="workWell.getIsPlayingButtonSeverity()"
-              aria-label="Play"
-              (click)="playWorkWell(workWell.idWWS)"
-            ></p-button>
-          </div>
-          <!-- Update button -->
-          <div class="flex justify-start mt-4">
-            <p-button
-              class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
-              icon="pi pi-pencil"
-              severity="warn"
-              aria-label="Update"
-              (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
-            ></p-button>
-          </div>
-          <!-- Delete button -->
-          <div class="flex justify-start mt-4">
-            <p-button
-              class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
-              icon="pi pi-trash"
-              severity="danger"
-              aria-label="Delete"
-              (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
-            ></p-button>
+      <div class="flex flex-col justify-between mb-2">
+        <div class="flex flex-row justify-between items-center mb-1">
+          <h3 class="font-bold text-lg">
+            <span *ngIf="isDebug()">{{ workWell.idWWS }} </span
+            >{{ workWell.name }}
+          </h3>
+          <div class="flex flex-row gap-2 justify-center">
+            <!-- Playing button -->
+            <div class="flex justify-start">
+              <p-button
+                class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
+                icon="pi pi-play"
+                [severity]="workWell.getIsPlayingButtonSeverity()"
+                aria-label="Play"
+                (click)="playWorkWell(workWell.idWWS)"
+              ></p-button>
+            </div>
+            <!-- Update button -->
+            <div class="flex justify-start">
+              <p-button
+                class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
+                icon="pi pi-pencil"
+                severity="warn"
+                aria-label="Update"
+                (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
+              ></p-button>
+            </div>
+            <!-- Delete button -->
+            <div class="flex justify-start">
+              <p-button
+                class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
+                icon="pi pi-trash"
+                severity="danger"
+                aria-label="Delete"
+                (click)="deleteWorkWellByIdFromTemplate(workWell.idWWS)"
+              ></p-button>
+            </div>
           </div>
         </div>
+        <p-panel
+          class="m-1"
+          header="Description"
+          *ngIf="workWell.description != ''"
+        >
+          <p class="m-0">{{ workWell.description }}</p>
+        </p-panel>
       </div>
 
       <!-- Timeline for each WorkWell -->

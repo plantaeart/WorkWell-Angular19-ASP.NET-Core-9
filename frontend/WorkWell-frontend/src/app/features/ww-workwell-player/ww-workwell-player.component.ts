@@ -41,18 +41,31 @@ import { WorkWell } from '../../models/workWell.model';
   ],
 })
 export class WwWorkwellPlayerComponent {
-  public workWellStore = inject(WorkWellStore);
-  public isVisible = false; // Controls the visibility of the component
+  public workWellStore: WorkWellStore = inject(WorkWellStore);
+  public isVisible: boolean = false; // Controls the visibility of the component
+  public isRunning: boolean = true; // Controls the running state of the component
+  public pauseButtonClass: string = 'bg-emerald-500 hover:bg-emerald-700';
+  public isShowCurrentTime: boolean = true; // Controls the visibility of the current time
 
   public lastEvents: WorkWellEvent[] = [];
   public lastCloned: WorkWellEvent[] = [];
   public lastWorkDay: WorkWellEvent = new WorkWellEvent({});
   public lastClonedWorkDay: WorkWellEvent = new WorkWellEvent({});
-  public isLoading = this.workWellStore.loading(); // Controls the loading state of the component
+  public isLoading: boolean = this.workWellStore.loading(); // Controls the loading state of the component
 
   toggleVisibility() {
     console.log('Toggling visibility');
     this.isVisible = !this.isVisible;
+  }
+
+  toggleRunning() {
+    console.log('Toggling running state');
+    this.isRunning = !this.isRunning;
+    this.pauseButtonClass = this.isRunning
+      ? 'bg-emerald-500 hover:bg-emerald-700'
+      : 'bg-amber-500 hover:bg-amber-700';
+
+    this.isShowCurrentTime = this.isRunning;
   }
 
   // Clone the workWell events to avoid mutating the original

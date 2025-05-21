@@ -1,8 +1,9 @@
 <div
   class="bg-gray-200 p-5 rounded-lg shadow-md fixed bottom-0 left-0 right-0 z-10"
+  [ngClass]="isVisible ? 'h-full' : 'h-auto'"
 >
   <div class="flex flex-row justify-between items-center">
-    <div class="flex flex-row items-center">
+    <div class="flex flex-row items-center w-1/2">
       <h3 class="text-lg font-semibold mr-4">
         {{
           this.workWellStore.isWorkWellPlaying()
@@ -10,7 +11,12 @@
             : "No workWell playing"
         }}
       </h3>
-      <div *ngIf="this.workWellStore.isWorkWellPlaying(); else noWorkWell">
+      <div
+        *ngIf="
+          this.workWellStore.isWorkWellPlaying() && isRunning;
+          else noWorkWell
+        "
+      >
         <i
           class="pi pi-spin pi-spinner text-green-500"
           style="font-size: 2rem"
@@ -21,26 +27,36 @@
       </ng-template>
     </div>
 
-    <button
-      class="w-1/8 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-      (click)="toggleVisibility()"
-    >
-      {{ isVisible ? "Hide" : "Show" }}
-    </button>
+    <div class="flex w-1/2 flex-row justify-end items-center">
+      <button
+        class="w-1/4 text-white px-4 py-2 rounded-lg mr-2 cursor-pointer"
+        [ngClass]="pauseButtonClass"
+        (click)="toggleRunning()"
+      >
+        {{ isRunning ? "Running" : "Pausing" }}
+      </button>
+
+      <button
+        class="w-1/4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-700 cursor-pointer"
+        (click)="toggleVisibility()"
+      >
+        {{ isVisible ? "Hide" : "Show" }}
+      </button>
+    </div>
   </div>
   <div
     *ngIf="
       !isLoading && isVisible && this.workWellStore.isWorkWellPlaying();
       else noWorkWellTimeline
     "
-    class="p-10 bg-gray-100 mt-2"
+    class="p-10 bg-gray-100 mt-2 rounded-lg shadow-md"
   >
     <ww-timeline
       [workWellName]="workWellName()"
       [events]="clonedWorkWellEvents()"
       [workDay]="cloneWorkDay()"
       [isHorizontal]="true"
-      [isShowCurrentTime]="true"
+      [isShowCurrentTime]="isShowCurrentTime"
     ></ww-timeline>
   </div>
   <ng-template #noWorkWellTimeline>

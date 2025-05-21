@@ -26,6 +26,24 @@
   <div
     class="flex flex-column justify-between items-center gap-3 text-[#000411]"
   >
+    <p class="text-xl">📃 Description of your Work Well?</p>
+    <form>
+      <textarea
+        class="form-control text-center text-lg w-50 border-2 border-[#000411] rounded-lg"
+        pTextarea
+        name="workWellDescription"
+        rows="5"
+        cols="30"
+        placeholder="Enter a description"
+        [maxLength]="100"
+        [(ngModel)]="addNewWorkWell.description"
+        [hidden]="addNewWorkWell.description === undefined"
+      ></textarea>
+    </form>
+  </div>
+  <div
+    class="flex flex-column justify-between items-center gap-3 text-[#000411]"
+  >
     <p class="text-xl">💼 How many days do you work a week?</p>
     <p-inputnumber
       [(ngModel)]="addNewWorkWell.nbDayWork"
@@ -37,6 +55,29 @@
       [inputStyle]="{ width: '3rem' }"
       [min]="1"
       [max]="7"
+    >
+      <ng-template #incrementbuttonicon>
+        <span class="pi pi-plus"></span>
+      </ng-template>
+      <ng-template #decrementbuttonicon>
+        <span class="pi pi-minus"></span>
+      </ng-template>
+    </p-inputnumber>
+  </div>
+  <div
+    class="flex flex-column justify-between items-center gap-3 text-[#000411]"
+  >
+    <p class="text-xl">⏰ Alert time before next event (in minutes)</p>
+    <p-inputnumber
+      [(ngModel)]="addNewWorkWell.alertMinuteTimeBefore"
+      [showButtons]="true"
+      buttonLayout="vertical"
+      spinnerMode="vertical"
+      inputId="vertical"
+      name="alertMinuteTimeBefore"
+      [inputStyle]="{ width: '3rem' }"
+      [min]="1"
+      [max]="60"
     >
       <ng-template #incrementbuttonicon>
         <span class="pi pi-plus"></span>

@@ -1,4 +1,10 @@
-import { Component, EventEmitter, inject, Output } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  inject,
+  Output,
+} from '@angular/core';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { WorkWellStore } from '../../../../store/workWell.store';
 import { WorkWell } from '../../../../models/workWell.model';
@@ -6,6 +12,7 @@ import { FormsModule } from '@angular/forms';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { WorkWellScheduleType } from '../../../../../types/enums/workWellScheduleType';
 import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -16,6 +23,7 @@ import { CommonModule } from '@angular/common';
     FormsModule,
     InputNumberModule,
     SelectButtonModule,
+    TextareaModule,
   ],
   templateUrl: './ww-step-1.component.html',
   styleUrl: './ww-step-1.component.scss',
@@ -28,10 +36,17 @@ export class WwStep1Component {
     isCoherent: boolean;
   }>();
 
+  constructor(private cdRef: ChangeDetectorRef) {}
+
   stateOptions: any[] = [
     { label: 'Static', value: WorkWellScheduleType.STATIC },
     { label: 'Flexible', value: WorkWellScheduleType.FLEXIBLE },
   ];
+
+  // Method to handle the change of the WorkWell description
+  ngAfterViewInit() {
+    this.cdRef.detectChanges();
+  }
 
   // Method to check if the WorkWell name is coherent
   isWorkWellNameCoherent(): boolean {

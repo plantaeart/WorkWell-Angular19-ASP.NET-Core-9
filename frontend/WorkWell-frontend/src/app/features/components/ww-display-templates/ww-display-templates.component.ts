@@ -10,10 +10,11 @@ import { workWellListMapping } from '../../../utils/workWellUtils';
 import { WorkWell } from '../../../models/workWell.model';
 import { WorkWellResponse } from '../../../models/errors/workWellResponse';
 import { WorkWellEvent } from '../../../models/workWellEvent.model';
+import { PanelModule } from 'primeng/panel';
 
 @Component({
   selector: 'ww-display-templates',
-  imports: [ButtonModule, CommonModule, WwTimelineComponent],
+  imports: [ButtonModule, CommonModule, WwTimelineComponent, PanelModule],
   templateUrl: './ww-display-templates.component.html',
   styleUrl: './ww-display-templates.component.scss',
   animations: [
