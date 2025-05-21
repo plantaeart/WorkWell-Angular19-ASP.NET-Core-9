@@ -13,13 +13,16 @@ public class WorkWell
     public required string Name { get; set; }
 
     [FirestoreProperty(nameof(Description))]
-    public string? Description { get; set; }
+    public string Description { get; set; }
 
     [FirestoreProperty(nameof(IsPlaying))]
     public bool IsPlaying { get; set; }
 
     [FirestoreProperty(nameof(NbDayWork))]
     public int? NbDayWork { get; set; }
+
+    [FirestoreProperty(nameof(AlertMinuteTimeBefore))]
+    public int AlertMinuteTimeBefore { get; set; }
 
     [FirestoreProperty(nameof(UpdateDate))]
     public DateTime UpdateDate { get; set; }
@@ -37,15 +40,17 @@ public class WorkWell
         UpdateDate = DateTime.Now;
         IsPlaying = false;
         NbDayWork = null;
+        AlertMinuteTimeBefore = 5;
         ScheduleType = WorkWellScheduleType.STATIC;
         WorkWellSchedule = new List<WorkWellSchedule>();
     }
 
-    public WorkWell(string name, string? description, int? nbDayWork, DateTime updateDate, bool? isPlaying, WorkWellScheduleType scheduleType, List<WorkWellSchedule>? workWellSchedule)
+    public WorkWell(string name, string? description, int? nbDayWork, int alertMinuteTimeBefore, DateTime updateDate, bool? isPlaying, WorkWellScheduleType scheduleType, List<WorkWellSchedule>? workWellSchedule)
     {
         Name = name;
-        Description = description;
+        Description = description ?? string.Empty;
         NbDayWork = nbDayWork;
+        AlertMinuteTimeBefore = alertMinuteTimeBefore;
         UpdateDate = updateDate;
         IsPlaying = isPlaying ?? false;
         ScheduleType = scheduleType;
