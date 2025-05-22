@@ -27,13 +27,13 @@
     >
       <div class="time-label font-bold text-center">Current Time</div>
       <div class="time-value text-sm text-center text-xl">
-        {{ currentTime | date : "HH:mm" }}
+        {{ currentTime() | date : "HH:mm" }}
       </div>
       <!-- Progress Bar -->
       <div class="progress-bar w-full bg-gray-500 h-2 rounded mt-2">
         <div
           class="progress bg-green-500 h-full rounded transition-all duration-[1000ms] ease-linear"
-          [style.width.%]="(currentTime.getSeconds() / 60) * 100"
+          [style.width.%]="secondsPercentage()"
         ></div>
       </div>
     </div>
@@ -79,18 +79,12 @@
               >
               {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
             </div>
+            <!-- Time Until Next Event - using signal directly -->
             <div class="time-between text-sm text-center mt-2">
               <span class="font-semibold rounded-lg"
                 >Time Until Next Event:</span
               >
-              {{
-                getCurrentAndNextEvents().nextEvent
-                  ? getTimeBetweenEvents({
-                      startDateDateFormat:
-                        getCurrentAndNextEvents().nextEvent?.startDateDateFormat
-                    })
-                  : "N/A"
-              }}
+              {{ timeUntilNextEvent() }}
             </div>
           </ng-container>
         </ng-container>

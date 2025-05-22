@@ -5,6 +5,7 @@ import {
   OnDestroy,
   SimpleChanges,
   NgZone,
+  signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkWellEventType } from '../../../types/enums/workWellEventType';
@@ -17,6 +18,7 @@ import {
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { TimerService } from '../../core/services/timer.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'ww-timeline',
@@ -34,16 +36,26 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   @Input() alertTimeBeforeEvent: number = 5; // Default to 5 minutes
   @Input() isShowNotifications: boolean = false; // Default to show notifications
 
-  currentTime: Date = new Date(); // Property to hold the current time
-  private clockInterval: any; // To store the interval reference
-  private clockNotification: any; // To store the notification reference
-  public startDayName = startDayName; // Expose startDayName for use in the template
-  public endDayName = endDayName; // Expose endDayName for use in the template
+  // Convert to signal for better reactivity
+  currentTime = signal(new Date());
+
+  // Add signals for derived values that depend on time
+  timeUntilNextEvent = signal('N/A');
+  currentAndNextEvents = signal<{
+    currentEvent: WorkWellEvent | null;
+    nextEvent: WorkWellEvent | null;
+  }>({ currentEvent: null, nextEvent: null });
+  secondsPercentage = signal(0);
+
+  private clockInterval: any;
+  private clockNotification: any;
+  private timerSubscription: Subscription | null = null;
+
+  public startDayName = startDayName;
+  public endDayName = endDayName;
 
   public workDayStart!: WorkWellEvent;
   public workDayEnd!: WorkWellEvent;
-
-  private timerSubscription: any;
 
   constructor(
     private timerService: TimerService,
@@ -97,23 +109,43 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   private setIntervals() {
     this.ngZone.runOutsideAngular(() => {
       if (this.isShowCurrentTime && this.events.length > 0) {
-        const now = new Date();
-
+        // Use the synchronized timer service
         this.timerSubscription = this.timerService.currentTime$.subscribe(
           (time) => {
             this.ngZone.run(() => {
-              this.currentTime = time;
+              // Update all time-dependent values at once for synchronization
+              this.currentTime.set(time);
+
+              // Calculate seconds percentage for progress bar
+              this.secondsPercentage.set((time.getSeconds() / 60) * 100);
+
+              // Update current and next events
+              const events = this.calculateCurrentAndNextEvents(time);
+              this.currentAndNextEvents.set(events);
+
+              // Update time until next event
+              if (events.nextEvent) {
+                this.timeUntilNextEvent.set(
+                  this.calculateTimeBetweenEvents({
+                    startDateDateFormat: events.nextEvent.startDateDateFormat,
+                  })
+                );
+              } else {
+                this.timeUntilNextEvent.set('N/A');
+              }
             });
           }
         );
 
         if (this.isShowNotifications) {
-          // Your existing notification timing code (already properly synchronized)
+          // Notification timing logic
+          const now = new Date();
           const msToNextMinute =
             (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
           this.clockNotification = setTimeout(() => {
             this.notifiCationChecker();
-            // Now set interval to run every minute, exactly on the minute
+            // Set interval to run every minute, exactly on the minute
             this.clockNotification = setInterval(() => {
               this.notifiCationChecker();
             }, 60 * 1000);
@@ -124,42 +156,34 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   }
 
   private clearIntervals() {
-    this.ngZone.runOutsideAngular(() => {
-      // Clear the timeout and interval when the component is destroyed
-      if (this.clockInterval) {
-        clearInterval(this.clockInterval);
-      }
-      if (this.clockNotification) {
-        clearTimeout(this.clockNotification);
-        this.clockNotification = null;
-      }
-      this.ngZone.run(() => {});
-    });
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+      this.timerSubscription = null;
+    }
+
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+    }
+
+    if (this.clockNotification) {
+      clearTimeout(this.clockNotification);
+      clearInterval(this.clockNotification);
+      this.clockNotification = null;
+    }
   }
-
-  private updateTime = () => {
-    this.currentTime = new Date();
-    if (!this.isShowCurrentTime) this.isShowNotifications = false;
-    // Hide notifications if current time is not shown
-    else this.isShowNotifications = true; // Show notifications if current time is shown
-
-    this.ngZone.run(() => {});
-  };
 
   private notifiCationChecker = () => {
     if (this.isShowNotifications) {
-      this.showNotification(
-        this.getCurrentAndNextEvents().currentEvent,
-        this.getCurrentAndNextEvents().nextEvent
-      );
-
-      this.ngZone.run(() => {});
+      this.ngZone.run(() => {
+        const events = this.currentAndNextEvents();
+        this.showNotification(events.currentEvent, events.nextEvent);
+      });
     }
   };
 
   public isCurrentTimeInEvent(event: WorkWellEvent): boolean {
     if (this.isShowCurrentTime) {
-      const now = this.currentTime.getTime();
+      const now = this.currentTime().getTime();
 
       // Check if the current time is within 1 hour before the workday starts
       if (this.workDayStart) {
@@ -205,6 +229,91 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       );
     }
     return false; // If isShowCurrentTime is false, do not highlight any event
+  }
+
+  // Calculate current and next events using the current time
+  private calculateCurrentAndNextEvents(time: Date) {
+    const now = time.getTime();
+
+    // Sort events by start time
+    const filledEvents = this.filledEvents;
+
+    let currentEvent: WorkWellEvent | null = null;
+    let nextEvent: WorkWellEvent | null = null;
+
+    // Check if we are within 1 hour before the workday starts
+    if (this.workDayStart) {
+      const oneHourBeforeStart = new Date(
+        this.workDayStart.startDateDateFormat.getTime() - 60 * 60 * 1000
+      );
+      if (
+        now >= oneHourBeforeStart.getTime() &&
+        now < this.workDayStart.startDateDateFormat.getTime()
+      ) {
+        return {
+          currentEvent: this.workDayStart,
+          nextEvent: filledEvents[0] || null,
+        };
+      }
+    }
+
+    // Check if we are after the workday ends
+    if (this.workDayEnd && now > this.workDayEnd.endDateDateFormat.getTime()) {
+      return { currentEvent: this.workDayEnd, nextEvent: null };
+    }
+
+    // New var to have filledEvents + workDayStart and workDayEnd
+    const filledEventsWithWorkDay = [
+      this.workDayStart,
+      ...filledEvents,
+      this.workDayEnd,
+    ];
+
+    // Loop through events to find the current and next events
+    for (let i = 0; i < filledEventsWithWorkDay.length; i++) {
+      const event = filledEventsWithWorkDay[i];
+      if (
+        now >= event.startDateDateFormat.getTime() &&
+        now <= event.endDateDateFormat.getTime()
+      ) {
+        currentEvent = event;
+        nextEvent = filledEventsWithWorkDay[i + 1] || null; // Get the next event if it exists
+        break;
+      } else if (now < event.startDateDateFormat.getTime()) {
+        nextEvent = event;
+        break;
+      }
+    }
+
+    // If no current event is found and the current time is before the first event, set currentEvent to Start Day
+    if (!currentEvent && this.workDay) {
+      currentEvent = this.workDayStart; // Set to Start Day if no current event is found
+    }
+
+    return { currentEvent, nextEvent };
+  }
+
+  // Calculate time between events using the current time
+  private calculateTimeBetweenEvents(
+    nextEvent: { startDateDateFormat: Date | undefined } | null
+  ): string {
+    if (!nextEvent) {
+      return 'N/A';
+    }
+
+    const timeDiff =
+      (nextEvent.startDateDateFormat as Date).getTime() -
+      this.currentTime().getTime();
+
+    if (timeDiff < 0) {
+      return '0 min 0 sec'; // If the next event has already started
+    }
+
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+    return `${hours} hour ${minutes} min ${seconds} sec`;
   }
 
   get filledEvents() {
@@ -282,85 +391,13 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   }
 
   public getCurrentAndNextEvents() {
-    const now = this.currentTime.getTime();
-
-    // Sort events by start time
-    const filledEvents = this.filledEvents;
-
-    let currentEvent: WorkWellEvent | null = null;
-    let nextEvent: WorkWellEvent | null = null;
-
-    // Check if we are within 1 hour before the workday starts
-    if (this.workDayStart) {
-      const oneHourBeforeStart = new Date(
-        this.workDayStart.startDateDateFormat.getTime() - 60 * 60 * 1000
-      );
-      if (
-        now >= oneHourBeforeStart.getTime() &&
-        now < this.workDayStart.startDateDateFormat.getTime()
-      ) {
-        return {
-          currentEvent: this.workDayStart,
-          nextEvent: filledEvents[0] || null,
-        };
-      }
-    }
-
-    // Check if we are after the workday ends
-    if (this.workDayEnd && now > this.workDayEnd.endDateDateFormat.getTime()) {
-      return { currentEvent: this.workDayEnd, nextEvent: null };
-    }
-
-    // New var to have filledEvents + workDayStart and workDayEnd
-    const filledEventsWithWorkDay = [
-      this.workDayStart,
-      ...filledEvents,
-      this.workDayEnd,
-    ];
-
-    // Loop through events to find the current and next events
-    for (let i = 0; i < filledEventsWithWorkDay.length; i++) {
-      const event = filledEventsWithWorkDay[i];
-      if (
-        now >= event.startDateDateFormat.getTime() &&
-        now <= event.endDateDateFormat.getTime()
-      ) {
-        currentEvent = event;
-        nextEvent = filledEventsWithWorkDay[i + 1] || null; // Get the next event if it exists
-        break;
-      } else if (now < event.startDateDateFormat.getTime()) {
-        nextEvent = event;
-        break;
-      }
-    }
-
-    // If no current event is found and the current time is before the first event, set currentEvent to Start Day
-    if (!currentEvent && this.workDay) {
-      currentEvent = this.workDayStart; // Set to Start Day if no current event is found
-    }
-
-    return { currentEvent, nextEvent };
+    return this.currentAndNextEvents();
   }
 
   public getTimeBetweenEvents(
     nextEvent: { startDateDateFormat: Date | undefined } | null
   ): string {
-    if (!nextEvent) {
-      return 'N/A';
-    }
-
-    const timeDiff =
-      (nextEvent.startDateDateFormat as Date).getTime() -
-      this.currentTime.getTime(); // Corrected logic
-    if (timeDiff < 0) {
-      return '0 min 0 sec'; // If the next event has already started
-    }
-
-    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
-
-    return `${hours} hour ${minutes} min ${seconds} sec`;
+    return this.calculateTimeBetweenEvents(nextEvent);
   }
 
   // Method that will trigger every alterTimeBeforeEvent minutes a toast to announce the next event
@@ -371,7 +408,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     if (this.isShowNotifications && event && nextEvent) {
       const timeDiff =
         (nextEvent.startDateDateFormat as Date).getTime() -
-        this.currentTime.getTime();
+        this.currentTime().getTime();
       if (timeDiff < 0) {
         return; // If the next event has already started
       }

@@ -50,7 +50,7 @@ import { TimerService } from '../../core/services/timer.service';
     ]),
   ],
 })
-export class WwWorkwellPlayerComponent {
+export class WwWorkwellPlayerComponent implements OnInit, OnDestroy {
   public workWellStore: WorkWellStore = inject(WorkWellStore);
   public isVisible: boolean = false; // Controls the visibility of the component
   public isRunning: boolean = true; // Controls the running state of the component
@@ -77,6 +77,12 @@ export class WwWorkwellPlayerComponent {
         });
       }
     );
+  }
+
+  ngOnDestroy() {
+    if (this.timerSubscription) {
+      this.timerSubscription.unsubscribe();
+    }
   }
 
   toggleVisibility() {
