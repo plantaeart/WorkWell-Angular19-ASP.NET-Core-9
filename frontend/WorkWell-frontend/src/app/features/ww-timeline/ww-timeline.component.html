@@ -6,13 +6,25 @@
   ]"
   *ngIf="events.length > 0"
 >
-  <p-toast position="bottom-right" key="br" [baseZIndex]="5000">
-    <ng-template let-message #message>
-      <div class="flex flex-col items-start flex-auto">
+  <!-- Toast Notification -->
+  <p-toast position="bottom-right" [baseZIndex]="5000">
+    <ng-template let-message pTemplate="message">
+      <div
+        class="flex flex-col items-start flex-auto p-3 rounded-lg shadow-md"
+        [ngClass]="message.data?.colorClass || 'bg-gray-700'"
+      >
         <div class="flex items-center gap-2">
-          <span class="font-bold">Schedule informations</span>
+          <i class="pi pi-calendar text-white"></i>
+          <span class="text-white font-medium">Event Notification</span>
         </div>
-        <div class="font-medium text-lg my-4">{{ message.summary }}</div>
+        <div class="text-sm text-white">
+          <span class="font-semibold">Event:</span>
+          {{ message.data?.eventName }}
+        </div>
+        <div class="font-medium text-lg my-4 text-white">
+          {{ message.summary }}
+        </div>
+        <div class="text-sm text-white">{{ message.detail }}</div>
       </div>
     </ng-template>
   </p-toast>
@@ -21,6 +33,7 @@
     class="current-time flex flex-col items-center mr-10 mb-4"
     *ngIf="isShowCurrentTime"
   >
+    <p-button *ngIf="isDebug" (click)="testNotification()">Test</p-button>
     <!-- Current Time -->
     <div
       class="p-4 rounded-lg text-white shadow-md min-w-[150px] h-fit bg-gray-700"
@@ -79,7 +92,7 @@
               >
               {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
             </div>
-            <!-- Time Until Next Event - using signal directly -->
+            <!-- Time Until Next Event -->
             <div class="time-between text-sm text-center mt-2">
               <span class="font-semibold rounded-lg"
                 >Time Until Next Event:</span

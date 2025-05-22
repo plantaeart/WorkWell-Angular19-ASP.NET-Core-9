@@ -86,12 +86,10 @@ export class WwWorkwellPlayerComponent implements OnInit, OnDestroy {
   }
 
   toggleVisibility() {
-    console.log('Toggling visibility');
     this.isVisible = !this.isVisible;
   }
 
   toggleRunning() {
-    console.log('Toggling running state');
     this.isRunning = !this.isRunning;
     this.pauseButtonClass = this.isRunning
       ? 'bg-emerald-500 hover:bg-emerald-700'
@@ -102,7 +100,6 @@ export class WwWorkwellPlayerComponent implements OnInit, OnDestroy {
 
   // Clone the workWell events to avoid mutating the original
   public clonedWorkWellEvents = computed(() => {
-    console.log('Cloning workWell events');
     const playing = this.workWellStore.workWellPlaying();
     if (
       this.workWellStore.isWorkWellPlaying() &&
@@ -122,7 +119,6 @@ export class WwWorkwellPlayerComponent implements OnInit, OnDestroy {
 
   // Clone the workWell object to avoid mutating the original
   public cloneWorkDay = computed(() => {
-    console.log('Cloning work day');
     const playing = this.workWellStore.workWellPlaying();
     if (
       this.workWellStore.isWorkWellPlaying() &&
@@ -141,7 +137,6 @@ export class WwWorkwellPlayerComponent implements OnInit, OnDestroy {
   });
 
   public workWellName = computed(() => {
-    console.log('Getting workWell name');
     const playing = this.workWellStore.workWellPlaying();
     if (playing) {
       return playing.name;
@@ -150,7 +145,6 @@ export class WwWorkwellPlayerComponent implements OnInit, OnDestroy {
   });
 
   public isWorkWellPlaying = computed(() => {
-    console.log('Checking if workWell is playing');
     return this.workWellStore.isWorkWellPlaying();
   });
 }

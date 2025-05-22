@@ -19,10 +19,12 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { TimerService } from '../../core/services/timer.service';
 import { Subscription } from 'rxjs';
+import { ButtonModule } from 'primeng/button';
+import { environment } from '../../environments/environment.development';
 
 @Component({
   selector: 'ww-timeline',
-  imports: [CommonModule, ToastModule],
+  imports: [CommonModule, ToastModule, ButtonModule],
   providers: [MessageService],
   templateUrl: './ww-timeline.component.html',
   styleUrl: './ww-timeline.component.scss',
@@ -35,6 +37,8 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   @Input() isShowCurrentTime: boolean = true; // Default to show current time
   @Input() alertTimeBeforeEvent: number = 5; // Default to 5 minutes
   @Input() isShowNotifications: boolean = false; // Default to show notifications
+
+  public isDebug = signal(environment.debug);
 
   // Convert to signal for better reactivity
   currentTime = signal(new Date());
@@ -56,6 +60,8 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
 
   public workDayStart!: WorkWellEvent;
   public workDayEnd!: WorkWellEvent;
+
+  private sentNotifications = new Set<string>();
 
   constructor(
     private timerService: TimerService,
@@ -88,7 +94,6 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       this.events.length > 0 &&
       this.workWellName !== ''
     ) {
-      console.log('Update timeline !');
       this.setIntervals();
     }
   }
@@ -98,6 +103,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       'Initializing WwTimelineComponent for workWellName:',
       this.workWellName
     );
+    this.resetNotifications();
     this.clearIntervals();
     this.setIntervals();
   }
@@ -405,54 +411,180 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     event: WorkWellEvent | null,
     nextEvent: WorkWellEvent | null
   ): Promise<void> {
-    if (this.isShowNotifications && event && nextEvent) {
+    if (!this.isShowNotifications) return;
+
+    // Case 1: Regular event notifications
+    if (event && nextEvent) {
       const timeDiff =
         (nextEvent.startDateDateFormat as Date).getTime() -
         this.currentTime().getTime();
-      if (timeDiff < 0) {
-        return; // If the next event has already started
+
+      // Format the start time
+      const startTime = nextEvent.startDateDateFormat.toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      // Create unique identifiers for notifications
+      const startNotificationId = `start_${
+        nextEvent.name
+      }_${nextEvent.startDateDateFormat.getTime()}`;
+      const reminderNotificationId = `reminder_${
+        nextEvent.name
+      }_${nextEvent.startDateDateFormat.getTime()}_${
+        this.alertTimeBeforeEvent
+      }`;
+
+      // Handle event start notification (within 1 second)
+      if (timeDiff >= 0 && timeDiff < 1000) {
+        if (!this.sentNotifications.has(startNotificationId)) {
+          this.messageService.add({
+            sticky: true,
+            severity: 'custom',
+            summary: `${nextEvent.name} is starting now!`,
+            detail: `Event has begun at ${startTime}`,
+            data: {
+              eventName: nextEvent.name,
+              eventType: nextEvent.eventType,
+              colorClass: this.getEventClass(nextEvent.eventType),
+              startTime: startTime,
+            },
+          });
+          this.sentNotifications.add(startNotificationId);
+        }
+        return;
       }
 
+      // Calculate time components for reminder logic
       const hours = Math.floor(timeDiff / (1000 * 60 * 60));
       const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
-      // Notify X minutes before any event
+      // Handle alert before event notification
       if (
         hours === 0 &&
-        minutes === this.alertTimeBeforeEvent &&
+        minutes <= this.alertTimeBeforeEvent &&
         seconds === 0
       ) {
-        this.messageService.add({
-          sticky: true,
-          severity: 'contrast',
-          summary: `Notification: ${event.name} will start in ${this.alertTimeBeforeEvent} minutes!`,
-        });
-        return;
-      }
-
-      // Notify X minutes before the start of the day
-      if (
-        nextEvent === this.workDayStart &&
-        hours === 0 &&
-        minutes === this.alertTimeBeforeEvent &&
-        seconds === 0
-      ) {
-        this.messageService.add({
-          sticky: true,
-          severity: 'info',
-          summary: `Notification: Workday starts in ${this.alertTimeBeforeEvent} minutes!`,
-        });
+        if (!this.sentNotifications.has(reminderNotificationId)) {
+          this.messageService.add({
+            sticky: true,
+            severity: 'custom',
+            summary: `${nextEvent.name} will start in ${this.alertTimeBeforeEvent} minutes!`,
+            detail: `Event starts at ${startTime}`,
+            data: {
+              eventName: nextEvent.name,
+              eventType: nextEvent.eventType,
+              colorClass: this.getEventClass(nextEvent.eventType),
+              startTime: startTime,
+            },
+          });
+          this.sentNotifications.add(reminderNotificationId);
+        }
         return;
       }
     }
 
-    this.messageService.add({
-      sticky: true,
-      severity: 'info',
-      summary: `Tests in ${this.alertTimeBeforeEvent} minutes!`,
+    // Case 2: Workday start notifications
+    if (this.workDayStart) {
+      const workdayTimeDiff =
+        this.workDayStart.startDateDateFormat.getTime() -
+        this.currentTime().getTime();
+
+      const workdayStartTime =
+        this.workDayStart.startDateDateFormat.toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+
+      const workdayStartNotificationId = `workday_start_${this.workDayStart.startDateDateFormat.getTime()}`;
+      const workdayReminderNotificationId = `workday_reminder_${this.workDayStart.startDateDateFormat.getTime()}_${
+        this.alertTimeBeforeEvent
+      }`;
+
+      // Workday starting now notification
+      if (workdayTimeDiff >= 0 && workdayTimeDiff < 1000) {
+        if (!this.sentNotifications.has(workdayStartNotificationId)) {
+          this.messageService.add({
+            sticky: true,
+            severity: 'custom',
+            summary: `Your workday is starting now!`,
+            detail: `Workday has begun at ${workdayStartTime}`,
+            data: {
+              eventName: this.workDayStart.name,
+              eventType: WorkWellEventType.WORKDAY,
+              colorClass: this.getEventClass(WorkWellEventType.WORKDAY),
+              startTime: workdayStartTime,
+            },
+          });
+          this.sentNotifications.add(workdayStartNotificationId);
+        }
+        return;
+      }
+
+      // Workday reminder notification
+      const workdayHours = Math.floor(workdayTimeDiff / (1000 * 60 * 60));
+      const workdayMinutes = Math.floor(
+        (workdayTimeDiff % (1000 * 60 * 60)) / (1000 * 60)
+      );
+      const workdaySeconds = Math.floor((workdayTimeDiff % (1000 * 60)) / 1000);
+
+      if (
+        workdayHours === 0 &&
+        workdayMinutes <= this.alertTimeBeforeEvent &&
+        workdaySeconds === 0
+      ) {
+        if (!this.sentNotifications.has(workdayReminderNotificationId)) {
+          this.messageService.add({
+            sticky: true,
+            severity: 'custom',
+            summary: `Workday starts in ${this.alertTimeBeforeEvent} minutes!`,
+            detail: `Workday begins at ${workdayStartTime}`,
+            data: {
+              eventName: this.workDayStart.name,
+              eventType: WorkWellEventType.WORKDAY,
+              colorClass: this.getEventClass(WorkWellEventType.WORKDAY),
+              startTime: workdayStartTime,
+            },
+          });
+          this.sentNotifications.add(workdayReminderNotificationId);
+        }
+        return;
+      }
+    }
+  }
+  public resetNotifications() {
+    this.sentNotifications.clear();
+  }
+
+  // Make a test showNotification to test the notification
+  public testNotification() {
+    console.log('Testing notification');
+
+    // Test current event
+    const testCurrentEvent = new WorkWellEvent({
+      name: 'Current Event',
+      startDateDateFormat: new Date(
+        new Date().getTime() - 10 * 60 * 1000 // 10 minutes ago
+      ),
+      endDateDateFormat: new Date(
+        new Date().getTime() + 20 * 60 * 1000 // 20 minutes from now
+      ),
+      eventType: WorkWellEventType.MEETING,
     });
 
-    console.log('here !!');
+    // Test next event
+    const testNextEvent = new WorkWellEvent({
+      name: 'Next Event',
+      startDateDateFormat: new Date(
+        new Date().getTime() + 3 * 60 * 1000 // 2 minutes later
+      ),
+      endDateDateFormat: new Date(
+        new Date().getTime() + 35 * 60 * 1000 // 35 minutes from now
+      ),
+      eventType: WorkWellEventType.PAUSE,
+    });
+
+    this.showNotification(testCurrentEvent, testNextEvent);
   }
 }

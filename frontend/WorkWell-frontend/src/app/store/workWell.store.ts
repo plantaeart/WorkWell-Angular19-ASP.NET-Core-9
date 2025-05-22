@@ -309,6 +309,10 @@ export class WorkWellStore {
     console.log('isWorkWellPlaying', this.isWorkWellPlaying());
     if (this.workWellPlaying().idWWS != -1) {
       console.log('Work well is playing, idWWS:', this.workWellPlaying().idWWS);
+      console.log(
+        'Work well is playing, alertMinuteTimeBefore:',
+        this.workWellPlaying().alertMinuteTimeBefore
+      );
     }
   }
 }
