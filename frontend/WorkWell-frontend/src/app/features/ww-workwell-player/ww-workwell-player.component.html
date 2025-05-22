@@ -5,11 +5,7 @@
   <div class="flex flex-row justify-between items-center">
     <div class="flex flex-row items-center w-1/2">
       <h3 class="text-lg font-semibold mr-4">
-        {{
-          this.workWellStore.isWorkWellPlaying()
-            ? workWellName()
-            : "No workWell playing"
-        }}
+        {{ this.isWorkWellPlaying() ? workWellName() : "No workWell playing" }}
       </h3>
       <div
         *ngIf="
@@ -28,6 +24,9 @@
     </div>
 
     <div class="flex w-1/2 flex-row justify-end items-center">
+      <p class="mr-2 text-3xl font-bold text-gray-700">
+        {{ this.currentTime | date : "HH:mm:ss" }}
+      </p>
       <button
         class="w-1/4 text-white px-4 py-2 rounded-lg mr-2 cursor-pointer"
         [ngClass]="pauseButtonClass"
@@ -44,24 +43,33 @@
       </button>
     </div>
   </div>
-  <div
-    *ngIf="
-      !isLoading && isVisible && this.workWellStore.isWorkWellPlaying();
-      else noWorkWellTimeline
-    "
-    class="p-10 bg-gray-100 mt-2 rounded-lg shadow-md"
-  >
-    <ww-timeline
-      [workWellName]="workWellName()"
-      [events]="clonedWorkWellEvents()"
-      [workDay]="cloneWorkDay()"
-      [isHorizontal]="true"
-      [isShowCurrentTime]="isShowCurrentTime"
-    ></ww-timeline>
-  </div>
-  <ng-template #noWorkWellTimeline>
-    <div class="text-center mt-2" *ngIf="!isLoading && isVisible">
+  <div class="bg-gray-100 rounded-lg shadow-md mt-2">
+    <div
+      *ngIf="!isLoading && !isLoadingInitialWorkWellPlaying"
+      [ngClass]="
+        isVisible && clonedWorkWellEvents().length > 0
+          ? 'h-full p-10'
+          : 'h-0 overflow-hidden'
+      "
+    >
+      <ww-timeline
+        [workWellName]="workWellName()"
+        [events]="clonedWorkWellEvents()"
+        [workDay]="cloneWorkDay()"
+        [isHorizontal]="true"
+        [isShowCurrentTime]="isShowCurrentTime"
+        [alertTimeBeforeEvent]="
+          this.workWellStore.workWellPlaying().alertMinuteTimeBefore
+        "
+        [isShowNotifications]="true"
+      ></ww-timeline>
+    </div>
+
+    <div
+      class="flex justify-center text-center mt-2"
+      *ngIf="!isLoading && isVisible && clonedWorkWellEvents().length === 0"
+    >
       <p class="text-gray-500">No workWell playing</p>
     </div>
-  </ng-template>
+  </div>
 </div>

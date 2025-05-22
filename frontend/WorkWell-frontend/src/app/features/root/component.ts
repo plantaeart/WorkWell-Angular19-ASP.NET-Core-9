@@ -24,7 +24,9 @@ export class AppComponent {
   // Load work wells on initialization
   ngOnInit() {
     this.workWellStore.getAllWorkWellFromStore();
+    this.workWellStore.loadingInitialWorkWellPlaying.set(true);
     // Update the workWellPlaying signal
     this.workWellStore.getWorkWellPlaying();
+    this.workWellStore.loadingInitialWorkWellPlaying.set(false);
   }
 }

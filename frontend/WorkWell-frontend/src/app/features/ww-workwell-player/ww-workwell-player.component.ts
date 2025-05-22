@@ -1,4 +1,12 @@
-import { Component, computed, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  inject,
+  NgZone,
+  OnDestroy,
+  OnInit,
+  signal,
+} from '@angular/core';
 import { WorkWellStore } from '../../store/workWell.store';
 import { CommonModule } from '@angular/common';
 import {
@@ -12,6 +20,8 @@ import { WwTimelineComponent } from '../ww-timeline/ww-timeline.component';
 import { WorkWellEvent } from '../../models/workWellEvent.model';
 import { areEventsEqual } from '../../utils/workWellUtils';
 import { WorkWell } from '../../models/workWell.model';
+import { timer } from 'rxjs';
+import { TimerService } from '../../core/services/timer.service';
 
 @Component({
   selector: 'ww-workwell-player',
@@ -46,12 +56,28 @@ export class WwWorkwellPlayerComponent {
   public isRunning: boolean = true; // Controls the running state of the component
   public pauseButtonClass: string = 'bg-emerald-500 hover:bg-emerald-700';
   public isShowCurrentTime: boolean = true; // Controls the visibility of the current time
-
+  public isLoading: boolean = this.workWellStore.loading(); // Controls the loading state of the component
+  public isLoadingInitialWorkWellPlaying =
+    this.workWellStore.loadingInitialWorkWellPlaying();
   public lastEvents: WorkWellEvent[] = [];
   public lastCloned: WorkWellEvent[] = [];
   public lastWorkDay: WorkWellEvent = new WorkWellEvent({});
   public lastClonedWorkDay: WorkWellEvent = new WorkWellEvent({});
-  public isLoading: boolean = this.workWellStore.loading(); // Controls the loading state of the component
+  public currentTime = new Date();
+  private timerSubscription: any;
+
+  constructor(private timerService: TimerService, private ngZone: NgZone) {}
+
+  ngOnInit() {
+    console.log('Initializing WorkWell Player Component');
+    this.timerSubscription = this.timerService.currentTime$.subscribe(
+      (time) => {
+        this.ngZone.run(() => {
+          this.currentTime = time;
+        });
+      }
+    );
+  }
 
   toggleVisibility() {
     console.log('Toggling visibility');
@@ -115,5 +141,10 @@ export class WwWorkwellPlayerComponent {
       return playing.name;
     }
     return '';
+  });
+
+  public isWorkWellPlaying = computed(() => {
+    console.log('Checking if workWell is playing');
+    return this.workWellStore.isWorkWellPlaying();
   });
 }

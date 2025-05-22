@@ -1,4 +1,21 @@
-<div class="flex justify-start" [ngClass]="getIsHorizontalTop()">
+<div
+  class="flex justify-start"
+  [ngClass]="[
+    getIsHorizontalTop(),
+    events.length > 0 ? '' : 'h-0 overflow-hidden'
+  ]"
+  *ngIf="events.length > 0"
+>
+  <p-toast position="bottom-right" key="br" [baseZIndex]="5000">
+    <ng-template let-message #message>
+      <div class="flex flex-col items-start flex-auto">
+        <div class="flex items-center gap-2">
+          <span class="font-bold">Schedule informations</span>
+        </div>
+        <div class="font-medium text-lg my-4">{{ message.summary }}</div>
+      </div>
+    </ng-template>
+  </p-toast>
   <!-- Current Time + Current and nextevent -->
   <div
     class="current-time flex flex-col items-center mr-10 mb-4"

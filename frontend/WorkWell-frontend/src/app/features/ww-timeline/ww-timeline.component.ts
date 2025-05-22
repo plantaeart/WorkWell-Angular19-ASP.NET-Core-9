@@ -4,6 +4,7 @@ import {
   OnInit,
   OnDestroy,
   SimpleChanges,
+  NgZone,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { WorkWellEventType } from '../../../types/enums/workWellEventType';
@@ -11,31 +12,44 @@ import { WorkWellEvent } from '../../models/workWellEvent.model';
 import {
   endDayName,
   startDayName,
-  workDayName,
   workHoursName,
 } from '../../../types/enums/workWellEventName';
+import { ToastModule } from 'primeng/toast';
+import { MessageService } from 'primeng/api';
+import { TimerService } from '../../core/services/timer.service';
 
 @Component({
   selector: 'ww-timeline',
-  imports: [CommonModule],
+  imports: [CommonModule, ToastModule],
+  providers: [MessageService],
   templateUrl: './ww-timeline.component.html',
   styleUrl: './ww-timeline.component.scss',
 })
 export class WwTimelineComponent implements OnInit, OnDestroy {
-  @Input() workWellName = ''; // Default to workDayName
+  @Input() workWellName: string = ''; // Default to workDayName
   @Input() events: WorkWellEvent[] = [];
   @Input() workDay: WorkWellEvent = new WorkWellEvent({}); // Default to empty workDay
-  @Input() isHorizontal = false; // Default to vertical timeline
-  @Input() isShowCurrentTime = true; // Default to show current time
+  @Input() isHorizontal: boolean = false; // Default to vertical timeline
+  @Input() isShowCurrentTime: boolean = true; // Default to show current time
+  @Input() alertTimeBeforeEvent: number = 5; // Default to 5 minutes
+  @Input() isShowNotifications: boolean = false; // Default to show notifications
 
   currentTime: Date = new Date(); // Property to hold the current time
-  private clockTimeout: any; // To store the timeout reference
   private clockInterval: any; // To store the interval reference
+  private clockNotification: any; // To store the notification reference
   public startDayName = startDayName; // Expose startDayName for use in the template
   public endDayName = endDayName; // Expose endDayName for use in the template
 
   public workDayStart!: WorkWellEvent;
   public workDayEnd!: WorkWellEvent;
+
+  private timerSubscription: any;
+
+  constructor(
+    private timerService: TimerService,
+    private messageService: MessageService,
+    private ngZone: NgZone
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['workDay'] && this.workDay) {
@@ -54,6 +68,17 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
         eventType: WorkWellEventType.WORKDAY,
       });
     }
+
+    // If events changed and workWellName too and no intervals are set, set them
+    if (
+      changes['events'] &&
+      changes['workWellName'] &&
+      this.events.length > 0 &&
+      this.workWellName !== ''
+    ) {
+      console.log('Update timeline !');
+      this.setIntervals();
+    }
   }
 
   ngOnInit() {
@@ -61,31 +86,75 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       'Initializing WwTimelineComponent for workWellName:',
       this.workWellName
     );
-
-    if (this.isShowCurrentTime && this.events.length > 0) {
-      // Start an interval to update the time every milisecond
-      this.clockInterval = setInterval(() => {
-        this.updateTime();
-      }, 1000); // Update every second
-    }
+    this.clearIntervals();
+    this.setIntervals();
   }
 
   ngOnDestroy() {
-    if (this.isShowCurrentTime) {
-      // Clear the timeout and interval when the component is destroyed
-      if (this.clockTimeout) {
-        clearTimeout(this.clockTimeout);
-        this.clockInterval = null;
+    this.clearIntervals();
+  }
+
+  private setIntervals() {
+    this.ngZone.runOutsideAngular(() => {
+      if (this.isShowCurrentTime && this.events.length > 0) {
+        const now = new Date();
+
+        this.timerSubscription = this.timerService.currentTime$.subscribe(
+          (time) => {
+            this.ngZone.run(() => {
+              this.currentTime = time;
+            });
+          }
+        );
+
+        if (this.isShowNotifications) {
+          // Your existing notification timing code (already properly synchronized)
+          const msToNextMinute =
+            (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+          this.clockNotification = setTimeout(() => {
+            this.notifiCationChecker();
+            // Now set interval to run every minute, exactly on the minute
+            this.clockNotification = setInterval(() => {
+              this.notifiCationChecker();
+            }, 60 * 1000);
+          }, msToNextMinute);
+        }
       }
+    });
+  }
+
+  private clearIntervals() {
+    this.ngZone.runOutsideAngular(() => {
+      // Clear the timeout and interval when the component is destroyed
       if (this.clockInterval) {
         clearInterval(this.clockInterval);
-        this.clockTimeout = null;
       }
-    }
+      if (this.clockNotification) {
+        clearTimeout(this.clockNotification);
+        this.clockNotification = null;
+      }
+      this.ngZone.run(() => {});
+    });
   }
 
   private updateTime = () => {
     this.currentTime = new Date();
+    if (!this.isShowCurrentTime) this.isShowNotifications = false;
+    // Hide notifications if current time is not shown
+    else this.isShowNotifications = true; // Show notifications if current time is shown
+
+    this.ngZone.run(() => {});
+  };
+
+  private notifiCationChecker = () => {
+    if (this.isShowNotifications) {
+      this.showNotification(
+        this.getCurrentAndNextEvents().currentEvent,
+        this.getCurrentAndNextEvents().nextEvent
+      );
+
+      this.ngZone.run(() => {});
+    }
   };
 
   public isCurrentTimeInEvent(event: WorkWellEvent): boolean {
@@ -292,5 +361,61 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
     return `${hours} hour ${minutes} min ${seconds} sec`;
+  }
+
+  // Method that will trigger every alterTimeBeforeEvent minutes a toast to announce the next event
+  public async showNotification(
+    event: WorkWellEvent | null,
+    nextEvent: WorkWellEvent | null
+  ): Promise<void> {
+    if (this.isShowNotifications && event && nextEvent) {
+      const timeDiff =
+        (nextEvent.startDateDateFormat as Date).getTime() -
+        this.currentTime.getTime();
+      if (timeDiff < 0) {
+        return; // If the next event has already started
+      }
+
+      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+      // Notify X minutes before any event
+      if (
+        hours === 0 &&
+        minutes === this.alertTimeBeforeEvent &&
+        seconds === 0
+      ) {
+        this.messageService.add({
+          sticky: true,
+          severity: 'contrast',
+          summary: `Notification: ${event.name} will start in ${this.alertTimeBeforeEvent} minutes!`,
+        });
+        return;
+      }
+
+      // Notify X minutes before the start of the day
+      if (
+        nextEvent === this.workDayStart &&
+        hours === 0 &&
+        minutes === this.alertTimeBeforeEvent &&
+        seconds === 0
+      ) {
+        this.messageService.add({
+          sticky: true,
+          severity: 'info',
+          summary: `Notification: Workday starts in ${this.alertTimeBeforeEvent} minutes!`,
+        });
+        return;
+      }
+    }
+
+    this.messageService.add({
+      sticky: true,
+      severity: 'info',
+      summary: `Tests in ${this.alertTimeBeforeEvent} minutes!`,
+    });
+
+    console.log('here !!');
   }
 }

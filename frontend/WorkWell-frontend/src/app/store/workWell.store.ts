@@ -20,6 +20,7 @@ export class WorkWellStore {
   isWorkWellPlaying = signal<boolean>(false);
   isUpdateState = signal<boolean>(false);
   loading = signal(false);
+  loadingInitialWorkWellPlaying = signal(false);
   error = signal<string | null>(null);
 
   //* Computed
