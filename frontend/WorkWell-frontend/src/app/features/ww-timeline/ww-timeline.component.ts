@@ -21,6 +21,7 @@ import { TimerService } from '../../core/services/timer.service';
 import { Subscription } from 'rxjs';
 import { ButtonModule } from 'primeng/button';
 import { environment } from '../../environments/environment.development';
+import { AudioService } from '../../core/services/audio.service';
 
 @Component({
   selector: 'ww-timeline',
@@ -62,11 +63,13 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
   public workDayEnd!: WorkWellEvent;
 
   private sentNotifications = new Set<string>();
+  public audioMuted = false;
 
   constructor(
     private timerService: TimerService,
     private messageService: MessageService,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private audioService: AudioService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -106,6 +109,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     this.resetNotifications();
     this.clearIntervals();
     this.setIntervals();
+    this.audioMuted = this.audioService.getMute();
   }
 
   ngOnDestroy() {
@@ -186,6 +190,11 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
       });
     }
   };
+
+  // Manage sound
+  public toggleSound() {
+    this.audioMuted = this.audioService.toggleMute();
+  }
 
   public isCurrentTimeInEvent(event: WorkWellEvent): boolean {
     if (this.isShowCurrentTime) {
@@ -451,6 +460,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
             },
           });
           this.sentNotifications.add(startNotificationId);
+          this.audioService.play('alert');
         }
         return;
       }
@@ -480,6 +490,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
             },
           });
           this.sentNotifications.add(reminderNotificationId);
+          this.audioService.play('reminder');
         }
         return;
       }
@@ -518,6 +529,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
             },
           });
           this.sentNotifications.add(workdayStartNotificationId);
+          this.audioService.play('alert');
         }
         return;
       }
@@ -548,6 +560,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
             },
           });
           this.sentNotifications.add(workdayReminderNotificationId);
+          this.audioService.play('reminder');
         }
         return;
       }
@@ -577,7 +590,7 @@ export class WwTimelineComponent implements OnInit, OnDestroy {
     const testNextEvent = new WorkWellEvent({
       name: 'Next Event',
       startDateDateFormat: new Date(
-        new Date().getTime() + 3 * 60 * 1000 // 2 minutes later
+        new Date().getTime() + 3 * 60 * 1000 // 3 minutes later
       ),
       endDateDateFormat: new Date(
         new Date().getTime() + 35 * 60 * 1000 // 35 minutes from now

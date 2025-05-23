@@ -28,98 +28,122 @@
       </div>
     </ng-template>
   </p-toast>
-  <!-- Current Time + Current and nextevent -->
-  <div
-    class="current-time flex flex-col items-center mr-10 mb-4"
-    *ngIf="isShowCurrentTime"
-  >
-    <p-button *ngIf="isDebug" (click)="testNotification()">Test</p-button>
-    <!-- Current Time -->
+
+  <div class="flex flex-row justify-between">
+    <!-- Current Time + Current and nextevent -->
     <div
-      class="p-4 rounded-lg text-white shadow-md min-w-[150px] h-fit bg-gray-700"
+      class="w-[99%] current-time flex flex-col items-center {{
+        getIsHorizontal() ? '' : 'mr-10'
+      }} mb-4"
+      *ngIf="isShowCurrentTime"
     >
-      <div class="time-label font-bold text-center">Current Time</div>
-      <div class="time-value text-sm text-center text-xl">
-        {{ currentTime() | date : "HH:mm" }}
-      </div>
-      <!-- Progress Bar -->
-      <div class="progress-bar w-full bg-gray-500 h-2 rounded mt-2">
-        <div
-          class="progress bg-green-500 h-full rounded transition-all duration-[1000ms] ease-linear"
-          [style.width.%]="secondsPercentage()"
-        ></div>
-      </div>
-    </div>
-    <div>
-      <!-- Current and Next Events -->
+      <p-button *ngIf="isDebug" (click)="testNotification()">Test</p-button>
+      <!-- Current Time -->
       <div
-        class="current-next-events flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[350px] h-fit bg-gray-800 mt-4"
+        class="p-4 rounded-lg text-white shadow-md min-w-[150px] h-fit bg-gray-700"
       >
-        <div class="event-info font-bold text-center text-lg">
-          Event Information
+        <div class="time-label font-bold text-center">Current Time</div>
+        <div class="time-value text-sm text-center text-xl">
+          {{ currentTime() | date : "HH:mm" }}
         </div>
-        <ng-container
-          *ngIf="
-            getCurrentAndNextEvents().currentEvent != this.workDayEnd;
-            else endOfDay
-          "
+        <!-- Progress Bar -->
+        <div class="progress-bar w-full bg-gray-500 h-2 rounded mt-2">
+          <div
+            class="progress bg-green-500 h-full rounded transition-all duration-[1000ms] ease-linear"
+            [style.width.%]="secondsPercentage()"
+          ></div>
+        </div>
+      </div>
+      <div>
+        <!-- Current and Next Events -->
+        <div
+          class="current-next-events flex flex-col items-center p-4 rounded-lg text-white shadow-md min-w-[350px] h-fit bg-gray-800 mt-4"
         >
+          <div class="event-info font-bold text-center text-lg">
+            Event Information
+          </div>
           <ng-container
             *ngIf="
-              getCurrentAndNextEvents().currentEvent != this.workDayStart;
-              else startOfDay
+              getCurrentAndNextEvents().currentEvent != this.workDayEnd;
+              else endOfDay
             "
           >
-            <div class="current-event text-sm text-center mt-2">
-              <span
-                class="font-semibold p-1 m-1 rounded-lg"
-                [ngClass]="
-                  getEventClass(
-                    getCurrentAndNextEvents().currentEvent?.eventType
-                  )
-                "
-                >Current Event:</span
-              >
-              {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
-            </div>
-            <div class="next-event text-sm text-center mt-2">
-              <span
-                class="font-semibold p-1 m-1 rounded-lg"
-                [ngClass]="
-                  getEventClass(getCurrentAndNextEvents().nextEvent?.eventType)
-                "
-                >Next Event:</span
-              >
-              {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
-            </div>
-            <!-- Time Until Next Event -->
-            <div class="time-between text-sm text-center mt-2">
-              <span class="font-semibold rounded-lg"
-                >Time Until Next Event:</span
-              >
-              {{ timeUntilNextEvent() }}
-            </div>
+            <ng-container
+              *ngIf="
+                getCurrentAndNextEvents().currentEvent != this.workDayStart;
+                else startOfDay
+              "
+            >
+              <div class="current-event text-sm text-center mt-2">
+                <span
+                  class="font-semibold p-1 m-1 rounded-lg"
+                  [ngClass]="
+                    getEventClass(
+                      getCurrentAndNextEvents().currentEvent?.eventType
+                    )
+                  "
+                  >Current Event:</span
+                >
+                {{ getCurrentAndNextEvents().currentEvent?.name || "None" }}
+              </div>
+              <div class="next-event text-sm text-center mt-2">
+                <span
+                  class="font-semibold p-1 m-1 rounded-lg"
+                  [ngClass]="
+                    getEventClass(
+                      getCurrentAndNextEvents().nextEvent?.eventType
+                    )
+                  "
+                  >Next Event:</span
+                >
+                {{ getCurrentAndNextEvents().nextEvent?.name || "None" }}
+              </div>
+              <!-- Time Until Next Event -->
+              <div class="time-between text-sm text-center mt-2">
+                <span class="font-semibold rounded-lg"
+                  >Time Until Next Event:</span
+                >
+                {{ timeUntilNextEvent() }}
+              </div>
+            </ng-container>
           </ng-container>
-        </ng-container>
 
-        <!-- End of Day Template -->
-        <ng-template #endOfDay>
-          <div
-            class="end-of-day text-center text-lg font-bold mt-2 rounded-lg bg-blue-600 p-1 m-1"
-          >
-            End of the day 🎉
-          </div>
-        </ng-template>
+          <!-- End of Day Template -->
+          <ng-template #endOfDay>
+            <div
+              class="end-of-day text-center text-lg font-bold mt-2 rounded-lg bg-blue-600 p-1 m-1"
+            >
+              End of the day 🎉
+            </div>
+          </ng-template>
 
-        <!-- Start of Day Template -->
-        <ng-template #startOfDay>
-          <div
-            class="start-of-day text-center text-lg font-bold mt-2 rounded-lg bg-blue-600 p-1 m-1"
-          >
-            Soon start of the day 🌞
-          </div>
-        </ng-template>
+          <!-- Start of Day Template -->
+          <ng-template #startOfDay>
+            <div
+              class="start-of-day text-center text-lg font-bold mt-2 rounded-lg bg-blue-600 p-1 m-1"
+            >
+              Soon start of the day 🌞
+            </div>
+          </ng-template>
+        </div>
       </div>
+    </div>
+    <!-- Add a sound toggle button to your timeline component -->
+    <div class="sound-controls" *ngIf="isShowCurrentTime">
+      <button
+        class="flex justify-center items-center p-4 rounded-lg text-white shadow-md cursor-pointer"
+        (click)="toggleSound()"
+        tooltip="Toggle notification sounds"
+        [ngClass]="{
+          'bg-gray-700 hover:bg-gray-500': audioMuted,
+          'bg-blue-600 hover:bg-blue-400': !audioMuted
+        }"
+      >
+        <span
+          class="pi pi-volume-{{ audioMuted ? 'off' : 'up' }}"
+          style="font-size: 1.5rem"
+        ></span>
+      </button>
     </div>
   </div>
   <!-- Timeline -->
