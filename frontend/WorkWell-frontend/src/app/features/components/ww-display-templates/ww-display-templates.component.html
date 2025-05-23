@@ -15,10 +15,50 @@
     >
       <div class="flex flex-col justify-between mb-2">
         <div class="flex flex-row justify-between items-center mb-1">
-          <h3 class="font-bold text-lg">
-            <span *ngIf="isDebug()">{{ workWell.idWWS }} </span
-            >{{ workWell.name }}
+          <!-- Normal display mode -->
+          <h3
+            *ngIf="editingWorkWellId !== workWell.idWWS"
+            class="font-bold text-lg"
+          >
+            <span *ngIf="isDebug()">{{ workWell.idWWS }} </span>
+            <!-- Make the name clickable -->
+            <span
+              class="cursor-pointer hover:text-blue-700"
+              (click)="startEditing(workWell)"
+            >
+              {{ workWell.name }}
+              <i class="pi pi-pencil text-xs ml-1 text-gray-500"></i>
+            </span>
           </h3>
+
+          <!-- Edit mode -->
+          <div
+            *ngIf="editingWorkWellId === workWell.idWWS"
+            class="flex items-center gap-2"
+          >
+            <input
+              type="text"
+              [(ngModel)]="editedName"
+              class="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              #nameInput
+              (keyup.enter)="saveWorkWellName(workWell)"
+              (keyup.escape)="cancelEditing()"
+            />
+            <button
+              pButton
+              icon="pi pi-check"
+              class="p-button-success p-button-sm"
+              (click)="saveWorkWellName(workWell)"
+              title="Save"
+            ></button>
+            <button
+              pButton
+              icon="pi pi-times"
+              class="p-button-danger p-button-sm"
+              (click)="cancelEditing()"
+              title="Cancel"
+            ></button>
+          </div>
           <div class="flex flex-row gap-2 justify-center">
             <!-- Locked button -->
             <div class="flex justify-start">

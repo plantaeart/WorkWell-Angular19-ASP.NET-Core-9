@@ -14,6 +14,8 @@ import { PanelModule } from 'primeng/panel';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ConfirmPopupModule } from 'primeng/confirmpopup';
 import { ToastModule } from 'primeng/toast';
+import { FormsModule } from '@angular/forms';
+import { ViewChild, ElementRef } from '@angular/core';
 
 @Component({
   selector: 'ww-display-templates',
@@ -24,6 +26,7 @@ import { ToastModule } from 'primeng/toast';
     PanelModule,
     ConfirmPopupModule,
     ToastModule,
+    FormsModule,
   ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './ww-display-templates.component.html',
@@ -53,6 +56,10 @@ export class WwDisplayTemplatesComponent {
   public isLoading = this.workWellStore.loading;
   public workWellToDelete: number | null = null;
 
+  public editingWorkWellId: number | null = null;
+  public editedName: string = '';
+  @ViewChild('nameInput') nameInput!: ElementRef;
+
   constructor(
     private router: Router,
     private confirmationService: ConfirmationService,
@@ -62,6 +69,62 @@ export class WwDisplayTemplatesComponent {
     this.workWellStore.getWorkWellPlaying();
     this.workWellStore.setIsUpdateState(false); // Reset the update state
     this.workWellStore.setAddNewWorkWell(new WorkWell({})); // Reset the new work well state
+  }
+
+  // Add these methods for inline editing
+  startEditing(workWell: WorkWell) {
+    this.editingWorkWellId = workWell.idWWS;
+    this.editedName = workWell.name;
+
+    // Focus the input after it renders
+    setTimeout(() => {
+      if (this.nameInput) {
+        this.nameInput.nativeElement.focus();
+      }
+    }, 0);
+  }
+
+  cancelEditing() {
+    this.editingWorkWellId = null;
+    this.editedName = '';
+  }
+
+  saveWorkWellName(workWell: WorkWell) {
+    if (!this.editedName.trim()) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'WorkWell name cannot be empty',
+        life: 3000,
+      });
+      return;
+    }
+
+    const originalName = workWell.name;
+    workWell.name = this.editedName.trim();
+
+    // Update the WorkWell in the store
+    this.workWellStore.updateWorkWellFromStore(workWell).then((resp) => {
+      if (resp && resp.errorType) {
+        console.error('Error updating WorkWell name:', resp.errorMessage);
+        // Revert name on error
+        workWell.name = originalName;
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to update WorkWell name',
+          life: 3000,
+        });
+      } else {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'WorkWell name updated successfully',
+          life: 3000,
+        });
+      }
+      this.editingWorkWellId = null;
+    });
   }
 
   confirmDelete(event: Event) {
