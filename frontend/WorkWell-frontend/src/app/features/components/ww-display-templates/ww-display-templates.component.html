@@ -39,8 +39,9 @@
             <input
               type="text"
               [(ngModel)]="editedName"
-              class="p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-fit p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
               #nameInput
+              [maxLength]="30"
               (keyup.enter)="saveWorkWellName(workWell)"
               (keyup.escape)="cancelEditing()"
             />
@@ -93,9 +94,48 @@
                 (click)="updateWorkWell(workWell)"
               ></p-button>
             </div>
+            <!-- Duplicate button -->
+            <div class="flex justify-start">
+              <p-confirmpopup #cpDuplicate key="duplicateConfirm">
+                <ng-template #headless let-message>
+                  <div class="rounded p-4">
+                    <span>{{ message.message }}</span>
+                    <div class="flex items-center gap-2 mt-4">
+                      <p-button
+                        (onClick)="
+                          duplicateWorkWell(workWellToDuplicate);
+                          cpDuplicate.onAccept()
+                        "
+                        icon="pi pi-clone"
+                        label="Duplicate"
+                        severity="info"
+                        size="small"
+                      />
+                      <p-button
+                        (onClick)="cpDuplicate.onReject()"
+                        label="Cancel"
+                        [text]="true"
+                        size="small"
+                        severity="secondary"
+                      />
+                    </div>
+                  </div>
+                </ng-template>
+              </p-confirmpopup>
+              <p-button
+                class="flex items-center size-10 cursor-pointer text-white font-bold rounded-lg shadow-lg"
+                icon="pi pi-clone"
+                severity="info"
+                aria-label="Duplicate"
+                [raised]="true"
+                (onClick)="
+                  workWellToDuplicate = workWell; confirmDuplicate($event)
+                "
+              ></p-button>
+            </div>
             <!-- Delete button -->
             <div class="flex justify-start">
-              <p-confirmpopup #cp>
+              <p-confirmpopup #cpDelete key="deleteConfirm">
                 <ng-template #headless let-message>
                   <div class="rounded p-4">
                     <span>{{ message.message }}</span>
@@ -103,7 +143,7 @@
                       <p-button
                         (onClick)="
                           deleteWorkWellByIdFromTemplate(workWellToDelete);
-                          cp.onAccept()
+                          cpDelete.onAccept()
                         "
                         icon="pi pi-trash"
                         label="Delete"
@@ -111,7 +151,7 @@
                         size="small"
                       />
                       <p-button
-                        (onClick)="cp.onReject()"
+                        (onClick)="cpDelete.onReject()"
                         label="Cancel"
                         [text]="true"
                         size="small"

@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment.development';
 import { WorkWell } from '../../models/workWell.model';
 import { Observable } from 'rxjs';
+import { WorkWellResponse } from '../../models/errors/workWellResponse';
 
 @Injectable({ providedIn: 'root' })
 export class WorkWellApiService {
@@ -33,8 +34,8 @@ export class WorkWellApiService {
   }
 
   // Create a new WorkWell entry in the API
-  createWorkWellFromApi(workWell: WorkWell): Observable<WorkWell> {
-    return this.http.post<WorkWell>(
+  createWorkWellFromApi(workWell: WorkWell): Observable<WorkWellResponse> {
+    return this.http.post<WorkWellResponse>(
       `${this.baseUrl}/api/WorkWell/CreateWorkWell`,
       workWell
     );

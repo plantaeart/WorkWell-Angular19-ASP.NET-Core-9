@@ -55,6 +55,7 @@ export class WwDisplayTemplatesComponent {
   public workWellList: WorkWell[] = [...workWellListMapping()];
   public isLoading = this.workWellStore.loading;
   public workWellToDelete: number | null = null;
+  public workWellToDuplicate: WorkWell | null = null;
 
   public editingWorkWellId: number | null = null;
   public editedName: string = '';
@@ -131,6 +132,7 @@ export class WwDisplayTemplatesComponent {
     this.confirmationService.confirm({
       target: event.target as EventTarget,
       message: 'Delete the selected work well?',
+      key: 'deleteConfirm',
       accept: () => {
         this.messageService.add({
           severity: 'success',
@@ -155,6 +157,70 @@ export class WwDisplayTemplatesComponent {
       (workWell) => workWell.idWWS !== idWWS
     );
   };
+
+  // Add this method for confirmation
+  confirmDuplicate(event: Event) {
+    this.confirmationService.confirm({
+      target: event.target as EventTarget,
+      message: 'Duplicate this WorkWell?',
+      key: 'duplicateConfirm',
+      accept: () => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Confirmed',
+          detail: 'You have duplicated the work well',
+          life: 3000,
+        });
+      },
+    });
+  }
+
+  async duplicateWorkWell(workWell: WorkWell | null) {
+    // Check if workWell is null or undefined
+    if (!workWell) return;
+
+    // Create a deep copy of the WorkWell
+    const duplicatedWorkWell = new WorkWell({
+      ...workWell,
+      name: `${workWell.name}-copied`,
+      idWWS: undefined, // Remove ID so the backend generates a new one
+      isPlaying: false, // Ensure the copy isn't playing
+      isLocked: false, // Start unlocked
+    });
+
+    try {
+      // Save the new WorkWell
+      const response = await this.workWellStore.createWorkWellFromStore(
+        duplicatedWorkWell
+      );
+
+      if (response && response.errorType) {
+        console.error('Error duplicating WorkWell:', response.errorMessage);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to duplicate WorkWell',
+          life: 3000,
+        });
+      } else {
+        if (response) {
+          console.log(response.data);
+          const newWorkWell = response.data;
+          // Get the newly created WorkWell with its ID
+          // Add to local list for immediate UI update
+          this.workWellList = [...this.workWellList, newWorkWell];
+        }
+      }
+    } catch (error) {
+      console.error('Error during WorkWell duplication:', error);
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'An unexpected error occurred while duplicating the WorkWell',
+        life: 3000,
+      });
+    }
+  }
 
   updateWorkWell(workWell: WorkWell) {
     this.workWellStore.setAddNewWorkWell(workWell);

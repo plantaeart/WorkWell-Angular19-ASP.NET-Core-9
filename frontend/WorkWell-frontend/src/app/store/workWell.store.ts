@@ -99,15 +99,34 @@ export class WorkWellStore {
   async createWorkWellFromStore(
     workWell: WorkWell
   ): Promise<WorkWellResponse | null> {
-    this.loading.set(true);
     try {
       console.log('Creating new work well...');
 
-      const res = await firstValueFrom(
+      const res: WorkWellResponse = await firstValueFrom(
         this.workWellService.createWorkWellFromApi(workWell)
       );
-      this.workWellList.update((list) => [...list, res]);
-      return null; // No error
+      const newWorkWell = new WorkWell({
+        ...res.data,
+        workWellSchedule: (res.data.workWellSchedule || []).map(
+          (s: any) =>
+            new WorkWellSchedule({
+              ...s,
+              meetings: (s.meetings || []).map(
+                (m: any) => new WorkWellEvent({ ...m })
+              ),
+              pauses: (s.pauses || []).map(
+                (p: any) => new WorkWellEvent({ ...p })
+              ),
+              lunch: s.lunch ? new WorkWellEvent({ ...s.lunch }) : undefined,
+              workDay: s.workDay
+                ? new WorkWellEvent({ ...s.workDay })
+                : undefined,
+            })
+        ),
+      });
+
+      this.workWellList.update((list) => [...list, newWorkWell]);
+      return new WorkWellResponse({ data: newWorkWell }); // No error
     } catch (err) {
       if (err instanceof Error) {
         this.error.set(err.message); // Access message safely
@@ -119,8 +138,6 @@ export class WorkWellStore {
         errorType: WorkWellErrorType.WORK_WELL_CREATION_FAILED,
         errorMessage: this.error(),
       });
-    } finally {
-      this.loading.set(false);
     }
   }
 
@@ -128,7 +145,6 @@ export class WorkWellStore {
   async updateWorkWellFromStore(
     workWell: WorkWell
   ): Promise<WorkWellResponse | null> {
-    this.loading.set(true);
     try {
       console.log(`Updating work well with ID: ${workWell.idWWS}...`);
 
@@ -150,8 +166,6 @@ export class WorkWellStore {
         errorType: WorkWellErrorType.WORK_WELL_UPDATE_FAILED,
         errorMessage: this.error(),
       });
-    } finally {
-      this.loading.set(false);
     }
   }
 
@@ -160,7 +174,6 @@ export class WorkWellStore {
     idWWS: number,
     isPlaying: boolean
   ): Promise<WorkWellResponse | null> {
-    this.loading.set(true);
     try {
       console.log(`Updating isPlaying status for ID: ${idWWS}...`);
       await firstValueFrom(
@@ -204,8 +217,6 @@ export class WorkWellStore {
         errorType: WorkWellErrorType.WORK_WELL_UPDATE_FAILED,
         errorMessage: this.error(),
       });
-    } finally {
-      this.loading.set(false);
     }
   }
 
@@ -248,7 +259,6 @@ export class WorkWellStore {
 
   // Delete WorkWell data by ID
   async deleteWorkWellFromStore(idWWS: number) {
-    this.loading.set(true);
     try {
       console.log(`Deleting work well with ID: ${idWWS}...`);
       // Simulate API call
@@ -266,8 +276,6 @@ export class WorkWellStore {
       } else {
         this.error.set('An unknown error occurred'); // Handle non-Error types
       }
-    } finally {
-      this.loading.set(false);
     }
   }
 

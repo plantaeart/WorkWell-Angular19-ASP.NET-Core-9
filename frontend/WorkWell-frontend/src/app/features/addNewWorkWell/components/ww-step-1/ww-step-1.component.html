@@ -12,7 +12,7 @@
         [(ngModel)]="addNewWorkWell.name"
         placeholder="Enter a name"
         [minlength]="3"
-        [maxlength]="20"
+        [maxlength]="30"
         (ngModelChange)="isWorkWellNameCoherent()"
       />
       <p *ngIf="!isWorkWellNameCoherent()" class="text-red-500 w-50">
@@ -41,7 +41,7 @@
       ></textarea>
     </form>
   </div>
-  <div
+  <!--<div
     class="flex flex-column justify-between items-center gap-3 text-[#000411]"
   >
     <p class="text-xl">💼 How many days do you work a week?</p>
@@ -63,7 +63,7 @@
         <span class="pi pi-minus"></span>
       </ng-template>
     </p-inputnumber>
-  </div>
+  </div>-->
   <div
     class="flex flex-column justify-between items-center gap-3 text-[#000411]"
   >
@@ -87,7 +87,7 @@
       </ng-template>
     </p-inputnumber>
   </div>
-  <div
+  <!--<div
     class="flex flex-column justify-between items-center gap-3 text-[#000411]"
   >
     <p class="text-xl">🕒 What schedule type do you have?</p>
@@ -99,5 +99,5 @@
       aria-labelledby="basic"
       name="scheduleType"
     />
-  </div>
+  </div>-->
 </div>
