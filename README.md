@@ -33,3 +33,4 @@ So to use Firestore for a ASP.Net core 9 webapi project you will need to :
 After that, you are good to go !
 And also Swagger is really helful to manipulate easily the API's endpoint 🙂
 * 22/04/2025 : Tried to use NGrx to make some state management in Angular, but... it was so complicated for nothing :( So i used the Signal store feature (since Angular 16) that really looks like VueJS Pinia store, and i really like that !
+* 24/05/2025 : I got to the end of this application, i have everything i wanted in it ! Time to pass to another project 😊
