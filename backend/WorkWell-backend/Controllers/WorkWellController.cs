@@ -84,8 +84,10 @@ public class WorkWellController : ControllerBase
 
     // POST: api/WorkWell/CreateWorkWell
     [HttpPost("CreateWorkWell")]
-    public async Task<IActionResult> CreateWorkWell([FromBody] WorkWell workWell)
+    public async Task<ActionResult<WorkWellResponse<WorkWell>>> CreateWorkWell([FromBody] WorkWell workWell)
     {
+        var response = new WorkWellResponse<WorkWell>();
+
         try
         {
             var snapshot = await _firestoreDb.Collection(CollectionName).GetSnapshotAsync();
@@ -103,11 +105,17 @@ public class WorkWellController : ControllerBase
             var document = _firestoreDb.Collection(CollectionName).Document();
             await document.SetAsync(workWell);
 
-            return CreatedAtAction(nameof(GetWorkWellById), new { idWWS = workWell.IdWWS }, workWell);
+            // Set the response data
+            response.Data = workWell;
+
+            return Ok(response);
         }
         catch (Exception ex)
         {
-            return StatusCode(500, $"Error: {ex.Message}");
+            _logger.LogError(ex, "Error creating WorkWell");
+            response.ErrorType = WorkWellErrorType.ServerError;
+            response.ErrorMessage = ex.Message;
+            return StatusCode(500, response);
         }
     }
 
